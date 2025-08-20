@@ -7,16 +7,17 @@ import com.petcare.back.domain.enumerated.PetTypeEnum;
 import com.petcare.back.domain.enumerated.TemperamentEnum;
 import com.petcare.back.domain.enumerated.VaccinationEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name = "pets")
 @Entity(name = "Pet")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -56,4 +57,10 @@ public class Pet {
     @JoinColumn(name = "user_id") // foreign key in pet table
     @JsonBackReference   // matches with User.pets
     private User owner;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }
