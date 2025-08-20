@@ -28,7 +28,8 @@ public class User implements UserDetails {
     private String name;
     private String email; // user login
     private String password;
-    private String address;
+    @Embedded
+    private Address address;
     private String phone;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
