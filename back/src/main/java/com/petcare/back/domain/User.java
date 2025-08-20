@@ -41,6 +41,18 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Role role;
 
+    @Embeddable
+    class Address {
+        String street;
+        String number;
+        String city;
+        String state;
+        String code;
+        Double latitude;   // geolocalization
+        Double longitude;  // geolocalization
+    }
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
