@@ -1,6 +1,6 @@
 package com.petcare.back.infra.security;
 
-import com.petcare.back.domain.UserRepository;
+import com.petcare.back.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

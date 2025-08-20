@@ -1,4 +1,4 @@
-package com.petcare.back.domain;
+package com.petcare.back.domain.enumerated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
