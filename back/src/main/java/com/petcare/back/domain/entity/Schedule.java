@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "schedule")
+@Table(name = "schedules")
 public class Schedule {
 
     @Id
@@ -30,6 +30,10 @@ public class Schedule {
     @ManyToOne
     @JoinColumn(name = "schedule_config_id")
     private ScheduleConfig scheduleConfig;
+
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

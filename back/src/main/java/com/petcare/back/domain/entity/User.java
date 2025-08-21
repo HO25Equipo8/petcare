@@ -49,7 +49,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "user_id")
     private List<Image> photosVerifyIdentity;
 
-
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
