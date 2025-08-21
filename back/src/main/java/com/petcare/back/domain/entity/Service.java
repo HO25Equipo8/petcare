@@ -40,6 +40,10 @@ public class Service {
     @Enumerated(EnumType.STRING)
     private List<PetTypeEnum> applicablePetTypes;
 
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
