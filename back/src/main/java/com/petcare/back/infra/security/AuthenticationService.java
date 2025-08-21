@@ -1,6 +1,7 @@
 package com.petcare.back.infra.security;
 
-import com.petcare.back.domain.UserRepository;
+import com.petcare.back.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -47,6 +47,8 @@ public class Pet {
 
     private Boolean active = true;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id")
     private Image imagePet;
 
     @OneToMany(mappedBy = "pet")

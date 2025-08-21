@@ -40,10 +40,15 @@ public class User implements UserDetails {
 
     private boolean verified;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "photo_perfil_id")
     private Image photoPerfil;
 
     //Fotos del dni del Sitter para verificar la identidad
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private List<Image> photosVerifyIdentity;
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -110,4 +115,5 @@ public class User implements UserDetails {
     public String getRoleName() {
         return role.name();
     }
+
 }
