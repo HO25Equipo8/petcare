@@ -1,9 +1,9 @@
 package com.petcare.back.repository;
 
-import com.petcare.back.domain.entity.ComboService;
+import com.petcare.back.domain.entity.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ComboServiceRepository extends JpaRepository<ComboService, Long> {
+public interface ImageRepository extends JpaRepository<Image, Long> {
 }
