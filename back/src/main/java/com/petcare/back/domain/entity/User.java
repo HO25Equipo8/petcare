@@ -29,8 +29,8 @@ public class User implements UserDetails {
     private String email; // user login
     private String password;
 
-    @Embedded
-    private Address address;
+    @OneToOne
+    private Location location;
 
     private String phone;
 
@@ -42,7 +42,7 @@ public class User implements UserDetails {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "photo_perfil_id")
-    private Image photoPerfil;
+    private Image profilePhoto;
 
     //Fotos del dni del Sitter para verificar la identidad
     @OneToMany(cascade = CascadeType.ALL)
@@ -62,18 +62,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<ScheduleConfig> scheduleConfigs;
-
-    @Embeddable
-    public static class Address {
-        String street;
-        String number;
-        String city;
-        String state;
-        String code;
-        Double latitude;   // geolocalization
-        Double longitude;  // geolocalization
-    }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
