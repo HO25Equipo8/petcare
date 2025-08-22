@@ -2,6 +2,7 @@ package com.petcare.back.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -62,6 +63,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<ScheduleConfig> scheduleConfigs;
+
+    //for testing purposes
+    public User(@Email String login, String encryptedPassword, Role role) {
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
