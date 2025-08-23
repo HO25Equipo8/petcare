@@ -40,16 +40,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
                         //.requestMatchers(HttpMethod.GET, "/", "/api/sitter/{id}", "/api/owner/{id}","/api/pet/{id}").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        //.requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        // SpringDoc OpenAPI paths
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/v3/api-docs.yaml",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
+                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**")
+                        .permitAll()
                         // Role-based endpoints
 
                         //.requestMatchers(HttpMethod.POST, "/api/cursos").hasRole("ADMIN")
@@ -72,7 +64,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // For production, use specific origins:
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://ourdomain.com"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8080/swagger-ui/index.html", "http://v3/api-docs", "https://ourdomain.com"));
         //configuration.setAllowedOrigins(Arrays.asList("https://ourdomain.com"));
         configuration.setAllowedOriginPatterns(Arrays.asList("*")); // For development
 
