@@ -66,6 +66,9 @@ public class User implements UserDetails {
 
     //for testing purposes
     public User(@Email String login, String encryptedPassword, Role role) {
+        this.email = login;
+        this.password = encryptedPassword;
+        this.role = role;
     }
 
     @Override
