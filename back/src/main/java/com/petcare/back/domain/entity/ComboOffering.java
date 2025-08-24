@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "combo_services")
+@Table(name = "combo_offerings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ComboService {
+public class ComboOffering {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,11 +36,11 @@ public class ComboService {
 
     @ManyToMany
     @JoinTable(
-            name = "combo_service_services",
-            joinColumns = @JoinColumn(name = "combo_service_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_id")
+            name = "combo_offering_services",
+            joinColumns = @JoinColumn(name = "combo_offering_id"),
+            inverseJoinColumns = @JoinColumn(name = "offering_id")
     )
-    private List<Service> services;
+    private List<Offering> offerings;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -50,8 +50,8 @@ public class ComboService {
 
     @Transient // no se guarda en DB
     public Double getFinalPrice() {
-        if (services == null || services.isEmpty()) return 0.0;
-        double total = services.stream()
+        if (offerings == null || offerings.isEmpty()) return 0.0;
+        double total = offerings.stream()
                 .mapToDouble(s -> s.getBasePrice().doubleValue())
                 .sum();
         return total - (total * (discount / 100));

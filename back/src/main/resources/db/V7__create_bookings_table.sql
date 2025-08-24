@@ -6,8 +6,8 @@ CREATE TABLE bookings (
     sitter_id BIGINT NOT NULL,        -- FK a users(id)
     pet_id BIGINT NOT NULL,           -- FK a pets(id)
 
-    service_id BIGINT,                -- FK a services(id)
-    combo_service_id BIGINT,          -- FK a combo_services(id)
+    offering_id BIGINT,                -- FK a services(id)
+    combo_offering_id BIGINT,          -- FK a combo_services(id)
     plan_id BIGINT,                   -- FK a plans(id)
     schedule_id BIGINT NOT NULL,      -- FK a schedules(schedule_id)
 

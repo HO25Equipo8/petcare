@@ -19,9 +19,9 @@ FOREIGN KEY (sitter_id) REFERENCES users(id),
 ADD CONSTRAINT fk_bookings_pet
 FOREIGN KEY (pet_id) REFERENCES pets(id),
 ADD CONSTRAINT fk_bookings_service
-FOREIGN KEY (service_id) REFERENCES services(id),
+FOREIGN KEY (offering_id) REFERENCES offerings(id),
 ADD CONSTRAINT fk_bookings_combo_service
-FOREIGN KEY (combo_service_id) REFERENCES combo_services(id),
+FOREIGN KEY (combo_offering_id) REFERENCES combo_offerings(id),
 ADD CONSTRAINT fk_bookings_plan
 FOREIGN KEY (plan_id) REFERENCES plans(id),
 ADD CONSTRAINT fk_bookings_schedule
@@ -37,17 +37,17 @@ ALTER TABLE schedule_config
 ADD CONSTRAINT fk_schedule_config_sitter
 FOREIGN KEY (sitter_id) REFERENCES users(id);
 
--- 🔗 Relaciones en service_applicable_pet_types
-ALTER TABLE service_applicable_pet_types
-ADD CONSTRAINT fk_service_pet_type_service
-FOREIGN KEY (service_id) REFERENCES services(id);
+-- 🔗 Relaciones en offering_applicable_pet_types
+ALTER TABLE offering_applicable_pet_types
+ADD CONSTRAINT fk_offering_pet_type_service
+FOREIGN KEY (offering_id) REFERENCES offerings(id);
 
--- 🔗 Relaciones en combo_service_services
-ALTER TABLE combo_service_services
-ADD CONSTRAINT fk_combo_service
-FOREIGN KEY (combo_service_id) REFERENCES combo_services(id),
-ADD CONSTRAINT fk_combo_service_service
-FOREIGN KEY (service_id) REFERENCES services(id);
+-- 🔗 Relaciones en combo_offering_services
+ALTER TABLE combo_offering_services
+ADD CONSTRAINT fk_combo_offering
+FOREIGN KEY (combo_offering_id) REFERENCES combo_offerings(id),
+ADD CONSTRAINT fk_combo_offering_service
+FOREIGN KEY (offering_id) REFERENCES offerings(id);
 
 -- 🔗 Relaciones en schedule_days
 ALTER TABLE schedule_days
@@ -60,6 +60,3 @@ ALTER TABLE schedules
 ADD CONSTRAINT fk_schedules_location
 FOREIGN KEY (location_id) REFERENCES locations(id);
 
-ALTER TABLE services
-ADD CONSTRAINT fk_services_location
-FOREIGN KEY (location_id) REFERENCES locations(id);

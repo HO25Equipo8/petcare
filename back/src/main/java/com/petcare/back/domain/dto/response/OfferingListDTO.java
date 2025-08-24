@@ -1,4 +1,4 @@
 package com.petcare.back.domain.dto.response;
 
-public record ComboServiceListDTO() {
+public record OfferingListDTO() {
 }

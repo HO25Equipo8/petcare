@@ -9,12 +9,4 @@ CREATE TABLE users (
     profile_photo_id BIGINT,
     role VARCHAR(50),
 
-    -- Campos embebidos de Address
-    address_street VARCHAR(100),
-    address_number VARCHAR(20),
-    address_city VARCHAR(100),
-    address_state VARCHAR(100),
-    address_code VARCHAR(20),
-    address_latitude DOUBLE,
-    address_longitude DOUBLE
 );

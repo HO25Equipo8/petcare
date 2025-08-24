@@ -8,10 +8,10 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record ComboServiceCreateDTO(
+public record ComboOfferingCreateDTO(
         @NotNull ComboEnum name,
         @NotBlank String description,
         @NotNull @DecimalMin("0.0") Double discount,
-        @NotEmpty List<Long> serviceIds
+        @NotEmpty List<Long> offeringIds
 ) {
 }

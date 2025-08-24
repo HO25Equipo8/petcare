@@ -1,11 +1,11 @@
 package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.PetCreateDTO;
-import com.petcare.back.domain.dto.response.ComboServiceResponseDTO;
+import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PetResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.service.ComboServiceService;
+import com.petcare.back.service.ComboOfferingService;
 import com.petcare.back.service.PetService;
 import com.petcare.back.service.PlanService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,7 +28,7 @@ import java.util.Map;
 public class OwnerController {
 
     private final PetService petService;
-    private final ComboServiceService comboServiceService;
+    private final ComboOfferingService comboOfferingService;
     private final PlanService planService;
 
     @PostMapping("/pet/register")
@@ -58,8 +58,8 @@ public class OwnerController {
     }
 
     @GetMapping("/list/combo")
-    public ResponseEntity<List<ComboServiceResponseDTO>> findAll() {
-        return ResponseEntity.ok(comboServiceService.findAll());
+    public ResponseEntity<List<ComboOfferingResponseDTO>> findAll() {
+        return ResponseEntity.ok(comboOfferingService.findAll());
     }
     @GetMapping("/list/plan")
     public ResponseEntity<?> getAll() {

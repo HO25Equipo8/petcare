@@ -1,7 +1,7 @@
 package com.petcare.back.domain.entity;
 
 import com.petcare.back.domain.enumerated.PetTypeEnum;
-import com.petcare.back.domain.enumerated.ServicePetsEnum;
+import com.petcare.back.domain.enumerated.OfferingEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,12 +15,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "services")
+@Table(name = "offerings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Service {
+public class Offering {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,7 @@ public class Service {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name", length = 50, nullable = false)
-    private ServicePetsEnum name;
+    private OfferingEnum name;
 
     @Column(nullable = false)
     private String description;

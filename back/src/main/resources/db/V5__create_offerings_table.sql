@@ -1,5 +1,5 @@
 -- Crea la tabla de servicios disponibles para mascotas
-CREATE TABLE services (
+CREATE TABLE offerings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,             -- ServicePetsEnum
     description VARCHAR(255) NOT NULL,
@@ -8,9 +8,9 @@ CREATE TABLE services (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 -- Mapea los tipos de mascota aplicables a cada servicio
-CREATE TABLE service_applicable_pet_types (
-    service_id BIGINT NOT NULL,
+CREATE TABLE offering_applicable_pet_types (
+    offering_id BIGINT NOT NULL,
     pet_type VARCHAR(50) NOT NULL,         -- PetTypeEnum
-    PRIMARY KEY (service_id, pet_type),
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    PRIMARY KEY (offering_id, pet_type),
+    FOREIGN KEY (offering_id) REFERENCES offerings(id) ON DELETE CASCADE
 );

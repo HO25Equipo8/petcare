@@ -1,16 +1,16 @@
 package com.petcare.back.service;
 
-import com.petcare.back.domain.dto.request.ComboServiceCreateDTO;
-import com.petcare.back.domain.dto.response.ComboServiceResponseDTO;
-import com.petcare.back.domain.entity.ComboService;
-import com.petcare.back.domain.entity.Service;
+import com.petcare.back.domain.dto.request.ComboOfferingCreateDTO;
+import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
+import com.petcare.back.domain.entity.ComboOffering;
+import com.petcare.back.domain.entity.Offering;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.mapper.request.ComboCreateMapper;
 import com.petcare.back.domain.mapper.response.ComboResponseMapper;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.repository.ComboServiceRepository;
-import com.petcare.back.repository.ServiceRepository;
+import com.petcare.back.repository.ComboOfferingRepository;
+import com.petcare.back.repository.OfferingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,14 +20,14 @@ import java.util.List;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-public class ComboServiceService {
+public class ComboOfferingService {
 
-    private final ComboServiceRepository comboServiceRepository;
-    private final ServiceRepository serviceRepository;
+    private final ComboOfferingRepository comboOfferingRepository;
+    private final OfferingRepository offeringRepository;
     private final ComboCreateMapper mapper;
     private final ComboResponseMapper comboResponseMapper;
 
-    public ComboServiceResponseDTO create(ComboServiceCreateDTO dto) throws MyException {
+    public ComboOfferingResponseDTO create(ComboOfferingCreateDTO dto) throws MyException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -35,13 +35,13 @@ public class ComboServiceService {
         if (user.getRole() != Role.ADMIN) {
             throw new MyException("Solo los admin pueden registrar combos");
         }
-        List<Service> services = serviceRepository.findAllById(dto.serviceIds());
-        ComboService combo = mapper.toEntity(dto, services);
-        return comboResponseMapper.toResponse(comboServiceRepository.save(combo));
+        List<Offering> offerings = offeringRepository.findAllById(dto.offeringIds());
+        ComboOffering combo = mapper.toEntity(dto, offerings);
+        return comboResponseMapper.toResponse(comboOfferingRepository.save(combo));
     }
 
-    public List<ComboServiceResponseDTO> findAll() {
-        return comboServiceRepository.findAll().stream()
+    public List<ComboOfferingResponseDTO> findAll() {
+        return comboOfferingRepository.findAll().stream()
                 .map(comboResponseMapper::toResponse)
                 .toList();
     }

@@ -2,7 +2,7 @@ package com.petcare.back.domain.enumerated;
 
 import java.util.Arrays;
 
-public enum ServicePetsEnum {
+public enum OfferingEnum {
     PASEO("Paseo"),
     ASEO("Aseo"),
     GUARDERIA("Guardería"),
@@ -10,11 +10,11 @@ public enum ServicePetsEnum {
 
     private final String label;
 
-    ServicePetsEnum(String label) { this.label = label; }
+    OfferingEnum(String label) { this.label = label; }
 
     public String getLabel() { return label; }
 
-    public static ServicePetsEnum fromLabel(String label) {
+    public static OfferingEnum fromLabel(String label) {
         return Arrays.stream(values())
                 .filter(e -> e.label.equalsIgnoreCase(label))
                 .findFirst()

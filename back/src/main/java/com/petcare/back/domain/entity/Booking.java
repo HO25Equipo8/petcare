@@ -38,12 +38,12 @@ public class Booking {
     private User sitter;
 
     @ManyToOne
-    @JoinColumn(name = "service_id")
-    private Service service;
+    @JoinColumn(name = "offering_id")
+    private Offering offering;
 
     @ManyToOne
-    @JoinColumn(name = "combo_service_id")
-    private ComboService comboService;
+    @JoinColumn(name = "combo_offering_id")
+    private ComboOffering comboOffering;
 
     @ManyToOne
     @JoinColumn(name = "plan_id")

@@ -1,15 +1,15 @@
 package com.petcare.back.controller;
 
-import com.petcare.back.domain.dto.request.ComboServiceCreateDTO;
+import com.petcare.back.domain.dto.request.ComboOfferingCreateDTO;
 import com.petcare.back.domain.dto.request.PlanCreateDTO;
-import com.petcare.back.domain.dto.request.ServiceCreateDTO;
-import com.petcare.back.domain.dto.response.ComboServiceResponseDTO;
+import com.petcare.back.domain.dto.request.OfferingCreateDTO;
+import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
-import com.petcare.back.domain.dto.response.ServiceResponseDTO;
+import com.petcare.back.domain.dto.response.OfferingResponseDTO;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.service.ComboServiceService;
+import com.petcare.back.service.ComboOfferingService;
 import com.petcare.back.service.PlanService;
-import com.petcare.back.service.ServiceService;
+import com.petcare.back.service.OfferingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
@@ -29,14 +28,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final ServiceService serviceService;
-    private final ComboServiceService comboServiceService;
+    private final OfferingService offeringService;
+    private final ComboOfferingService comboOfferingService;
     private final PlanService planService;
 
     @PostMapping("/register/service")
-    public ResponseEntity<?> createService(@Valid @RequestBody ServiceCreateDTO dto,  UriComponentsBuilder uriBuilder){
+    public ResponseEntity<?> createService(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
         try {
-            ServiceResponseDTO service = serviceService.createService(dto);
+            OfferingResponseDTO service = offeringService.createService(dto);
 
             URI uri = uriBuilder.path("/services/{id}").buildAndExpand(service.id()).toUri();
 
@@ -59,9 +58,9 @@ public class AdminController {
     }
 
     @PostMapping("/register/combo")
-    public ResponseEntity<?> create(@RequestBody @Valid ComboServiceCreateDTO dto, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<?> create(@RequestBody @Valid ComboOfferingCreateDTO dto, UriComponentsBuilder uriBuilder) {
         try {
-            ComboServiceResponseDTO combo = comboServiceService.create(dto);
+            ComboOfferingResponseDTO combo = comboOfferingService.create(dto);
 
             URI uri = uriBuilder.path("/services/{id}").buildAndExpand(combo.id()).toUri();
 
