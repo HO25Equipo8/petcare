@@ -1,7 +1,7 @@
 package com.petcare.back.domain.enumerated;
 
-public enum FrequencyEnum {
-    DIARIO("Diario"),
+public enum IntervalEnum {
+    SEMANAL("Semanal"),
     QUINCENAL("Quincenal"),
     MENSUAL("Mensual"),
     TRIMESTRAL("Trimestral"),
@@ -10,7 +10,7 @@ public enum FrequencyEnum {
 
     private final String label;
 
-    FrequencyEnum(String label) {
+    IntervalEnum(String label) {
         this.label = label;
     }
 

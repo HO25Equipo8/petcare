@@ -35,7 +35,6 @@ public class ComboServiceService {
         if (user.getRole() != Role.ADMIN) {
             throw new MyException("Solo los admin pueden registrar combos");
         }
-
         List<Service> services = serviceRepository.findAllById(dto.serviceIds());
         ComboService combo = mapper.toEntity(dto, services);
         return comboResponseMapper.toResponse(comboServiceRepository.save(combo));

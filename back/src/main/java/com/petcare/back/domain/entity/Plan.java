@@ -1,6 +1,6 @@
 package com.petcare.back.domain.entity;
 
-import com.petcare.back.domain.enumerated.FrequencyEnum;
+import com.petcare.back.domain.enumerated.IntervalEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,18 +24,14 @@ public class Plan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
 
+    private Integer timesPerWeek;
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private FrequencyEnum type;
+    private IntervalEnum intervalEnum;
 
-    @Column(name = "base_price", precision = 10, scale = 2, nullable = false)
-    private BigDecimal basePrice;
-
-    @Column(nullable = false)
-    private Double promotion; // %
+    private Double promotion;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
