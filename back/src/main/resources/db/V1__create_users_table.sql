@@ -6,7 +6,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
     verified BOOLEAN DEFAULT FALSE,
-    photo_perfil_id BIGINT,
+    profile_photo_id BIGINT,
     role VARCHAR(50),
 
     -- Campos embebidos de Address

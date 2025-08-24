@@ -6,6 +6,7 @@ import com.petcare.back.exception.MyException;
 import com.petcare.back.service.PetService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +18,13 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/owner")
+@RequiredArgsConstructor
 @SecurityRequirement(name = "bearer-key")
-public class BookingOwnerController {
+public class OwnerController {
 
     private final PetService petService;
 
-    public BookingOwnerController(PetService petService) {
-        this.petService = petService;
-    }
-
-    @PostMapping("/pets/register")
+    @PostMapping("/pet/register")
     public ResponseEntity<?> registerPet(@Valid @RequestBody PetCreateDTO petCreateDTO,
                                          UriComponentsBuilder uriBuilder) {
         try {

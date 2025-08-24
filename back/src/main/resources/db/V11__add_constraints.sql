@@ -1,7 +1,7 @@
 -- 🔗 Relaciones en users
 ALTER TABLE users
-ADD CONSTRAINT fk_users_photo_perfil
-FOREIGN KEY (photo_perfil_id) REFERENCES images(id);
+ADD CONSTRAINT fk_users_profile_photo
+FOREIGN KEY (profile_photo_id) REFERENCES images(id);
 
 -- 🔗 Relaciones en pets
 ALTER TABLE pets

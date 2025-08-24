@@ -27,7 +27,7 @@ public class Service {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "name", length = 50, nullable = false)
     private ServicePetsEnum name;
 
     @Column(nullable = false)
@@ -39,10 +39,6 @@ public class Service {
     @ElementCollection(targetClass = PetTypeEnum.class)
     @Enumerated(EnumType.STRING)
     private List<PetTypeEnum> applicablePetTypes;
-
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

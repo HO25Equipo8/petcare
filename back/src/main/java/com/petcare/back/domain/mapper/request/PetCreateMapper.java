@@ -1,4 +1,4 @@
-package com.petcare.back.domain.mapper;
+package com.petcare.back.domain.mapper.request;
 
 import com.petcare.back.domain.dto.request.PetCreateDTO;
 import com.petcare.back.domain.entity.Pet;

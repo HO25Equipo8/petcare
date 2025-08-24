@@ -47,4 +47,13 @@ public class ComboService {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Transient // no se guarda en DB
+    public Double getFinalPrice() {
+        if (services == null || services.isEmpty()) return 0.0;
+        double total = services.stream()
+                .mapToDouble(s -> s.getBasePrice().doubleValue())
+                .sum();
+        return total - (total * (discount / 100));
+    }
 }

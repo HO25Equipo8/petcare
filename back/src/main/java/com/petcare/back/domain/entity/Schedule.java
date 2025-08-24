@@ -31,10 +31,6 @@ public class Schedule {
     @JoinColumn(name = "schedule_config_id")
     private ScheduleConfig scheduleConfig;
 
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 

@@ -14,5 +14,6 @@ public record PetResponseDTO(
         TemperamentEnum temperament,
         VaccinationEnum vaccination,
         HealthStatusEnum health,
-        Long ownerId
+        Long ownerId,
+        String ownerEmail
 ) {}

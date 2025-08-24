@@ -3,6 +3,7 @@ package com.petcare.back.domain.enumerated;
 public enum ComboEnum {
     PASEO_BAÑO("Paseo + Baño"),
     PASEO_GUARDERIA("Paseo + Guardería"),
+    VETERINARIA_ASEO("Consulta + Aseo"),
     FULL_SERVICES("Todos los servicios");
 
     private final String label;
