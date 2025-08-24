@@ -1,6 +1,7 @@
 package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.PetCreateDTO;
+import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PetResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
@@ -31,7 +32,7 @@ public class OwnerController {
     private final ComboOfferingService comboOfferingService;
     private final PlanService planService;
 
-    @PostMapping("/pet/register")
+    @PostMapping("/register/pet")
     public ResponseEntity<?> registerPet(@Valid @RequestBody PetCreateDTO petCreateDTO,
                                          UriComponentsBuilder uriBuilder) {
         try {
@@ -61,6 +62,32 @@ public class OwnerController {
     public ResponseEntity<List<ComboOfferingResponseDTO>> findAll() {
         return ResponseEntity.ok(comboOfferingService.findAll());
     }
+
+    @PostMapping("/register/plan")
+    public ResponseEntity<?> create(@RequestBody @Valid PlanCreateDTO dto, UriComponentsBuilder uriBuilder) {
+        try {
+            PlanResponseDTO plan = planService.createPlan(dto);
+
+            URI uri = uriBuilder.path("/api/plans/{id}").buildAndExpand(plan.id()).toUri();
+
+            return ResponseEntity.created(uri).body(Map.of(
+                    "status", "success",
+                    "message", "Plan registrado con éxito",
+                    "data", plan
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
     @GetMapping("/list/plan")
     public ResponseEntity<?> getAll() {
         try {

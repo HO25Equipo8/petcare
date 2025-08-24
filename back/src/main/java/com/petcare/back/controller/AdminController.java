@@ -10,6 +10,7 @@ import com.petcare.back.exception.MyException;
 import com.petcare.back.service.ComboOfferingService;
 import com.petcare.back.service.PlanService;
 import com.petcare.back.service.OfferingService;
+import com.petcare.back.service.ScheduleConfigService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class AdminController {
     private final OfferingService offeringService;
     private final ComboOfferingService comboOfferingService;
     private final PlanService planService;
+    private final ScheduleConfigService scheduleConfigService;
 
     @PostMapping("/register/service")
     public ResponseEntity<?> createService(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
@@ -82,28 +84,9 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/register/plan")
-    public ResponseEntity<?> create(@RequestBody @Valid PlanCreateDTO dto, UriComponentsBuilder uriBuilder) {
-        try {
-            PlanResponseDTO plan = planService.createPlan(dto);
-
-            URI uri = uriBuilder.path("/api/plans/{id}").buildAndExpand(plan.id()).toUri();
-
-            return ResponseEntity.created(uri).body(Map.of(
-                    "status", "success",
-                    "message", "Plan registrado con éxito",
-                    "data", plan
-            ));
-        } catch (MyException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "error",
-                    "message", e.getMessage()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "status", "error",
-                    "message", "Error interno del servidor"
-            ));
-        }
+    @PostMapping("/admin/schedules/expire-now")
+    public ResponseEntity<String> expireNow() {
+        int count = scheduleConfigService.expireOldSchedules();
+        return ResponseEntity.ok("Se expiraron " + count + " horarios disponibles anteriores a hoy");
     }
 }

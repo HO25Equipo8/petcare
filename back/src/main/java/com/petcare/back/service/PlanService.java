@@ -29,8 +29,8 @@ public class PlanService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        if (user.getRole() != Role.ADMIN) {
-            throw new MyException("Solo los admin pueden registrar planes");
+        if (user.getRole() != Role.OWNER || user.getRole() != Role.ADMIN) {
+            throw new MyException("Solo los admin y dueños pueden registrar planes");
         }
 
         Plan plan = planMapper.toEntity(dto);
