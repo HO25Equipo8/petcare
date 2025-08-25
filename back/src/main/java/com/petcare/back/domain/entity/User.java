@@ -3,10 +3,7 @@ package com.petcare.back.domain.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +15,7 @@ import java.util.List;
 @Table(name = "users")
 @Entity(name = "User")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -30,7 +28,8 @@ public class User implements UserDetails {
     private String email; // user login
     private String password;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL) // si querés que se guarde Location automáticamente
+    @JoinColumn(name = "location_id")
     private Location location;
 
     private String phone;
