@@ -11,7 +11,12 @@ public record UserRegisterDTO(
                 regexp = "^(?=.*[0-9])(?=.*[A-Z]).{8,}$",
                 message = "Password must be at least 8 characters long, with at least one digit and one uppercase"
         )
-        String pass,
+        String pass1,
+        @Pattern(
+                regexp = "^(?=.*[0-9])(?=.*[A-Z]).{8,}$",
+                message = "Password must be at least 8 characters long, with at least one digit and one uppercase"
+        )
+        String pass2,
         Role role,
         LocationDTO location) {
 }
