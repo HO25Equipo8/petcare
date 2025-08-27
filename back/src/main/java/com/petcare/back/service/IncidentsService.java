@@ -2,17 +2,17 @@ package com.petcare.back.service;
 
 
 import com.petcare.back.domain.dto.request.IncidentsDTO;
-import com.petcare.back.domain.entity.IncidentImage;
+import com.petcare.back.domain.entity.Image;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+
 
 public interface IncidentsService {
 
-    void createIncident(IncidentsDTO incidentsDTO, List<MultipartFile> images)throws IOException;
-    IncidentImage getIncidentImage(Long incidentId, Long imageId);
+    void createIncident(IncidentsDTO incidentsDTO, MultipartFile file) throws IOException;
     IncidentsDTO getIncidentsDTO(Long incidentId);
+    Image uploadImage(MultipartFile file) throws IOException;
 }
 
 

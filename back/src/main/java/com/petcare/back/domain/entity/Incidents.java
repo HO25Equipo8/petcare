@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -22,9 +21,9 @@ public class Incidents {
 
     private String description;
 
-    @OneToMany(mappedBy = "incident",  cascade = CascadeType.ALL, orphanRemoval = true)
-    @Column(nullable = false)
-    private List<IncidentImage> images = new ArrayList<>();
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "image_id") 
+    private Image image;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "owner_id")

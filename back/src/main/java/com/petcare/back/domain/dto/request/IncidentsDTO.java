@@ -2,7 +2,12 @@ package com.petcare.back.domain.dto.request;
 
 
 
+import com.petcare.back.domain.entity.Image;
+import com.petcare.back.domain.entity.Pet;
+import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.IncidentsTypes;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +29,15 @@ public class IncidentsDTO {
 
     private Instant incidentsDate = Instant.now();
 
-    private Long imageIds;
+    private Image imageIds;
 
+    private User owner;
+
+
+    private Pet pet;
+
+
+    private User sitter;
 
 
 }
