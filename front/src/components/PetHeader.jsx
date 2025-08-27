@@ -114,7 +114,7 @@ export function PetHeader({ currentView, onNavigate, isLoggedIn, user, onLogin, 
             </div>
           ) : (
             <Button onClick={onLogin} size="sm">
-              Sign In
+              Acceder
             </Button>
           )}
 
