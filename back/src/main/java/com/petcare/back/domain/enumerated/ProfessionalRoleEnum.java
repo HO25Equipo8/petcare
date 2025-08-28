@@ -4,5 +4,7 @@ public enum ProfessionalRoleEnum {
     PASEADOR,
     VETERINARIO,
     PELUQUERO,
-    CUIDADOR
+    CUIDADOR,
+    ADMINISTRADOR,
+    USUARIO
 }

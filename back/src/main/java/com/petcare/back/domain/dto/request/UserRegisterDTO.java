@@ -14,6 +14,6 @@ public record UserRegisterDTO(
         )
         String pass,
         Role role,
-        ProfessionalRoleEnum professionalRoleEnum,
+        ProfessionalRoleEnum professionalRole,
         LocationDTO location) {
 }

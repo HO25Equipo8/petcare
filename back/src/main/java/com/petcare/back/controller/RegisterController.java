@@ -5,6 +5,7 @@ import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
 import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.entity.User;
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.repository.UserRepository;
 import com.petcare.back.service.LocationService;
@@ -65,6 +66,8 @@ public class RegisterController {
             newUser.setLocation(location);
             locationService.save(location);
         }
+
+        newUser.setRoleProfessional(userRegisterDTO.professionalRole());
 
         userRepository.save(newUser);
 
