@@ -16,6 +16,11 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String url;
+    private String imageName;
+
+    private String imageType;
+
+    @Lob
+    private byte[] data;
 
 }
