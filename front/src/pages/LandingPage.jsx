@@ -1,9 +1,8 @@
-// ...existing code...
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { MapPin, Clock, Shield, Star, Heart, Users, Calendar, AlertTriangle } from 'lucide-react';
-import { PetCareLogo } from './PetCareLogo';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
+import { MapPin, Clock, Shield, Star, Heart } from 'lucide-react';
+import { Logo } from '../components/ui/Logo';
 
 
 
@@ -89,7 +88,7 @@ export function LandingPage({ onNavigate, onLogin }) {
             {/* Logo principal en hero */}
             <div className="flex justify-center mb-8">
               <div className="w-24 h-24 text-primary-500 flex items-center justify-center">
-                <PetCareLogo size={96} />
+                <Logo size={96} />
               </div>
             </div>
             
@@ -281,7 +280,7 @@ export function LandingPage({ onNavigate, onLogin }) {
             <div>
               <div className="flex items-center mb-4">
                 <div className="w-8 h-8 text-primary-400 mr-3">
-                  <PetCareLogo size={32} />
+                  <Logo size={32} />
                 </div>
                 <div>
                   <div className="font-semibold text-white font-headings">PetCare</div>

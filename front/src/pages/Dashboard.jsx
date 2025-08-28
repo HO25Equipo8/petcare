@@ -1,8 +1,6 @@
-// ...existing code...
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 import { Heart, MapPin, Calendar, Clock, Star, Plus, AlertTriangle } from 'lucide-react';
 
 

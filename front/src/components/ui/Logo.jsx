@@ -1,8 +1,4 @@
-// ...existing code...
-
-
-
-export function PetCareLogo({ size = 32, className = "" }) {
+export function Logo({ size = 32, className = "" }) {
   return (
     <svg
       width={size}
@@ -16,7 +12,7 @@ export function PetCareLogo({ size = 32, className = "" }) {
       <title id="petcare-logo-title">Logotipo plataforma de cuidado de mascotas</title>
       <desc id="petcare-logo-desc">Escudo geométrico con una huella de mascota y una marca de verificación, en estilo minimalista.</desc>
 
-      {/* Definiciones de estilo */}
+      {/* Estilo */}
       <defs>
         <style>
           {`
@@ -34,7 +30,7 @@ export function PetCareLogo({ size = 32, className = "" }) {
         </style>
       </defs>
 
-      {/* Escudo protector - símbolo de cuidado y seguridad */}
+      {/* Escudo */}
       <path 
         className="logo-stroke"
         d="M128 24
@@ -46,17 +42,17 @@ export function PetCareLogo({ size = 32, className = "" }) {
            Z" 
       />
 
-      {/* Huella de mascota - geometría simple y reconocible */}
-      {/* Cojín central */}
+      {/* Huella de pata */}
+      {/* Almohadilla */}
       <circle className="logo-stroke" cx="128" cy="120" r="28"/>
       
-      {/* Deditos de la huella */}
+      {/* Dedos de huella */}
       <circle className="logo-stroke" cx="96"  cy="92" r="12"/>
       <circle className="logo-stroke" cx="160" cy="92" r="12"/>
       <circle className="logo-stroke" cx="112" cy="68" r="12"/>
       <circle className="logo-stroke" cx="144" cy="68" r="12"/>
 
-      {/* Marca de verificación - confianza y servicio garantizado */}
+      {/* Paloma */}
       <path className="logo-stroke" d="M88 164 L120 192 L172 140"/>
     </svg>
   );

@@ -1,7 +1,6 @@
-// ...existing code...
-import { Button } from './ui/button';
-import { Menu, User, MapPin, Calendar, Users, AlertTriangle, Shield, Settings } from 'lucide-react';
-import { PetCareLogo } from './PetCareLogo';
+import { Button } from './ui/Button';
+import { User, MapPin, Calendar, Users, AlertTriangle, Shield } from 'lucide-react';
+import { Logo } from './ui/Logo';
 
 
 
@@ -50,7 +49,7 @@ export function PetHeader({ currentView, onNavigate, isLoggedIn, user, onLogin, 
           <div className="flex items-center cursor-pointer" onClick={() => onNavigate('landing')}>
             {/* Logo actualizado con el nuevo diseño */}
             <div className="w-8 h-8 text-primary-500 flex items-center justify-center mr-3">
-              <PetCareLogo size={32} />
+              <Logo size={32} />
             </div>
             
             {/* Brand name y slogan */}
@@ -117,15 +116,6 @@ export function PetHeader({ currentView, onNavigate, isLoggedIn, user, onLogin, 
               Acceder
             </Button>
           )}
-
-          {/* Mobile Menu Toggle */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="md:hidden"
-          >
-            <Menu className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 

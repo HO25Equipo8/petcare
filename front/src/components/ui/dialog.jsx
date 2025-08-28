@@ -1,5 +1,6 @@
 "use client";
 
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog@1.1.6";
 import { XIcon } from "lucide-react@0.487.0";
@@ -22,10 +23,11 @@ function DialogClose(props) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
-function DialogOverlay({ className, ...props }) {
+const DialogOverlay = React.forwardRef(function DialogOverlay({ className, ...props }, ref) {
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
+      ref={ref}
       className={cn(
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
         className,
@@ -33,7 +35,7 @@ function DialogOverlay({ className, ...props }) {
       {...props}
     />
   );
-}
+});
 
 function DialogContent({ className, children, ...props }) {
   return (
@@ -57,20 +59,22 @@ function DialogContent({ className, children, ...props }) {
   );
 }
 
-function DialogHeader({ className, ...props }) {
+const DialogHeader = React.forwardRef(function DialogHeader({ className, ...props }, ref) {
   return (
     <div
       data-slot="dialog-header"
+      ref={ref}
       className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
       {...props}
     />
   );
-}
+});
 
-function DialogFooter({ className, ...props }) {
+const DialogFooter = React.forwardRef(function DialogFooter({ className, ...props }, ref) {
   return (
     <div
       data-slot="dialog-footer"
+      ref={ref}
       className={cn(
         "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
         className,
@@ -78,7 +82,7 @@ function DialogFooter({ className, ...props }) {
       {...props}
     />
   );
-}
+});
 
 function DialogTitle({ className, ...props }) {
   return (

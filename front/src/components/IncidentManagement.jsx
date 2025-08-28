@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Label } from './ui/label';
-import { Badge } from './ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { AlertTriangle, Camera, CheckCircle, Clock, Plus, Image as ImageIcon, X } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Textarea } from './ui/Textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
+import { Label } from './ui/Label';
+import { Badge } from './ui/Badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/Dialog';
+import { AlertTriangle, Camera, CheckCircle, Clock, Plus } from 'lucide-react';
+import { FallbackImage } from './common/FallbackImage';
 
 
 
@@ -389,7 +389,7 @@ export function IncidentManagement({ onNavigate }) {
                   <div className="flex gap-2">
                     {incident.images.map((image, index) => (
                       <div key={index} className="relative">
-                        <ImageWithFallback
+                        <FallbackImage
                           src={image}
                           alt={`Evidencia ${index + 1}`}
                           className="w-24 h-24 object-cover rounded-lg border"
