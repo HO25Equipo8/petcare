@@ -66,11 +66,21 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<ScheduleConfig> scheduleConfigs;
 
-    //for testing purposes
+    //minimum atributes constructor
     public User(@Email String login, String encryptedPassword, Role role) {
         this.email = login;
         this.password = encryptedPassword;
         this.role = role;
+    }
+
+    // OAuth users constructor
+    public User(String email, String name, String provider, String providerId, Role role) {
+        this.email = email;
+        this.name = name;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.role = role;
+        this.verified = true; // OAuth users are pre-verified
     }
 
     @Override
