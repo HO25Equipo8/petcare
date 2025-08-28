@@ -68,7 +68,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         user.setName(name);
         user.setProvider("google");
         user.setProviderId(googleId);
-        user.setVerified(true); // Google emails are verified
         user.setRole(Role.USER); // Default role
         // Password is null for OAuth users
 

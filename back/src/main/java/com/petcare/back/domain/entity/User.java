@@ -80,7 +80,6 @@ public class User implements UserDetails {
         this.provider = provider;
         this.providerId = providerId;
         this.role = role;
-        this.verified = true; // OAuth users are pre-verified
     }
 
     @Override
