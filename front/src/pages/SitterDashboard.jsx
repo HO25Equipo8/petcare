@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/Dialog';
-import { Input } from '../components/ui/Input';
-import { Label } from '../components/ui/Label';
-import { Switch } from '../components/ui/Switch';
-import { Textarea } from '../components/ui/Textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/Select';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card.jsx';
+import { Button } from '../components/ui/Button.jsx';
+import { Badge } from '../components/ui/Badge.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs.jsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/Dialog.jsx';
+import { Input } from '../components/ui/Input.jsx';
+import { Label } from '../components/ui/Label.jsx';
+import { Switch } from '../components/ui/Switch.jsx';
+import { Textarea } from '../components/ui/Textarea.jsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/Select.jsx';
 import { 
   Calendar, 
   Clock, 

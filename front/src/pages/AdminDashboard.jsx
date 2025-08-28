@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
-import { Input } from '../components/ui/Input';
-import { Label } from '../components/ui/Label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/Select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/Dialog';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card.jsx';
+import { Button } from '../components/ui/Button.jsx';
+import { Badge } from '../components/ui/Badge.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs.jsx';
+import { Input } from '../components/ui/Input.jsx';
+import { Label } from '../components/ui/Label.jsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/Select.jsx';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table.jsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/Dialog.jsx';
 import { 
   Users, 
   Heart, 
