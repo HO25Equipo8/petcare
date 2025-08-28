@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Table(name = "locations")
 @Getter
@@ -20,9 +18,9 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // Ej: "Sucursal San Lorenzo"
+    private String street;
 
-    private String address; // Calle y número
+    private String number;
 
     private String city;
 
@@ -33,13 +31,5 @@ public class Location {
     private Double latitude;
 
     private Double longitude;
-
-    @OneToMany(mappedBy = "location")
-    private List<Schedule> schedules; // Horarios disponibles en esta sede
-
-    @OneToMany(mappedBy = "location")
-    private List<Service> services; // Servicios ofrecidos en esta sede
-
-    // Getters, setters, constructor vacío y constructor con campos
 }
 
