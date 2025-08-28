@@ -28,6 +28,9 @@ public class User implements UserDetails {
     private String email; // user login
     private String password;
 
+    private String provider; // google sign in
+    private String providerId; //google sign in
+
     @OneToOne(cascade = CascadeType.ALL) // si querés que se guarde Location automáticamente
     @JoinColumn(name = "location_id")
     private Location location;
