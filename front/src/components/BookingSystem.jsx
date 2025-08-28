@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './ui/Card';
-import { Button } from './ui/Button';
-import { Badge } from './ui/Badge';
-import { Input } from './ui/Input';
-import { Label } from './ui/Label';
-import { Textarea } from './ui/Textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
-import { Calendar } from './ui/Calendar';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/Card.jsx';
+import { Button } from './ui/Button.jsx';
+import { Badge } from './ui/Badge.jsx';
+import { Input } from './ui/Input.jsx';
+import { Label } from './ui/Label.jsx';
+import { Textarea } from './ui/Textarea.jsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
+import { Calendar } from './ui/Calendar.jsx';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs.jsx';
 import { Calendar as CalendarIcon, Clock, MapPin, Heart, Check, Plus, Edit, Trash2, Star } from 'lucide-react';
 
 

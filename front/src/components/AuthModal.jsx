@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog';
-import { Button } from './ui/Button';
-import { Input } from './ui/Input';
-import { Label } from './ui/Label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
-import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './ui/Card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog.jsx';
+import { Button } from './ui/Button.jsx';
+import { Input } from './ui/Input.jsx';
+import { Label } from './ui/Label.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs.jsx';
+import { Card, CardContent } from './ui/Card.jsx';
 import { User, Mail, Lock } from 'lucide-react';
-import { Logo } from './ui/Logo';
+import { Logo } from './ui/Logo.jsx';
 
 
 

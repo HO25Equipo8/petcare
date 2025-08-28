@@ -1,6 +1,6 @@
-import { Button } from './ui/Button';
+import { Button } from './ui/Button.jsx';
 import { User, MapPin, Calendar, Users, AlertTriangle, Shield } from 'lucide-react';
-import { Logo } from './ui/Logo';
+import { Logo } from './ui/Logo.jsx';
 
 
 
