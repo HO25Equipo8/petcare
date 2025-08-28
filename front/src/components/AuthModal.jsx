@@ -4,7 +4,7 @@ import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Label } from './ui/Label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
-import { Card, CardContent } from './ui/Card';
+import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './ui/Card';
 import { User, Mail, Lock } from 'lucide-react';
 import { Logo } from './ui/Logo';
 

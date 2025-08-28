@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Heart, MapPin, Calendar, Clock, Star, Plus, AlertTriangle } from 'lucide-react';

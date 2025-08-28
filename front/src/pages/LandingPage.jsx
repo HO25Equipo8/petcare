@@ -1,5 +1,5 @@
 import { Button } from '../components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { MapPin, Clock, Shield, Star, Heart } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
