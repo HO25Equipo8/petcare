@@ -50,25 +50,6 @@ public class RegisterController {
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass());
         User newUser = new User(userRegisterDTO.login(), encryptedPassword, role);
 
-        // 👇 mapear la Location desde el DTO
-        if (userRegisterDTO.location() != null) {
-            LocationDTO locDto = userRegisterDTO.location();
-            Location location = new Location(
-                    null, // id autogenerado
-                    locDto.street(),
-                    locDto.number(),
-                    locDto.city(),
-                    locDto.province(),
-                    locDto.country(),
-                    1.0,
-                    1.0
-            );
-            newUser.setLocation(location);
-            locationService.save(location);
-        }
-
-        newUser.setRoleProfessional(userRegisterDTO.professionalRole());
-
         userRepository.save(newUser);
 
         // return ResponseEntity.ok().build();

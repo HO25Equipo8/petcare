@@ -13,7 +13,6 @@ public record UserRegisterDTO(
                 message = "Password must be at least 8 characters long, with at least one digit and one uppercase"
         )
         String pass,
-        Role role,
-        ProfessionalRoleEnum professionalRole,
-        LocationDTO location) {
+        Role role
+) {
 }
