@@ -1,5 +1,6 @@
 package com.petcare.back.infra.security;
 
+import com.petcare.back.infra.gsignin.OAuth2AuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,9 @@ public class SecurityConfiguration {
     @Autowired
     private SecurityFilter securityFilter;
 
+    @Autowired
+    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception
     {
@@ -42,11 +46,14 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.GET, "/hello").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
+<<<<<<< HEAD
                         .requestMatchers(HttpMethod.POST,"/api/upload").permitAll()
+=======
+                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Allow OAuth2 endpoints
+>>>>>>> origin/feat-gsignin
                         //.requestMatchers(HttpMethod.GET, "/", "/api/sitter/{id}", "/api/owner/{id}","/api/pet/{id}").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**")
-                        .permitAll()
                         // Role-based endpoints
 
                         //.requestMatchers(HttpMethod.POST, "/api/cursos").hasRole("ADMIN")
@@ -57,10 +64,14 @@ public class SecurityConfiguration {
 
                         //.requestMatchers(HttpMethod.DELETE, "/api/cursos/", "/api/mentorias/", "/api/certificaciones/").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
-                        .requestMatchers(HttpMethod.PUT,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
-                        .requestMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
+                        //.requestMatchers(HttpMethod.GET,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
+                        //.requestMatchers(HttpMethod.PUT,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
+                        //.requestMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
+                        .permitAll()
                         .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
