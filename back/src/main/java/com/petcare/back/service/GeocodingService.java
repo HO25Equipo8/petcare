@@ -1,11 +1,15 @@
 package com.petcare.back.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -13,21 +17,32 @@ import java.util.Map;
 public class GeocodingService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    @Value("${api.key.google}")
+    private String apiKey;
 
     public double[] getCoordinatesFromAddress(String address) {
-        String url = "https://nominatim.openstreetmap.org/search?format=json&q=" + address;
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" +
+                URLEncoder.encode(address, StandardCharsets.UTF_8) +
+                "&key=" + apiKey;
 
-        ResponseEntity<List<Map<String, Object>>> response =
+        ResponseEntity<Map<String, Object>> response =
                 restTemplate.exchange(url, HttpMethod.GET, null,
-                        new ParameterizedTypeReference<List<Map<String, Object>>>() {});
+                        new ParameterizedTypeReference<>() {});
 
-        if (response.getBody() != null && !response.getBody().isEmpty()) {
-            Map<String, Object> location = response.getBody().get(0);
-            double lat = Double.parseDouble((String) location.get("lat"));
-            double lon = Double.parseDouble((String) location.get("lon"));
-            return new double[]{lat, lon};
+        Map<String, Object> body = response.getBody();
+        if (body == null || !"OK".equals(body.get("status"))) {
+            throw new RuntimeException("No se encontraron coordenadas para la dirección: " + address);
         }
 
-        throw new RuntimeException("No se encontraron coordenadas para la dirección: " + address);
+        List<Map<String, Object>> results = (List<Map<String, Object>>) body.get("results");
+        if (results.isEmpty()) {
+            throw new RuntimeException("No se encontraron coordenadas para la dirección: " + address);
+        }
+
+        Map<String, Object> geometry = (Map<String, Object>) ((Map<String, Object>) results.get(0).get("geometry")).get("location");
+        double lat = ((Number) geometry.get("lat")).doubleValue();
+        double lng = ((Number) geometry.get("lng")).doubleValue();
+
+        return new double[]{lat, lng};
     }
 }

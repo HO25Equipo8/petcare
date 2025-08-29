@@ -34,12 +34,12 @@ public class AdminController {
     private final PlanService planService;
     private final ScheduleConfigService scheduleConfigService;
 
-    @PostMapping("/register/service")
-    public ResponseEntity<?> createService(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
+    @PostMapping("/register/offering")
+    public ResponseEntity<?> createOfering(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
         try {
             OfferingResponseDTO service = offeringService.createService(dto);
 
-            URI uri = uriBuilder.path("/services/{id}").buildAndExpand(service.id()).toUri();
+            URI uri = uriBuilder.path("/offering/{id}").buildAndExpand(service.id()).toUri();
 
             return ResponseEntity.created(uri).body(Map.of(
                     "status", "success",

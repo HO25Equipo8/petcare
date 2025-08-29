@@ -14,7 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 @Service
 public class PetService {
@@ -46,9 +48,13 @@ public class PetService {
         pet.setActive(true);
         pet.setCreatedAt(LocalDateTime.now());
 
+        // 🧠 Cálculo de edad según fecha de nacimiento
+        if (pet.getBirthDate() != null) {
+            int years = Period.between(pet.getBirthDate(), LocalDate.now()).getYears();
+            pet.setAge(years);
+        }
+
         Pet savedPet = petRepository.save(pet);
         return petResponseMapper.toDto(savedPet);
     }
-
-
 }

@@ -1,6 +1,7 @@
 package com.petcare.back.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -56,11 +57,15 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "roleProfessional", nullable = false)
+    private ProfessionalRoleEnum roleProfessional; // Ej: PASEADOR, PELUQUERO, VETERINARIO Solo para SITTER
+
     @OneToMany(mappedBy = "owner")
     private List<Booking> bookingsAsOwner;
 
-    @OneToMany(mappedBy = "sitter")
-    private List<Booking> bookingsAsSitter;
+    @OneToMany(mappedBy = "professional")
+    private List<BookingProfessional> bookingsAsProfessional = new ArrayList<>();
 
     @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
