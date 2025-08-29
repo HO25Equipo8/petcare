@@ -21,7 +21,7 @@ import java.util.List;
 public class ComboOffering {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "combo_offering_id")
+    @Column(name = "id")
     private Long id;
 
     @Enumerated(EnumType.STRING)

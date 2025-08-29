@@ -16,7 +16,7 @@ public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "street", nullable = false)
@@ -34,10 +34,10 @@ public class Location {
     @Column(name = "country", nullable = false)
     private String country;
 
-    @Column(name = "latitude", precision = 10, scale = 7)
+    @Column(name = "latitude", nullable = false)
     private Double latitude;
 
-    @Column(name = "longitude", precision = 10, scale = 7)
+    @Column(name = "longitude", nullable = false)
     private Double longitude;
 }
 

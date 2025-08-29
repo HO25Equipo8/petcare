@@ -24,7 +24,7 @@ public class ScheduleConfig {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_config_id")
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(optional = false)

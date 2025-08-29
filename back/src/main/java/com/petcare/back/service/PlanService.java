@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -42,13 +43,13 @@ public class PlanService {
                 dto.intervalEnum().getLabel());
         plan.setName(generatedName);
 
-        // Guardamos la frecuencia real
+        // Guardamos la frecuencia real como double
         double sessionsPerWeek = dto.frequencyEnum().getFrequencyPerWeek();
         plan.setTimesPerWeek(sessionsPerWeek);
 
         // Calculamos el descuento usando las reglas configuradas por admin
-        double discount = calculateDiscountBySessions(sessionsPerWeek);
-        plan.setPromotion(discount);
+        BigDecimal discount = calculateDiscountBySessions(sessionsPerWeek);
+        plan.setPromotion(discount.doubleValue());
 
         return planResponseMapper.toDto(planRepository.save(plan));
     }
@@ -57,13 +58,13 @@ public class PlanService {
      * Busca el descuento aplicable según la cantidad de sesiones/semana
      * sin necesidad de pasar categoría explícitamente (se deduce por rango).
      */
-    private double calculateDiscountBySessions(double sessionsPerWeek) {
+    private BigDecimal calculateDiscountBySessions(double sessionsPerWeek) {
         return planDiscountRuleRepository.findAll().stream()
                 .filter(rule -> sessionsPerWeek >= rule.getMinSessionsPerWeek()
                         && sessionsPerWeek <= rule.getMaxSessionsPerWeek())
                 .map(PlanDiscountRule::getDiscount)
                 .findFirst()
-                .orElse(0.0);
+                .orElse(BigDecimal.ZERO);
     }
 
     private User getAuthenticatedUser() {

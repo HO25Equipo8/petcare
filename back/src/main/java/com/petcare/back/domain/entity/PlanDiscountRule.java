@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "plan_discount_rules")
 @Getter
@@ -28,16 +30,12 @@ public class PlanDiscountRule {
     @Column(name = "category", nullable = false)
     private CustomerCategory category;
 
-    @DecimalMin("0.0")
     @Column(name = "min_sessions_per_week", nullable = false)
-    private double minSessionsPerWeek;
+    private Double minSessionsPerWeek;
 
-    @DecimalMin("0.0")
     @Column(name = "max_sessions_per_week", nullable = false)
-    private double maxSessionsPerWeek;
+    private Double maxSessionsPerWeek;
 
-    @DecimalMin("0.0")
-    @DecimalMax("1.0")
-    @Column(name = "discount", nullable = false, precision = 4, scale = 2)
-    private Double discount;
+    @Column(name = "discount", precision = 10, scale = 2, nullable = false)
+    private BigDecimal discount;
 }

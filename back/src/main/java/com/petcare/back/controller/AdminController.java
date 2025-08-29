@@ -1,8 +1,10 @@
 package com.petcare.back.controller;
 
+import com.petcare.back.domain.dto.request.BookingSimulationRequestDTO;
 import com.petcare.back.domain.dto.request.ComboOfferingCreateDTO;
 import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.request.OfferingCreateDTO;
+import com.petcare.back.domain.dto.response.BookingSimulationResponseDTO;
 import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.domain.dto.response.OfferingResponseDTO;
@@ -33,6 +35,7 @@ public class AdminController {
     private final ComboOfferingService comboOfferingService;
     private final PlanDiscountRuleService planDiscountRuleService;
     private final ScheduleConfigService scheduleConfigService;
+    private final BookingService bookingService;
 
     @PostMapping("/register/offering")
     public ResponseEntity<?> createOfering(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
@@ -111,10 +114,20 @@ public class AdminController {
         ));
     }
 
-
+    //Metodo para cambiar el estado a expirado de las reservas anteriores al dia de hoy
     @PostMapping("/schedules/expire-now")
     public ResponseEntity<String> expireNow() {
         int count = scheduleConfigService.expireOldSchedules();
         return ResponseEntity.ok("Se expiraron " + count + " horarios disponibles anteriores a hoy");
+    }
+
+    @PostMapping("/simulation")
+    public ResponseEntity<?> simulate(@RequestBody BookingSimulationRequestDTO dto) {
+        BookingSimulationResponseDTO bookingSimulationResponseDTO = bookingService.simulateBooking(dto);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Simulacion creada con éxito",
+                "data", bookingSimulationResponseDTO
+        ));
     }
 }
