@@ -6,11 +6,10 @@ import com.petcare.back.domain.dto.request.OfferingCreateDTO;
 import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.domain.dto.response.OfferingResponseDTO;
+import com.petcare.back.domain.entity.PlanDiscountRule;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.service.ComboOfferingService;
-import com.petcare.back.service.PlanService;
-import com.petcare.back.service.OfferingService;
-import com.petcare.back.service.ScheduleConfigService;
+import com.petcare.back.repository.PlanDiscountRuleRepository;
+import com.petcare.back.service.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
@@ -31,7 +31,7 @@ public class AdminController {
 
     private final OfferingService offeringService;
     private final ComboOfferingService comboOfferingService;
-    private final PlanService planService;
+    private final PlanDiscountRuleService planDiscountRuleService;
     private final ScheduleConfigService scheduleConfigService;
 
     @PostMapping("/register/offering")
@@ -84,7 +84,35 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/admin/schedules/expire-now")
+    @PostMapping("/register/discount/rule")
+    public ResponseEntity<?> createRule(@RequestBody PlanDiscountRule rule) {
+        PlanDiscountRule created = planDiscountRuleService.createRule(rule);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Regla de descuento creada con éxito",
+                "data", created
+        ));
+    }
+
+    @GetMapping("/list/discount/rule")
+    public ResponseEntity<?> getAllRules() {
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "data", planDiscountRuleService.getAllRules()
+        ));
+    }
+
+    @DeleteMapping("/delete/discount/rule/{id}")
+    public ResponseEntity<?> deleteRule(@PathVariable Long id) {
+        planDiscountRuleService.deleteRule(id);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Regla de descuento eliminada con éxito"
+        ));
+    }
+
+
+    @PostMapping("/schedules/expire-now")
     public ResponseEntity<String> expireNow() {
         int count = scheduleConfigService.expireOldSchedules();
         return ResponseEntity.ok("Se expiraron " + count + " horarios disponibles anteriores a hoy");

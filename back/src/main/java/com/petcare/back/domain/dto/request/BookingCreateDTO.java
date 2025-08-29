@@ -11,7 +11,6 @@ public record BookingCreateDTO(
         Long comboOfferingId,
         Long planId,
         List<Long> scheduleIds,
-        BigDecimal finalPrice,
         List<ProfessionalBookingDTO> professionals
 ) {
     public record ProfessionalBookingDTO(

@@ -29,7 +29,7 @@ public class Schedule {
     private Instant establishedTime;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_config_id")
+    @JoinColumn(name = "schedule_config_id", nullable = false)
     private ScheduleConfig scheduleConfig;
 
     @Enumerated(EnumType.STRING)
@@ -37,9 +37,11 @@ public class Schedule {
     private ScheduleStatus status = ScheduleStatus.DISPONIBLE;
 
     @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
 

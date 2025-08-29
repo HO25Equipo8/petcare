@@ -22,28 +22,33 @@ import java.util.List;
 @AllArgsConstructor
 public class Offering {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "id")
+        private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "name", length = 50, nullable = false)
-    private OfferingEnum name;
+        @Enumerated(EnumType.STRING)
+        @Column(name = "name", length = 50, nullable = false)
+        private OfferingEnum name;
 
-    @Column(nullable = false)
-    private String description;
+        @Column(name = "description", nullable = false)
+        private String description;
 
-    @Column(name = "base_price", precision = 10, scale = 2, nullable = false)
-    private BigDecimal basePrice;
+        @Column(name = "base_price", precision = 10, scale = 2, nullable = false)
+        private BigDecimal basePrice;
 
-    @ElementCollection(targetClass = PetTypeEnum.class)
-    @Enumerated(EnumType.STRING)
-    private List<PetTypeEnum> applicablePetTypes;
+        @ElementCollection(targetClass = PetTypeEnum.class)
+        @Enumerated(EnumType.STRING)
+        @CollectionTable(name = "offering_pet_types", joinColumns = @JoinColumn(name = "offering_id"))
+        @Column(name = "pet_type", nullable = false)
+        private List<PetTypeEnum> applicablePetTypes;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+        @CreationTimestamp
+        @Column(name = "created_at", updatable = false)
+        private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+        @UpdateTimestamp
+        @Column(name = "updated_at")
+        private LocalDateTime updatedAt;
 }
 

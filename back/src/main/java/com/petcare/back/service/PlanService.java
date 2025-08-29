@@ -3,11 +3,13 @@ package com.petcare.back.service;
 import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.domain.entity.Plan;
+import com.petcare.back.domain.entity.PlanDiscountRule;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.mapper.request.PlanCreateMapper;
 import com.petcare.back.domain.mapper.response.PlanResponseMapper;
 import com.petcare.back.exception.MyException;
+import com.petcare.back.repository.PlanDiscountRuleRepository;
 import com.petcare.back.repository.PlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -23,11 +25,10 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final PlanCreateMapper planMapper;
     private final PlanResponseMapper planResponseMapper;
+    private final PlanDiscountRuleRepository planDiscountRuleRepository;
 
     public PlanResponseDTO createPlan(PlanCreateDTO dto) throws MyException {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        User user = getAuthenticatedUser();
 
         if (user.getRole() != Role.OWNER) {
             throw new MyException("Solo los dueños pueden seleccionar su plan");
@@ -35,26 +36,39 @@ public class PlanService {
 
         Plan plan = planMapper.toEntity(dto);
 
-        String generatedName = "Plan " + dto.frequencyEnum().getLabel() + " " + dto.intervalEnum().getLabel();
+        // Generar nombre dinámico
+        String generatedName = String.format("Plan %s %s",
+                dto.frequencyEnum().getLabel(),
+                dto.intervalEnum().getLabel());
         plan.setName(generatedName);
 
-        double baseDiscount = switch (dto.intervalEnum()) {
-            case SEMANAL -> 0.03;
-            case QUINCENAL -> 0.05;
-            case MENSUAL -> 0.08;
-            case TRIMESTRAL -> 0.10;
-            case SEMESTRAL -> 0.13;
-            case ANUAL -> 0.20;
-        };
+        // Guardamos la frecuencia real
+        double sessionsPerWeek = dto.frequencyEnum().getFrequencyPerWeek();
+        plan.setTimesPerWeek(sessionsPerWeek);
 
-        double discountFrecuency = Math.min(0.30, dto.frequencyEnum().getFrequencyPerWeek() * 0.05);
+        // Calculamos el descuento usando las reglas configuradas por admin
+        double discount = calculateDiscountBySessions(sessionsPerWeek);
+        plan.setPromotion(discount);
 
-        plan.setTimesPerWeek(dto.frequencyEnum().getFrequencyPerWeek());
-        Double totalDiscount = baseDiscount + discountFrecuency;
-        plan.setPromotion(totalDiscount > 0.4 ? 0.4 : totalDiscount);
-
-        System.out.println(plan.getPromotion() + "Promocion");
         return planResponseMapper.toDto(planRepository.save(plan));
+    }
+
+    /**
+     * Busca el descuento aplicable según la cantidad de sesiones/semana
+     * sin necesidad de pasar categoría explícitamente (se deduce por rango).
+     */
+    private double calculateDiscountBySessions(double sessionsPerWeek) {
+        return planDiscountRuleRepository.findAll().stream()
+                .filter(rule -> sessionsPerWeek >= rule.getMinSessionsPerWeek()
+                        && sessionsPerWeek <= rule.getMaxSessionsPerWeek())
+                .map(PlanDiscountRule::getDiscount)
+                .findFirst()
+                .orElse(0.0);
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 
     public List<PlanResponseDTO> getAllPlans() {

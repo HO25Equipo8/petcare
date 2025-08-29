@@ -24,16 +24,20 @@ public class ScheduleConfig {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "schedule_config_id")
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "sitter_id")
+    @JoinColumn(name = "sitter_id", nullable = false)
     private User sitter;
 
+    @Column(name = "configuration_name")
     private String configurationName;
 
+    @Column(name = "start_date")
     private LocalDate startDate;
 
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @Column(name = "start_time", nullable = false)
@@ -64,9 +68,12 @@ public class ScheduleConfig {
     private List<WeekDayEnum> days;
 
     @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
+
 
