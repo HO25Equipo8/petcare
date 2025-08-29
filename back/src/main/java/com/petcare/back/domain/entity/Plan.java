@@ -26,7 +26,7 @@ public class Plan {
 
     private String name;
 
-    private Integer timesPerWeek;
+    private Double timesPerWeek;
 
     @Enumerated(EnumType.STRING)
     private IntervalEnum intervalEnum;

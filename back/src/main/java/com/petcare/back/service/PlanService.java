@@ -29,27 +29,31 @@ public class PlanService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        if (user.getRole() != Role.OWNER || user.getRole() != Role.ADMIN) {
-            throw new MyException("Solo los admin y dueños pueden registrar planes");
+        if (user.getRole() != Role.OWNER) {
+            throw new MyException("Solo los dueños pueden seleccionar su plan");
         }
 
         Plan plan = planMapper.toEntity(dto);
 
-        String generatedName = "Plan " + dto.timesPerWeek() + " veces por semana/" + dto.intervalEnum().getLabel();
+        String generatedName = "Plan " + dto.frequencyEnum().getLabel() + " " + dto.intervalEnum().getLabel();
         plan.setName(generatedName);
 
         double baseDiscount = switch (dto.intervalEnum()) {
-            case SEMANAL -> 0.05;
-            case QUINCENAL -> 0.10;
-            case MENSUAL -> 0.15;
-            case TRIMESTRAL -> 0.20;
-            case SEMESTRAL -> 0.25;
-            case ANUAL -> 0.30;
+            case SEMANAL -> 0.03;
+            case QUINCENAL -> 0.05;
+            case MENSUAL -> 0.08;
+            case TRIMESTRAL -> 0.10;
+            case SEMESTRAL -> 0.13;
+            case ANUAL -> 0.20;
         };
 
-        double extra = dto.timesPerWeek() >= 5 ? 0.05 : 0.0; // Ejemplo: más de 5 sesiones por semana
-        plan.setPromotion(baseDiscount + extra);
+        double discountFrecuency = Math.min(0.30, dto.frequencyEnum().getFrequencyPerWeek() * 0.05);
 
+        plan.setTimesPerWeek(dto.frequencyEnum().getFrequencyPerWeek());
+        Double totalDiscount = baseDiscount + discountFrecuency;
+        plan.setPromotion(totalDiscount > 0.4 ? 0.4 : totalDiscount);
+
+        System.out.println(plan.getPromotion() + "Promocion");
         return planResponseMapper.toDto(planRepository.save(plan));
     }
 

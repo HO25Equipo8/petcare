@@ -7,6 +7,6 @@ CREATE TABLE users (
     phone VARCHAR(50),
     verified BOOLEAN DEFAULT FALSE,
     profile_photo_id BIGINT,
+    role_professional VARCHAR(50),
     role VARCHAR(50),
-
 );

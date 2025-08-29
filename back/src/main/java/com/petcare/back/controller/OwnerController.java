@@ -1,11 +1,14 @@
 package com.petcare.back.controller;
 
+import com.petcare.back.domain.dto.request.BookingCreateDTO;
 import com.petcare.back.domain.dto.request.PetCreateDTO;
 import com.petcare.back.domain.dto.request.PlanCreateDTO;
+import com.petcare.back.domain.dto.response.BookingResponseDTO;
 import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PetResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.exception.MyException;
+import com.petcare.back.service.BookingService;
 import com.petcare.back.service.ComboOfferingService;
 import com.petcare.back.service.PetService;
 import com.petcare.back.service.PlanService;
@@ -14,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,7 +25,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/owner")
 @RequiredArgsConstructor
@@ -31,6 +35,7 @@ public class OwnerController {
     private final PetService petService;
     private final ComboOfferingService comboOfferingService;
     private final PlanService planService;
+    private final BookingService bookingService;
 
     @PostMapping("/register/pet")
     public ResponseEntity<?> registerPet(@Valid @RequestBody PetCreateDTO petCreateDTO,
@@ -102,6 +107,36 @@ public class OwnerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "error",
                     "message", "Error al obtener los planes"
+            ));
+        }
+    }
+
+    @PostMapping("/register/booking")
+    public ResponseEntity<?> createBooking(
+            @RequestBody @Valid BookingCreateDTO dto,
+            UriComponentsBuilder uriBuilder
+    ) {
+        try {
+            BookingResponseDTO booking = bookingService.createBooking(dto);
+
+            URI uri = uriBuilder.path("/api/bookings/{id}")
+                    .buildAndExpand(booking.id())
+                    .toUri();
+
+            return ResponseEntity.created(uri).body(Map.of(
+                    "status", "success",
+                    "message", "Reserva registrada con éxito",
+                    "data", booking
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
             ));
         }
     }
