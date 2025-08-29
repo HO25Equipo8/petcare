@@ -36,8 +36,14 @@ public class RegisterController {
     @PostMapping
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
             , UriComponentsBuilder uriComponentsBuilder){
+        // Check if email already exists
         if (userRepository.findByEmail(userRegisterDTO.login()) != null) {
             return ResponseEntity.badRequest().build();
+        }
+
+        // Check if passwords match
+        if (!userRegisterDTO.pass1().equals(userRegisterDTO.pass2())) {
+            return ResponseEntity.badRequest().body("Passwords do not match");
         }
 
         Role role;
@@ -47,7 +53,7 @@ public class RegisterController {
             role = Role.USER;
         }
 
-        String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass());
+        String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
         User newUser = new User(userRegisterDTO.login(), encryptedPassword, role);
 
         userRepository.save(newUser);

@@ -29,6 +29,9 @@ public class User implements UserDetails {
     private String email; // user login
     private String password;
 
+    private String provider; // google sign in
+    private String providerId; //google sign in
+
     @OneToOne(cascade = CascadeType.ALL) // si querés que se guarde Location automáticamente
     @JoinColumn(name = "location_id")
     private Location location;
@@ -68,10 +71,19 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<ScheduleConfig> scheduleConfigs;
 
-    //for testing purposes
+    //minimum atributes constructor
     public User(@Email String login, String encryptedPassword, Role role) {
         this.email = login;
         this.password = encryptedPassword;
+        this.role = role;
+    }
+
+    // OAuth users constructor
+    public User(String email, String name, String provider, String providerId, Role role) {
+        this.email = email;
+        this.name = name;
+        this.provider = provider;
+        this.providerId = providerId;
         this.role = role;
     }
 
