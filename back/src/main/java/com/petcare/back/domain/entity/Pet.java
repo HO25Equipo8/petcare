@@ -2,13 +2,15 @@ package com.petcare.back.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.petcare.back.domain.enumerated.*;
+import com.petcare.back.domain.enumerated.HealthStatusEnum;
+import com.petcare.back.domain.enumerated.PetTypeEnum;
+import com.petcare.back.domain.enumerated.TemperamentEnum;
+import com.petcare.back.domain.enumerated.VaccinationEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,17 +36,6 @@ public class Pet {
 
     private Integer age;
 
-    private Double weight; //Peso
-
-    private String color; // Color del pelaje
-
-    @Enumerated(EnumType.STRING)
-    private PetSizeEnum petSize;  // Tamaño: pequeño, mediano, grande
-
-    private LocalDate birthDate; // Fecha de nacimiento
-
-    private String microchip; // Número de microchip
-
     @Enumerated(EnumType.STRING)
     private TemperamentEnum temperament;
 
@@ -53,14 +44,6 @@ public class Pet {
 
     @Enumerated(EnumType.STRING)
     private HealthStatusEnum health;
-
-    private String allergies; // Alergias conocidas
-
-    private String medications; // Medicamentos actuales
-
-    private String specialNeeds; // Necesidades especiales (comportamiento, cuidados)
-
-    private String emergencyContact; // Veterinario o contacto de emergencia
 
     private Boolean active = true;
 

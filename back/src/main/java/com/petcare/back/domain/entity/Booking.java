@@ -12,8 +12,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "bookings")
@@ -35,16 +33,17 @@ public class Booking {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    private List<BookingProfessional> professionals = new ArrayList<>();
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "sitter_id")
+    private User sitter;
 
     @ManyToOne
-    @JoinColumn(name = "offering_id")
-    private Offering offering;
+    @JoinColumn(name = "service_id")
+    private Service service;
 
     @ManyToOne
-    @JoinColumn(name = "combo_offering_id")
-    private ComboOffering comboOffering;
+    @JoinColumn(name = "combo_service_id")
+    private ComboService comboService;
 
     @ManyToOne
     @JoinColumn(name = "plan_id")
@@ -53,13 +52,9 @@ public class Booking {
     @Column(name = "reservation_date", nullable = false)
     private Instant reservationDate = Instant.now();
 
-    @ManyToMany
-    @JoinTable(
-            name = "booking_schedules",
-            joinColumns = @JoinColumn(name = "booking_id"),
-            inverseJoinColumns = @JoinColumn(name = "schedule_id")
-    )
-    private List<Schedule> schedules = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "schedule_id", nullable = false, referencedColumnName = "schedule_id")
+    private Schedule schedule;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

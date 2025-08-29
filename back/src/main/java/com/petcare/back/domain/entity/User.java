@@ -1,10 +1,12 @@
 package com.petcare.back.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +18,6 @@ import java.util.List;
 @Table(name = "users")
 @Entity(name = "User")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -29,8 +30,7 @@ public class User implements UserDetails {
     private String email; // user login
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL) // si querés que se guarde Location automáticamente
-    @JoinColumn(name = "location_id")
+    @OneToOne
     private Location location;
 
     private String phone;
@@ -54,15 +54,11 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "roleProfessional", nullable = false)
-    private ProfessionalRoleEnum roleProfessional; // Ej: PASEADOR, PELUQUERO, VETERINARIO Solo para SITTER
-
     @OneToMany(mappedBy = "owner")
     private List<Booking> bookingsAsOwner;
 
-    @OneToMany(mappedBy = "professional")
-    private List<BookingProfessional> bookingsAsProfessional = new ArrayList<>();
+    @OneToMany(mappedBy = "sitter")
+    private List<Booking> bookingsAsSitter;
 
     @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

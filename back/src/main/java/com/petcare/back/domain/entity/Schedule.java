@@ -1,6 +1,5 @@
 package com.petcare.back.domain.entity;
 
-import com.petcare.back.domain.enumerated.ScheduleStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,9 +31,9 @@ public class Schedule {
     @JoinColumn(name = "schedule_config_id")
     private ScheduleConfig scheduleConfig;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private ScheduleStatus status = ScheduleStatus.DISPONIBLE;
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

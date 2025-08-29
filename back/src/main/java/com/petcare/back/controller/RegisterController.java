@@ -1,14 +1,10 @@
 package com.petcare.back.controller;
 
-import com.petcare.back.domain.dto.request.LocationDTO;
 import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
-import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.entity.User;
-import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.repository.UserRepository;
-import com.petcare.back.service.LocationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +23,6 @@ public class RegisterController {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private LocationService locationService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -49,7 +43,6 @@ public class RegisterController {
 
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass());
         User newUser = new User(userRegisterDTO.login(), encryptedPassword, role);
-
         userRepository.save(newUser);
 
         // return ResponseEntity.ok().build();
