@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class ValidateOfferingName implements ValidationOffering {
 
     @Override
-    public void validar(OfferingCreateDTO dto) throws MyException {
+    public void validate(OfferingCreateDTO dto) throws MyException {
         if (dto.name() == null) {
             throw new MyException("El nombre del servicio es obligatorio.");
         }

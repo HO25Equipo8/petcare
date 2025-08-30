@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class ValidateOfferingPetTypes implements ValidationOffering {
 
     @Override
-    public void validar(OfferingCreateDTO dto) throws MyException {
+    public void validate(OfferingCreateDTO dto) throws MyException {
         if (dto.applicablePetTypes() == null || dto.applicablePetTypes().isEmpty()) {
             throw new MyException("Debe especificarse al menos un tipo de mascota aplicable.");
         }

@@ -13,5 +13,4 @@ import java.util.Optional;
 public interface OfferingRepository extends JpaRepository<Offering, Long> {
 
     List<Offering> findByName(OfferingEnum name);
-    Optional<Offering> findByNameAndPetTypesContaining(OfferingEnum name, PetTypeEnum petType);
 }

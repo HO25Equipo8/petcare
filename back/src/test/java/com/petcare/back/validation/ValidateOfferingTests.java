@@ -37,50 +37,50 @@ class ValidateOfferingTests {
     @Test
     void precioBaseCero_debeFallar() {
         var dto = new OfferingCreateDTO(OfferingEnum.PASEO, "desc", BigDecimal.ZERO, List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.PASEADOR);
-        assertThrows(MyException.class, () -> validatePrice.validar(dto));
+        assertThrows(MyException.class, () -> validatePrice.validate(dto));
     }
 
     @Test
     void precioBaseNegativo_debeFallar() {
         var dto = new OfferingCreateDTO(OfferingEnum.PASEO, "desc", BigDecimal.valueOf(-100), List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.PASEADOR);
-        assertThrows(MyException.class, () -> validatePrice.validar(dto));
+        assertThrows(MyException.class, () -> validatePrice.validate(dto));
     }
 
     @Test
     void sinTipoDeMascota_debeFallar() {
         var dto = new OfferingCreateDTO(OfferingEnum.PASEO, "desc", BigDecimal.valueOf(1000), List.of(), ProfessionalRoleEnum.PASEADOR);
-        assertThrows(MyException.class, () -> validatePetTypes.validar(dto));
+        assertThrows(MyException.class, () -> validatePetTypes.validate(dto));
     }
 
     @Test
     void tipoDeMascotaValido_debePasar() {
         var dto = new OfferingCreateDTO(OfferingEnum.PASEO, "desc", BigDecimal.valueOf(1000), List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.PASEADOR);
-        assertDoesNotThrow(() -> validatePetTypes.validar(dto));
+        assertDoesNotThrow(() -> validatePetTypes.validate(dto));
     }
 
     @Test
     void nombreNulo_debeFallar() {
         var dto = new OfferingCreateDTO(null, "desc", BigDecimal.valueOf(1000), List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.PASEADOR);
-        assertThrows(MyException.class, () -> validateName.validar(dto));
+        assertThrows(MyException.class, () -> validateName.validate(dto));
     }
 
     @Test
     void rolIncompatible_debeFallar() {
         var dto = new OfferingCreateDTO(OfferingEnum.ASEO, "desc", BigDecimal.valueOf(1000), List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.VETERINARIO);
-        assertThrows(MyException.class, () -> validateRoleCompatibility.validar(dto));
+        assertThrows(MyException.class, () -> validateRoleCompatibility.validate(dto));
     }
 
     @Test
     void rolCompatible_debePasar() {
         var dto = new OfferingCreateDTO(OfferingEnum.ASEO, "desc", BigDecimal.valueOf(1000), List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.PELUQUERO);
-        assertDoesNotThrow(() -> validateRoleCompatibility.validar(dto));
+        assertDoesNotThrow(() -> validateRoleCompatibility.validate(dto));
     }
 
     @Test
     void servicioDuplicadoConTiposIguales_debeFallar() {
         var dto = new OfferingCreateDTO(
                 OfferingEnum.PASEO,
-                "desc",
+                "Paseo matutino", // variante válida
                 BigDecimal.valueOf(1000),
                 List.of(PetTypeEnum.PERRO, PetTypeEnum.GATO),
                 ProfessionalRoleEnum.PASEADOR
@@ -88,14 +88,33 @@ class ValidateOfferingTests {
 
         var existingOffering = new Offering();
         existingOffering.setName(OfferingEnum.PASEO);
-        existingOffering.setApplicablePetTypes(List.of(PetTypeEnum.GATO, PetTypeEnum.PERRO)); // mismo conjunto
+        existingOffering.setDescription("Paseo matutino");
+        existingOffering.setApplicablePetTypes(List.of(PetTypeEnum.GATO, PetTypeEnum.PERRO));
 
         when(offeringRepository.findByName(OfferingEnum.PASEO))
                 .thenReturn(List.of(existingOffering));
 
         var validator = new ValidateOfferingUniqueness(offeringRepository);
-        assertThrows(MyException.class, () -> validator.validar(dto));
+        assertThrows(MyException.class, () -> validator.validate(dto));
     }
+
+    @Test
+    void descripcionNoValidaParaTipo_debeFallar() {
+        var dto = new OfferingCreateDTO(
+                OfferingEnum.ASEO,
+                "Paseo matutino", // descripción inválida para ASEO
+                BigDecimal.valueOf(1000),
+                List.of(PetTypeEnum.PERRO),
+                ProfessionalRoleEnum.PELUQUERO
+        );
+
+        when(offeringRepository.findByName(OfferingEnum.ASEO))
+                .thenReturn(List.of()); // no importa, no hay duplicado
+
+        var validator = new ValidateOfferingUniqueness(offeringRepository);
+        assertThrows(MyException.class, () -> validator.validate(dto));
+    }
+
     @Test
     void descripcionVacia_debeFallar() {
         var dto = new OfferingCreateDTO(OfferingEnum.PASEO, "   ", BigDecimal.valueOf(1000), List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.PASEADOR);
@@ -117,14 +136,14 @@ class ValidateOfferingTests {
     @Test
     void precioBaseAlto_debePasar() {
         var dto = new OfferingCreateDTO(OfferingEnum.PASEO, "desc", BigDecimal.valueOf(99999), List.of(PetTypeEnum.PERRO), ProfessionalRoleEnum.PASEADOR);
-        assertDoesNotThrow(() -> validatePrice.validar(dto));
+        assertDoesNotThrow(() -> validatePrice.validate(dto));
     }
 
     @Test
     void servicioNuevoConTiposDistintos_debePasar() {
         var dto = new OfferingCreateDTO(
                 OfferingEnum.PASEO,
-                "desc",
+                "Paseo personalizado", // descripción válida para PASEO
                 BigDecimal.valueOf(1000),
                 List.of(PetTypeEnum.PERRO),
                 ProfessionalRoleEnum.PASEADOR
@@ -132,12 +151,13 @@ class ValidateOfferingTests {
 
         var existingOffering = new Offering();
         existingOffering.setName(OfferingEnum.PASEO);
+        existingOffering.setDescription("Paseo grupal con otros perros"); // distinta
         existingOffering.setApplicablePetTypes(List.of(PetTypeEnum.GATO)); // distinto
 
         when(offeringRepository.findByName(OfferingEnum.PASEO))
                 .thenReturn(List.of(existingOffering));
 
         var validator = new ValidateOfferingUniqueness(offeringRepository);
-        assertDoesNotThrow(() -> validator.validar(dto));
+        assertDoesNotThrow(() -> validator.validate(dto));
     }
 }

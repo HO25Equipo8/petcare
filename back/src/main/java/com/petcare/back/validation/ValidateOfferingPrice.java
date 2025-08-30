@@ -12,7 +12,7 @@ public class ValidateOfferingPrice implements ValidationOffering {
     private static final BigDecimal MAX_PRICE = new BigDecimal("100000.00");
 
     @Override
-    public void validar(OfferingCreateDTO dto) throws MyException {
+    public void validate(OfferingCreateDTO dto) throws MyException {
         BigDecimal price = dto.basePrice();
 
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {

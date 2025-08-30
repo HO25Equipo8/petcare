@@ -23,7 +23,7 @@ public class ValidateOfferingRoleCompatibility implements ValidationOffering {
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     @Override
-    public void validar(OfferingCreateDTO dto) throws MyException {
+    public void validate(OfferingCreateDTO dto) throws MyException {
         ProfessionalRoleEnum requiredRole = requiredRoles.get(dto.name());
         log.debug("Rol recibido: {}", dto.allowedRole()); // o dto.allowedRol() según el nombre
 

@@ -9,6 +9,8 @@ import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.domain.dto.response.OfferingResponseDTO;
 import com.petcare.back.domain.entity.PlanDiscountRule;
+import com.petcare.back.domain.enumerated.OfferingEnum;
+import com.petcare.back.domain.enumerated.OfferingVariantDescriptionEnum;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PlanDiscountRuleRepository;
 import com.petcare.back.service.*;
@@ -21,8 +23,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
 @RestController
@@ -129,5 +133,14 @@ public class AdminController {
                 "message", "Simulacion creada con éxito",
                 "data", bookingSimulationResponseDTO
         ));
+    }
+
+    @GetMapping("/list/variant/descriptions")
+    public Map<OfferingEnum, List<String>> getDescriptionsByOffering() {
+        return Arrays.stream(OfferingVariantDescriptionEnum.values())
+                .collect(Collectors.groupingBy(
+                        OfferingVariantDescriptionEnum::getBaseOffering,
+                        Collectors.mapping(OfferingVariantDescriptionEnum::getDescription, Collectors.toList())
+                ));
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class ValidateOfferingDescription implements ValidationOffering {
 
     @Override
-    public void validar(OfferingCreateDTO dto) throws MyException {
+    public void validate(OfferingCreateDTO dto) throws MyException {
         if (dto.description() == null || dto.description().trim().isEmpty()) {
             throw new MyException("La descripción del servicio no puede estar vacía.");
         }

@@ -37,7 +37,7 @@ public class OfferingService {
         }
 
         for (ValidationOffering v : validations) {
-            v.validar(dto);
+            v.validate(dto);
         }
 
         Offering offering = mapper.toEntity(dto);

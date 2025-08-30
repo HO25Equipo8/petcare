@@ -18,4 +18,5 @@ public record OfferingCreateDTO(
         List<PetTypeEnum> applicablePetTypes,
         @NotNull(message = "Debe especificarse un rol profesional válido")
         ProfessionalRoleEnum allowedRole) {
+
 }
