@@ -14,6 +14,8 @@ public record OfferingCreateDTO(
         @NotNull OfferingEnum name,
         @NotBlank String description,
         @NotNull @DecimalMin("0.00") BigDecimal basePrice,
+        @NotNull(message = "Debe especificarse al menos un tipo de mascota")
         List<PetTypeEnum> applicablePetTypes,
+        @NotNull(message = "Debe especificarse un rol profesional válido")
         ProfessionalRoleEnum allowedRole) {
 }
