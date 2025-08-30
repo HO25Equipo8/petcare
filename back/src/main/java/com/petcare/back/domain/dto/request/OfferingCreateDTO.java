@@ -2,6 +2,7 @@ package com.petcare.back.domain.dto.request;
 
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.PetTypeEnum;
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,5 +14,6 @@ public record OfferingCreateDTO(
         @NotNull OfferingEnum name,
         @NotBlank String description,
         @NotNull @DecimalMin("0.00") BigDecimal basePrice,
-        List<PetTypeEnum> applicablePetTypes) {
+        List<PetTypeEnum> applicablePetTypes,
+        ProfessionalRoleEnum allowedRole) {
 }

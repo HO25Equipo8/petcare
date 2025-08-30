@@ -32,46 +32,62 @@ public class SecurityConfiguration {
     @Autowired
     private SecurityFilter securityFilter;
 
-    @Autowired
-    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+//    @Autowired
+//    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception
+//    {
+//        return httpSecurity
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//                .csrf(csrf -> csrf.disable())
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(authz -> authz
+//                        .requestMatchers(HttpMethod.GET, "/hello").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
+//                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Allow OAuth2 endpoints
+//                        //.requestMatchers(HttpMethod.GET, "/", "/api/sitter/{id}", "/api/owner/{id}","/api/pet/{id}").permitAll()
+//                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**")
+//                        // Role-based endpoints
+//
+//                        //.requestMatchers(HttpMethod.POST, "/api/cursos").hasRole("ADMIN")
+//                        //.requestMatchers(HttpMethod.POST, "/api/mentorias", "/api/certificaciones").hasAnyRole("ADMIN", "MENTOR")
+//
+//                        //.requestMatchers(HttpMethod.PUT, "/api/cursos/").hasRole("ADMIN")
+//                        //.requestMatchers(HttpMethod.PUT, "/api/mentorias/", "/api/certificaciones/").hasAnyRole("ADMIN", "MENTOR")
+//
+//                        //.requestMatchers(HttpMethod.DELETE, "/api/cursos/", "/api/mentorias/", "/api/certificaciones/").hasRole("ADMIN")
+//
+//                        //.requestMatchers(HttpMethod.GET,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
+//                        //.requestMatchers(HttpMethod.PUT,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
+//                        //.requestMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
+//                        .permitAll()
+//                        .anyRequest().authenticated())
+//                .oauth2Login(oauth2 -> oauth2
+//                        .successHandler(oAuth2AuthenticationSuccessHandler)
+//                )
+//                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception
-    {
-        return httpSecurity
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.GET, "/hello").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
-                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Allow OAuth2 endpoints
-                        //.requestMatchers(HttpMethod.GET, "/", "/api/sitter/{id}", "/api/owner/{id}","/api/pet/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/hello").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**")
-                        // Role-based endpoints
-
-                        //.requestMatchers(HttpMethod.POST, "/api/cursos").hasRole("ADMIN")
-                        //.requestMatchers(HttpMethod.POST, "/api/mentorias", "/api/certificaciones").hasAnyRole("ADMIN", "MENTOR")
-
-                        //.requestMatchers(HttpMethod.PUT, "/api/cursos/").hasRole("ADMIN")
-                        //.requestMatchers(HttpMethod.PUT, "/api/mentorias/", "/api/certificaciones/").hasAnyRole("ADMIN", "MENTOR")
-
-                        //.requestMatchers(HttpMethod.DELETE, "/api/cursos/", "/api/mentorias/", "/api/certificaciones/").hasRole("ADMIN")
-
-                        //.requestMatchers(HttpMethod.GET,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
-                        //.requestMatchers(HttpMethod.PUT,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
-                        //.requestMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

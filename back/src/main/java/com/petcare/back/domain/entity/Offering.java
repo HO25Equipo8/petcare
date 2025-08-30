@@ -2,6 +2,7 @@ package com.petcare.back.domain.entity;
 
 import com.petcare.back.domain.enumerated.PetTypeEnum;
 import com.petcare.back.domain.enumerated.OfferingEnum;
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,6 +43,13 @@ public class Offering {
         @CollectionTable(name = "offering_pet_types", joinColumns = @JoinColumn(name = "offering_id"))
         @Column(name = "pet_type", nullable = false)
         private List<PetTypeEnum> applicablePetTypes;
+
+        @Enumerated(EnumType.STRING)
+        @Column(name = "allowed_role", nullable = false, length = 50)
+        private ProfessionalRoleEnum allowedRole;
+
+        @Column(name = "active", nullable = false)
+        private boolean active = true;
 
         @CreationTimestamp
         @Column(name = "created_at", updatable = false)
