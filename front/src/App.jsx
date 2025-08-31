@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { PetHeader } from './components/PetHeader';
-import { LandingPage } from './components/LandingPage';
-import { Dashboard } from './components/Dashboard';
-import { SitterDashboard } from './components/SitterDashboard';
-import { AdminDashboard } from './components/AdminDashboard';
+import { LandingPage } from './pages/LandingPage';
+import { Dashboard } from './pages/Dashboard';
+import { SitterDashboard } from './pages/SitterDashboard';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { PetProfiles } from './components/PetProfiles';
 import { CaregiverDirectory } from './components/CaregiverDirectory';
 import { LiveTracking } from './components/LiveTracking';

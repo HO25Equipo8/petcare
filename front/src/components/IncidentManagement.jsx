@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Label } from './ui/label';
-import { Badge } from './ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { AlertTriangle, Camera, CheckCircle, Clock, Plus, Image as ImageIcon, X } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/Card.jsx';
+import { Button } from './ui/Button.jsx';
+import { Input } from './ui/Input.jsx';
+import { Textarea } from './ui/Textarea.jsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
+import { Label } from './ui/Label.jsx';
+import { Badge } from './ui/Badge.jsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/Dialog.jsx';
+import { AlertTriangle, Camera, CheckCircle, Clock, Plus } from 'lucide-react';
+import { FallbackImage } from './common/FallbackImage';
 
 
 
@@ -389,7 +389,7 @@ export function IncidentManagement({ onNavigate }) {
                   <div className="flex gap-2">
                     {incident.images.map((image, index) => (
                       <div key={index} className="relative">
-                        <ImageWithFallback
+                        <FallbackImage
                           src={image}
                           alt={`Evidencia ${index + 1}`}
                           className="w-24 h-24 object-cover rounded-lg border"
