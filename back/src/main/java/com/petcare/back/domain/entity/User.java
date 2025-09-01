@@ -71,12 +71,16 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<ScheduleConfig> scheduleConfigs;
 
+
+
     //minimum atributes constructor
-    public User(@Email String login, String encryptedPassword, Role role) {
+    public User(@Email String login, String encryptedPassword, Role role,ProfessionalRoleEnum roleProfessional) {
         this.email = login;
         this.password = encryptedPassword;
         this.role = role;
+        this.roleProfessional = roleProfessional;
     }
+
 
     // OAuth users constructor
     public User(String email, String name, String provider, String providerId, Role role) {

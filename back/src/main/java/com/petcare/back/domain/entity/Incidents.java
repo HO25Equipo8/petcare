@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,19 +23,18 @@ public class Incidents {
 
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "image_id") 
-    private Image image;
+    @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> imageIds = new ArrayList<>();
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false) // 👈 ahora puede haber muchos incidents por owner
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false) // 👈 ahora puede haber muchos incidents por pet
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false) // 👈 ahora puede haber muchos incidents por sitter
     @JoinColumn(name = "sitter_id")
     private User sitter;
 

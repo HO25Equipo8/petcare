@@ -17,10 +17,14 @@ public class Image {
     private Long id;
 
     private String imageName;
-
     private String imageType;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] data;
+
+    @ManyToOne
+    @JoinColumn(name = "incident_id")
+    private Incidents incident;
 
 }

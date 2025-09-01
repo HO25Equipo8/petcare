@@ -5,6 +5,7 @@ import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
 import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.entity.User;
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.repository.UserRepository;
 import com.petcare.back.service.LocationService;
@@ -33,11 +34,11 @@ public class RegisterController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping
-    public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
-            , UriComponentsBuilder uriComponentsBuilder){
+    public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO,
+                                          UriComponentsBuilder uriComponentsBuilder) {
         // Check if email already exists
         if (userRepository.findByEmail(userRegisterDTO.login()) != null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Email already exists");
         }
 
         // Check if passwords match
@@ -45,21 +46,31 @@ public class RegisterController {
             return ResponseEntity.badRequest().body("Passwords do not match");
         }
 
-        Role role;
-        if (userRegisterDTO.role() != null) {
-            role = userRegisterDTO.role();
-        } else {
-            role = Role.USER;
-        }
+        // Determinar el rol general
+        Role role = (userRegisterDTO.role() != null) ? userRegisterDTO.role() : Role.USER;
 
+        // Determinar el rol profesional (puede venir nulo si no aplica)
+        ProfessionalRoleEnum professionalRole = userRegisterDTO.professionalRole();
+
+        // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
-        User newUser = new User(userRegisterDTO.login(), encryptedPassword, role);
+
+        // Crear el usuario con el nuevo constructor
+        User newUser = new User(
+                userRegisterDTO.login(),
+                encryptedPassword,
+                role,
+                professionalRole
+        );
 
         userRepository.save(newUser);
 
-        // return ResponseEntity.ok().build();
+        // Respuesta con DTO
         UserDTO userDTO = new UserDTO(newUser.getId());
-        URI url = uriComponentsBuilder.path("/users/{id}").buildAndExpand(newUser.getId()).toUri();
+        URI url = uriComponentsBuilder.path("/users/{id}")
+                .buildAndExpand(newUser.getId())
+                .toUri();
+
         return ResponseEntity.created(url).body(userDTO);
     }
 }
