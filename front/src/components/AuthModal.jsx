@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-
-import { User, Shield, Mail, Lock, Phone, MapPin } from 'lucide-react';
-import { PetCareLogo } from './PetCareLogo';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog.jsx';
+import { Button } from './ui/Button.jsx';
+import { Input } from './ui/Input.jsx';
+import { Label } from './ui/Label.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs.jsx';
+import { Card, CardContent } from './ui/Card.jsx';
+import { User, Mail, Lock } from 'lucide-react';
+import { Logo } from './ui/Logo.jsx';
 
 
 
@@ -116,7 +113,7 @@ export function AuthModal({ isOpen, onClose, onLogin }) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <PetCareLogo size={20} className="text-white" />
+              <Logo size={20} className="text-white" />
             </div>
             Bienvenido a PetCare
           </DialogTitle>

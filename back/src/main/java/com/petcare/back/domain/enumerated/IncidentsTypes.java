@@ -16,7 +16,7 @@ public enum IncidentsTypes {
     DAÑOS_EN_LAS_INSTALACIONES(IncidentsCategory.GUARDERIA),
     MASCOTA_SE_LASTIMA_EN_EL_ENTRENAMIENTO(IncidentsCategory.ADIESTRAMIENTO),
     PROBLEMAS_DE_COMPORTAMIENTO(IncidentsCategory.ADIESTRAMIENTO),
-    EL_DUEÑO_NO_RECOJIO_A_TIEMPO_LA_MASCOTA(IncidentsCategory.ADIESTRAMIENTO)
+    EL_DUEÑO_NO_RECOGIO_A_TIEMPO_LA_MASCOTA(IncidentsCategory.ADIESTRAMIENTO)
 
     ;
     private final IncidentsCategory incidentsCategory;

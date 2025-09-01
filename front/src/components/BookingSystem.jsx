@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Calendar } from './ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Calendar as CalendarIcon, Clock, MapPin, Heart, DollarSign, Check, Plus, Edit, Trash2, Star } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from './ui/Card.jsx';
+import { Button } from './ui/Button.jsx';
+import { Badge } from './ui/Badge.jsx';
+import { Input } from './ui/Input.jsx';
+import { Label } from './ui/Label.jsx';
+import { Textarea } from './ui/Textarea.jsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
+import { Calendar } from './ui/Calendar.jsx';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs.jsx';
+import { Calendar as CalendarIcon, Clock, MapPin, Heart, Check, Plus, Edit, Trash2, Star } from 'lucide-react';
 
 
 
