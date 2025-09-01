@@ -11,6 +11,7 @@ import com.petcare.back.domain.mapper.response.PlanResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PlanDiscountRuleRepository;
 import com.petcare.back.repository.PlanRepository;
+import com.petcare.back.validation.ValidationPlanCreate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,12 +28,17 @@ public class PlanService {
     private final PlanCreateMapper planMapper;
     private final PlanResponseMapper planResponseMapper;
     private final PlanDiscountRuleRepository planDiscountRuleRepository;
+    private final List<ValidationPlanCreate> validationPlanCreates;
 
     public PlanResponseDTO createPlan(PlanCreateDTO dto) throws MyException {
         User user = getAuthenticatedUser();
 
         if (user.getRole() != Role.OWNER) {
             throw new MyException("Solo los dueños pueden seleccionar su plan");
+        }
+
+        for (ValidationPlanCreate v : validationPlanCreates) {
+            v.validate(dto);
         }
 
         Plan plan = planMapper.toEntity(dto);

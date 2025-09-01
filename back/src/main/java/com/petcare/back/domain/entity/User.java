@@ -71,6 +71,9 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<ScheduleConfig> scheduleConfigs;
 
+    @Column(nullable = false)
+    private Boolean active;
+
     //minimum atributes constructor
     public User(@Email String login, String encryptedPassword, Role role) {
         this.email = login;

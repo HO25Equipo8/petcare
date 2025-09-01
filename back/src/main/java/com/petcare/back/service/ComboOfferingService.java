@@ -38,8 +38,8 @@ public class ComboOfferingService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        if (user.getRole() != Role.ADMIN) {
-            throw new MyException("Solo los admin pueden registrar combos");
+        if (user.getRole() != Role.SITTER) {
+            throw new MyException("Solo los profesionales pueden registrar combos");
         }
 
         List<Offering> offerings = offeringRepository.findAllById(dto.offeringIds());

@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan("com.petcare.back.domain.entity") // o donde estén tus entidades
+@EntityScan("com.petcare.back.domain.entity")
 @EnableJpaRepositories("com.petcare.back.repository")
 public class BackApplication {
 

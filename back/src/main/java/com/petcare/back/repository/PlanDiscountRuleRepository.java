@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface PlanDiscountRuleRepository extends JpaRepository<PlanDiscountRule, Long> {
     Optional<PlanDiscountRule> findByCategory(CustomerCategory category);
+
+    List<PlanDiscountRule> findAllByCategory(CustomerCategory category);
 }

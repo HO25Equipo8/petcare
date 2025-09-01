@@ -56,6 +56,8 @@ public class RegisterController {
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
         User newUser = new User(userRegisterDTO.login(), encryptedPassword, role);
 
+        newUser.setActive(true);
+        newUser.setRoleProfessional(ProfessionalRoleEnum.USUARIO);
         userRepository.save(newUser);
 
         // return ResponseEntity.ok().build();

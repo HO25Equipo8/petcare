@@ -32,8 +32,8 @@ public class OfferingService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        if (user.getRole() != Role.ADMIN) {
-            throw new MyException("Solo los admin pueden registrar servicios");
+        if (user.getRole() != Role.SITTER) {
+            throw new MyException("Solo los profesionales pueden registrar servicios");
         }
 
         for (ValidationOffering v : validations) {
