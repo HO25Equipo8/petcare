@@ -42,13 +42,12 @@ public class RegisterController {
         }
         // Check if email already exists
         if (userRepository.findByEmail(userRegisterDTO.login()) != null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Email ya existe");
         }
         //Check for empty passwords
         if (userRegisterDTO.pass1() == null || userRegisterDTO.pass2() == null) {
             return ResponseEntity.badRequest().body("Contraseñas no pueden estar vacías");
         }
-
 
         // Check if passwords match
         if (!userRegisterDTO.pass1().equals(userRegisterDTO.pass2())) {
@@ -67,7 +66,6 @@ public class RegisterController {
 
         userRepository.save(newUser);
 
-        // return ResponseEntity.ok().build();
         UserDTO userDTO = new UserDTO(newUser.getId());
         URI url = uriComponentsBuilder.path("/users/{id}").buildAndExpand(newUser.getId()).toUri();
         return ResponseEntity.created(url).body(userDTO);
