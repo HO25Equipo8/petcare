@@ -47,6 +47,7 @@ public class RegisterControllerTest {
                 "Password1",
                 "Password1",
                 Role.USER,
+                null,
                 null
         );
 
@@ -70,6 +71,7 @@ public class RegisterControllerTest {
                 "Password1",
                 "Password1",
                 Role.USER,
+                null,
                 null
         );
 
@@ -93,6 +95,7 @@ public class RegisterControllerTest {
                 "Password1",
                 "Password1",
                 Role.USER,
+                null,
                 null
         );
 
@@ -116,6 +119,7 @@ public class RegisterControllerTest {
                 null,
                 null,
                 Role.USER,
+                null,
                 null
         );
 
@@ -141,6 +145,7 @@ public class RegisterControllerTest {
                 "Peras",
                 "Manzanas",
                 Role.USER,
+                null,
                 null
         );
 
