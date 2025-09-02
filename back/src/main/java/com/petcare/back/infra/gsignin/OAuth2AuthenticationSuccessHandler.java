@@ -42,6 +42,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             response.sendRedirect("https://petcare-zeta-kohl.vercel.app/login?error=oauth_error");
             return;
         }
+
         // Find or create user
         UserDetails userDetails = userRepository.findByEmail(email);
         User user;

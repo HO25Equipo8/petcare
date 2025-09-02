@@ -54,6 +54,11 @@ public class RegisterController {
             return ResponseEntity.badRequest().body("Contraseñas no coinciden");
         }
 
+        // Check if passwords match
+        if (!userRegisterDTO.pass1().equals(userRegisterDTO.pass2())) {
+            return ResponseEntity.badRequest().body("Passwords do not match");
+        }
+
         // Determinar el rol general
         Role role = (userRegisterDTO.role() != null) ? userRegisterDTO.role() : Role.USER;
 

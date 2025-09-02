@@ -44,9 +44,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.GET, "/hello").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
-
                         .requestMatchers(HttpMethod.POST,"/api/upload").permitAll()
-
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Allow OAuth2 endpoints
 
                         //.requestMatchers(HttpMethod.GET, "/", "/api/sitter/{id}", "/api/owner/{id}","/api/pet/{id}").permitAll()
