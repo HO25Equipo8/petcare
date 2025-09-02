@@ -54,22 +54,25 @@ public class RegisterController {
             return ResponseEntity.badRequest().body("Contraseñas no coinciden");
         }
 
-        Role role;
-        if (userRegisterDTO.role() != null) {
-            role = userRegisterDTO.role();
-        } else {
-            role = Role.USER;
-        }
+        // Determinar el rol general
+        Role role = (userRegisterDTO.role() != null) ? userRegisterDTO.role() : Role.USER;
 
+        // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
-        User newUser = new User(userRegisterDTO.login(), encryptedPassword, role);
 
-        newUser.setActive(true);
-        newUser.setRoleProfessional(ProfessionalRoleEnum.USUARIO);
+        // Crear el usuario con el nuevo constructor
+        User newUser = new User(
+                userRegisterDTO.login(),
+                encryptedPassword,
+                role);
+
         userRepository.save(newUser);
 
         UserDTO userDTO = new UserDTO(newUser.getId());
-        URI url = uriComponentsBuilder.path("/users/{id}").buildAndExpand(newUser.getId()).toUri();
+        URI url = uriComponentsBuilder.path("/users/{id}")
+                .buildAndExpand(newUser.getId())
+                .toUri();
+
         return ResponseEntity.created(url).body(userDTO);
     }
 }

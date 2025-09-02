@@ -74,12 +74,14 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Boolean active;
 
+
     //minimum atributes constructor
     public User(@Email String login, String encryptedPassword, Role role) {
         this.email = login;
         this.password = encryptedPassword;
         this.role = role;
     }
+
 
     // OAuth users constructor
     public User(String email, String name, String provider, String providerId, Role role) {

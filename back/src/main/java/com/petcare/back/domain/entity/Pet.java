@@ -89,6 +89,7 @@ public class Pet {
     @OneToMany(mappedBy = "pet")
     @JsonManagedReference
     private List<Booking> bookings;
+    
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
