@@ -1,10 +1,14 @@
 package com.petcare.back.domain.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.petcare.back.domain.entity.*;
 import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
+
 
 public record UserRegisterDTO(
         @NotBlank(message = "Email no puede estar vacío")
@@ -23,5 +27,7 @@ public record UserRegisterDTO(
         )
         String pass2,
         Role role,
-        LocationDTO location) {
+        ProfessionalRoleEnum professionalRole,
+        LocationDTO location
+        ) {
 }

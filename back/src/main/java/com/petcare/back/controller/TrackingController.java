@@ -15,7 +15,7 @@ public class TrackingController {
         this.service = service;
     }
 
-    // Guardar nueva ubicación (ej: desde la app móvil del cuidador)
+
     @PostMapping("/{bookingId}")
     public TrackingPoint saveLocation(@PathVariable UUID bookingId, @RequestBody TrackingPoint point) {
         point.setBookingId(bookingId);

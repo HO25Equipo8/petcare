@@ -37,8 +37,9 @@ public class OwnerController {
     private final PlanService planService;
     private final BookingService bookingService;
 
-    @PostMapping("/register/pet")
-    public ResponseEntity<?> registerPet(@Valid @RequestBody PetCreateDTO petCreateDTO,
+    @PostMapping("/register/pet/")
+    public ResponseEntity<?> registerPet(@PathVariable Long ownerId,
+                                         @Valid @RequestBody PetCreateDTO petCreateDTO,
                                          UriComponentsBuilder uriBuilder) {
         try {
             PetResponseDTO pet = petService.createPet(petCreateDTO);

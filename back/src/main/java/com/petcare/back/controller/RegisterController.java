@@ -34,6 +34,7 @@ public class RegisterController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping
+
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
             , UriComponentsBuilder uriComponentsBuilder){
         // Check for empty email
@@ -54,20 +55,36 @@ public class RegisterController {
             return ResponseEntity.badRequest().body("Contraseñas no coinciden");
         }
 
-        Role role;
-        if (userRegisterDTO.role() != null) {
-            role = userRegisterDTO.role();
-        } else {
-            role = Role.USER;
+        // Check if passwords match
+        if (!userRegisterDTO.pass1().equals(userRegisterDTO.pass2())) {
+            return ResponseEntity.badRequest().body("Passwords do not match");
         }
 
+        // Determinar el rol general
+        Role role = (userRegisterDTO.role() != null) ? userRegisterDTO.role() : Role.USER;
+
+        // Determinar el rol profesional (puede venir nulo si no aplica)
+        ProfessionalRoleEnum professionalRole = userRegisterDTO.professionalRole();
+
+        // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
-        User newUser = new User(userRegisterDTO.login(), encryptedPassword, role);
+
+        // Crear el usuario con el nuevo constructor
+        User newUser = new User(
+                userRegisterDTO.login(),
+                encryptedPassword,
+                role,
+                professionalRole
+        );
 
         userRepository.save(newUser);
 
+        // Respuesta con DTO
         UserDTO userDTO = new UserDTO(newUser.getId());
-        URI url = uriComponentsBuilder.path("/users/{id}").buildAndExpand(newUser.getId()).toUri();
+        URI url = uriComponentsBuilder.path("/users/{id}")
+                .buildAndExpand(newUser.getId())
+                .toUri();
+
         return ResponseEntity.created(url).body(userDTO);
     }
 }

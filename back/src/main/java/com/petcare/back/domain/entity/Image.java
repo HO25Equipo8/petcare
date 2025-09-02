@@ -16,7 +16,15 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String url;
+    private String imageName;
+    private String imageType;
 
-    private String description;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] data;
+
+    @ManyToOne
+    @JoinColumn(name = "incident_id")
+    private Incidents incident;
+
 }
