@@ -82,13 +82,11 @@ public class BookingService {
         booking.setStatus(BookingStatusEnum.PENDIENTE);
 
         // 6. Asignar profesionales
-        List<BookingProfessional> bookingProfessionals = dto.professionals().stream()
-                .map(p -> {
-                    User prof = professionalRepository.findById(p.userId())
-                            .orElseThrow(() -> new RuntimeException("Professional not found: " + p.userId()));
-                    return new BookingProfessional(booking, prof);
-                }).toList();
-        booking.setProfessionals(bookingProfessionals);
+        List<User> professionals = dto.professionals().stream()
+                .map(p -> professionalRepository.findById(p.getId())
+                        .orElseThrow(() -> new RuntimeException("Professional not found: " + p.getId())))
+                .toList();
+        booking.setProfessionals(professionals);
 
         // 7. Calcular precio final con descuento del plan
         booking.setFinalPrice(calculateBookingPrice(booking));

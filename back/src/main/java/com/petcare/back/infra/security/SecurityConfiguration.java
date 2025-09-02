@@ -65,9 +65,9 @@ public class SecurityConfiguration {
                         //.requestMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
                         .permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2AuthenticationSuccessHandler)
-                )
+                // .oauth2Login(oauth2 -> oauth2
+                //        .successHandler(oAuth2AuthenticationSuccessHandler)
+                //)
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

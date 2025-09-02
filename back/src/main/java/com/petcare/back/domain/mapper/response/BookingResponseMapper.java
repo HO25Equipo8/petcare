@@ -21,9 +21,10 @@ public interface BookingResponseMapper {
                     ".toList())")
     @Mapping(target = "professionalNames", expression =
             "java(booking.getProfessionals().stream()" +
-                    ".map(bp -> bp.getProfessional().getName() + \" - \" + bp.getProfessional().getRole())" +
+                    ".map(p -> p.getName() + \" - \" + p.getRole())" +
                     ".toList())"
     )
     BookingResponseDTO toDTO(Booking booking);
 }
+
 
