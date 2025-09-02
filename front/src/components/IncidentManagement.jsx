@@ -9,8 +9,7 @@ import { Badge } from './ui/Badge.jsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/Dialog.jsx';
 import { AlertTriangle, Camera, CheckCircle, Clock, Plus } from 'lucide-react';
 import { FallbackImage } from './common/FallbackImage';
-
-
+import StatsCard from '../components/StatsCard.jsx';
 
 export function IncidentManagement({ onNavigate }) {
   const [incidents, setIncidents] = useState([
@@ -256,59 +255,39 @@ export function IncidentManagement({ onNavigate }) {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Incidentes</p>
-                <p className="text-2xl font-semibold">{incidents.length}</p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Pendientes</p>
-                <p className="text-2xl font-semibold text-orange-600">
-                  {incidents.filter(i => i.status === 'pending').length}
-                </p>
-              </div>
-              <Clock className="w-8 h-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">En Progreso</p>
-                <p className="text-2xl font-semibold text-blue-600">
-                  {incidents.filter(i => i.status === 'in-progress').length}
-                </p>
-              </div>
-              <Clock className="w-8 h-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Resueltos</p>
-                <p className="text-2xl font-semibold text-green-600">
-                  {incidents.filter(i => i.status === 'resolved').length}
-                </p>
-              </div>
-              <CheckCircle className="w-8 h-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
+        {[
+          {
+            title: 'Total Incidentes',
+            value: incidents.length,
+            icon: <AlertTriangle className="w-8 h-8 text-orange-500" />,
+          },
+          {
+            title: 'Pendientes',
+            value: incidents.filter(i => i.status === 'pending').length,
+            valueColor: 'text-orange-600',
+            icon: <Clock className="w-8 h-8 text-orange-500" />,
+          },
+          {
+            title: 'En Progreso',
+            value: incidents.filter(i => i.status === 'in-progress').length,
+            valueColor: 'text-blue-600',
+            icon: <Clock className="w-8 h-8 text-blue-500" />,
+          },
+          {
+            title: 'Resueltos',
+            value: incidents.filter(i => i.status === 'resolved').length,
+            valueColor: 'text-green-600',
+            icon: <CheckCircle className="w-8 h-8 text-green-500" />,
+          },
+        ].map((card, idx) => (
+          <StatsCard
+            key={card.title}
+            title={card.title}
+            value={card.value}
+            valueColor={card.valueColor}
+            icon={card.icon}
+          />
+        ))}
       </div>
 
       {/* Incidents List */}

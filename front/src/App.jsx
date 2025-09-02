@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { PetHeader } from './components/PetHeader';
 import { LandingPage } from './pages/LandingPage';
-import { Dashboard } from './pages/Dashboard';
+import { OwnerDashboard } from './pages/OwnerDashboard';
 import { SitterDashboard } from './pages/SitterDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { PetProfiles } from './components/PetProfiles';
@@ -48,13 +48,13 @@ function App() {
         return user.role === 'admin' ? (
           <AdminDashboard user={user} onNavigate={setCurrentView} />
         ) : (
-          <Dashboard onNavigate={setCurrentView} />
+          <OwnerDashboard onNavigate={setCurrentView} />
         );
       case 'sitter-dashboard':
         return user.role === 'sitter' ? (
           <SitterDashboard user={user} onNavigate={setCurrentView} />
         ) : (
-          <Dashboard onNavigate={setCurrentView} />
+          <OwnerDashboard onNavigate={setCurrentView} />
         );
       case 'dashboard':
         // Route to appropriate dashboard based on role
@@ -63,7 +63,7 @@ function App() {
         } else if (user.role === 'sitter') {
           return <SitterDashboard user={user} onNavigate={setCurrentView} />;
         } else {
-          return <Dashboard onNavigate={setCurrentView} />;
+          return <OwnerDashboard onNavigate={setCurrentView} />;
         }
       case 'pets':
         return user.role !== 'admin' ? (
@@ -75,7 +75,7 @@ function App() {
         return user.role === 'owner' ? (
           <CaregiverDirectory onNavigate={setCurrentView} />
         ) : (
-          <Dashboard onNavigate={setCurrentView} />
+          <OwnerDashboard onNavigate={setCurrentView} />
         );
       case 'tracking':
         return user.role !== 'admin' ? (
