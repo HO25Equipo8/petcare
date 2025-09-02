@@ -1,10 +1,8 @@
 package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.ComboOfferingCreateDTO;
-import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.request.OfferingCreateDTO;
 import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
-import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.domain.dto.response.OfferingResponseDTO;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.ComboOfferingService;
@@ -35,7 +33,7 @@ public class AdminController {
     private final ScheduleConfigService scheduleConfigService;
 
     @PostMapping("/register/offering")
-    public ResponseEntity<?> createOfering(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<?> createOffering(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
         try {
             OfferingResponseDTO service = offeringService.createService(dto);
 

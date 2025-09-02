@@ -34,11 +34,25 @@ public class RegisterController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping
-    public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO,
-                                          UriComponentsBuilder uriComponentsBuilder) {
+
+    public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
+            , UriComponentsBuilder uriComponentsBuilder){
+        // Check for empty email
+        if (userRegisterDTO.login() == null) {
+            return ResponseEntity.badRequest().body("Email no puede estar vacío");
+        }
         // Check if email already exists
         if (userRepository.findByEmail(userRegisterDTO.login()) != null) {
-            return ResponseEntity.badRequest().body("Email already exists");
+            return ResponseEntity.badRequest().body("Email ya existe");
+        }
+        //Check for empty passwords
+        if (userRegisterDTO.pass1() == null || userRegisterDTO.pass2() == null) {
+            return ResponseEntity.badRequest().body("Contraseñas no pueden estar vacías");
+        }
+
+        // Check if passwords match
+        if (!userRegisterDTO.pass1().equals(userRegisterDTO.pass2())) {
+            return ResponseEntity.badRequest().body("Contraseñas no coinciden");
         }
 
         // Check if passwords match

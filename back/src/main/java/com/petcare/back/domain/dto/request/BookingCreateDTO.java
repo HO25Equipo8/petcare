@@ -15,7 +15,6 @@ public record BookingCreateDTO(
         List<ProfessionalBookingDTO> professionals
 ) {
     public record ProfessionalBookingDTO(
-            Long userId,
-            ProfessionalRoleEnum roleProfessional
+            Long userId
     ) {}
 }
