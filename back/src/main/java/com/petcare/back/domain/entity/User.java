@@ -58,7 +58,7 @@ public class User implements UserDetails {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "roleProfessional", nullable = false)
+    @Column(name = "roleProfessional")
     private ProfessionalRoleEnum roleProfessional; // Ej: PASEADOR, PELUQUERO, VETERINARIO Solo para SITTER
 
     @OneToMany(mappedBy = "owner")
