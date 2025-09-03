@@ -1,18 +1,12 @@
+
 import { useState } from 'react';
 import { PetHeader } from './components/PetHeader';
-import { LandingPage } from './pages/LandingPage';
-import { OwnerDashboard } from './pages/OwnerDashboard';
-import { SitterDashboard } from './pages/SitterDashboard';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { PetProfiles } from './components/PetProfiles';
-import { CaregiverDirectory } from './components/CaregiverDirectory';
-import { LiveTracking } from './components/LiveTracking';
-import { BookingSystem } from './components/BookingSystem';
-import { IncidentManagement } from './components/IncidentManagement';
+import { AppRoutes } from './AppRoutes';
 import { AuthModal } from './components/AuthModal';
+import { BrowserRouter } from 'react-router-dom';
+
 
 function App() {
-  const [currentView, setCurrentView] = useState('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -20,100 +14,37 @@ function App() {
   const handleLogin = (userData) => {
     setUser(userData);
     setIsLoggedIn(true);
-    // Navigate to appropriate dashboard based on role
-    if (userData.role === 'admin') {
-      setCurrentView('admin-dashboard');
-    } else if (userData.role === 'sitter') {
-      setCurrentView('sitter-dashboard');
-    } else {
-      setCurrentView('dashboard');
-    }
   };
 
   const handleLogout = () => {
     setUser(null);
     setIsLoggedIn(false);
-    setCurrentView('landing');
-  };
-
-  const renderContent = () => {
-    // If not logged in, show landing page
-    if (!isLoggedIn || !user) {
-      return <LandingPage onNavigate={setCurrentView} onLogin={() => setShowAuthModal(true)} />;
-    }
-
-    // Route based on current view and user role
-    switch (currentView) {
-      case 'admin-dashboard':
-        return user.role === 'admin' ? (
-          <AdminDashboard user={user} onNavigate={setCurrentView} />
-        ) : (
-          <OwnerDashboard onNavigate={setCurrentView} />
-        );
-      case 'sitter-dashboard':
-        return user.role === 'sitter' ? (
-          <SitterDashboard user={user} onNavigate={setCurrentView} />
-        ) : (
-          <OwnerDashboard onNavigate={setCurrentView} />
-        );
-      case 'dashboard':
-        // Route to appropriate dashboard based on role
-        if (user.role === 'admin') {
-          return <AdminDashboard user={user} onNavigate={setCurrentView} />;
-        } else if (user.role === 'sitter') {
-          return <SitterDashboard user={user} onNavigate={setCurrentView} />;
-        } else {
-          return <OwnerDashboard onNavigate={setCurrentView} />;
-        }
-      case 'pets':
-        return user.role !== 'admin' ? (
-          <PetProfiles onNavigate={setCurrentView} />
-        ) : (
-          <AdminDashboard user={user} onNavigate={setCurrentView} />
-        );
-      case 'caregivers':
-        return user.role === 'owner' ? (
-          <CaregiverDirectory onNavigate={setCurrentView} />
-        ) : (
-          <OwnerDashboard onNavigate={setCurrentView} />
-        );
-      case 'tracking':
-        return user.role !== 'admin' ? (
-          <LiveTracking onNavigate={setCurrentView} />
-        ) : (
-          <AdminDashboard user={user} onNavigate={setCurrentView} />
-        );
-      case 'booking':
-        return user.role !== 'admin' ? (
-          <BookingSystem onNavigate={setCurrentView} />
-        ) : (
-          <AdminDashboard user={user} onNavigate={setCurrentView} />
-        );
-      case 'incidents':
-        return <IncidentManagement onNavigate={setCurrentView} />;
-      default:
-        return <LandingPage onNavigate={setCurrentView} onLogin={() => setShowAuthModal(true)} />;
-    }
+    console.log('Sesión cerrada');
   };
 
   return (
-    <div className="min-h-screen bg-background-general">
-      <PetHeader 
-        currentView={currentView} 
-        onNavigate={setCurrentView} 
-        isLoggedIn={isLoggedIn}
-        user={user}
-        onLogin={() => setShowAuthModal(true)}
-        onLogout={handleLogout}
-      />
-      {renderContent()}
-      
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onLogin={handleLogin}
-      />
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-background-general">
+        <PetHeader 
+          isLoggedIn={isLoggedIn}
+          user={user}
+          onLogin={() => setShowAuthModal(true)}
+          onLogout={handleLogout}
+        />
+        <AppRoutes
+          user={user}
+          isLoggedIn={isLoggedIn}
+          setShowAuthModal={setShowAuthModal}
+        />
+        {!isLoggedIn && (
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            onLogin={handleLogin}
+          />
+        )}
+      </div>
+    </BrowserRouter>
   );
 }
 
