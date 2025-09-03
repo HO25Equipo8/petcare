@@ -1,8 +1,7 @@
 package com.petcare.back.domain.dto.request;
 
-import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
+import com.petcare.back.domain.entity.User;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public record BookingCreateDTO(
@@ -11,10 +10,6 @@ public record BookingCreateDTO(
         Long comboOfferingId,
         Long planId,
         List<Long> scheduleIds,
-        BigDecimal finalPrice,
-        List<ProfessionalBookingDTO> professionals
+        List<User> professionals
 ) {
-    public record ProfessionalBookingDTO(
-            Long userId
-    ) {}
 }

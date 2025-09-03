@@ -35,8 +35,13 @@ public class Booking {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    private List<BookingProfessional> professionals = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "booking_professionals",
+            joinColumns = @JoinColumn(name = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> professionals = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "offering_id")

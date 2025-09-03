@@ -33,6 +33,4 @@ public class IncidentsDTO {
     private Long petId;
 
     private Long sitterId;
-
-
 }

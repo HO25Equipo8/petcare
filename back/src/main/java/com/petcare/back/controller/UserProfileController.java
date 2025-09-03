@@ -1,17 +1,19 @@
 package com.petcare.back.controller;
 
+import com.petcare.back.domain.entity.Image;
+import com.petcare.back.repository.ImageRepository;
 import com.petcare.back.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+
 @SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/me")
