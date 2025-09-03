@@ -4,6 +4,7 @@ import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.repository.UserRepository;
+import com.petcare.back.service.EmailService;
 import com.petcare.back.service.LocationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,10 @@ public class RegisterControllerTest {
     @Mock
     private LocationService locationService;
 
+    @Mock
+    private EmailService emailService;
+
+    @Mock
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @BeforeEach
@@ -53,6 +58,10 @@ public class RegisterControllerTest {
 
         when(userRepository.findByEmail("test@test.com")).thenReturn(null);
 
+        // Mock EmailService to avoid actual email sending
+        doNothing().when(emailService).sendWelcomeEmail(anyString(), anyString());
+        doNothing().when(emailService).sendAdminNotification(anyString(), anyString());
+
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/");
 
         // Act
@@ -61,6 +70,10 @@ public class RegisterControllerTest {
         // Assert
         assertEquals(201, response.getStatusCode().value());
         verify(userRepository, times(1)).save(any(User.class));
+
+        // Verify emails were attempted to be sent
+        verify(emailService, times(1)).sendWelcomeEmail(eq("test@test.com"), any());
+        verify(emailService, times(1)).sendAdminNotification(eq("test@test.com"), any());
     }
 
     @Test

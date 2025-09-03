@@ -8,6 +8,7 @@ import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.repository.UserRepository;
+import com.petcare.back.service.EmailService;
 import com.petcare.back.service.LocationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,10 @@ public class RegisterController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    @PostMapping
+    @Autowired
+    private EmailService emailService;
 
+    @PostMapping
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
             , UriComponentsBuilder uriComponentsBuilder){
         // Check for empty email
@@ -79,6 +82,19 @@ public class RegisterController {
 
         userRepository.save(newUser);
 
+        // Send email notifications
+        try {
+            // Send welcome email to user
+            emailService.sendWelcomeEmail(newUser.getEmail(), getUserName(newUser));
+
+            // Send notification to admin
+            emailService.sendAdminNotification(newUser.getEmail(), getUserName(newUser));
+
+        } catch (Exception e) {
+            // If email fails, return error (as requested)
+            return ResponseEntity.status(500).body("Usuario creado pero error enviando emails: " + e.getMessage());
+        }
+
         // Respuesta con DTO
         UserDTO userDTO = new UserDTO(newUser.getId());
         URI url = uriComponentsBuilder.path("/users/{id}")
@@ -86,5 +102,10 @@ public class RegisterController {
                 .toUri();
 
         return ResponseEntity.created(url).body(userDTO);
+    }
+
+    // Helper method to get user name
+    private String getUserName(User user) {
+        return user.getEmail().split("@")[0]; // Uses part before @ as name
     }
 }
