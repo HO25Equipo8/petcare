@@ -19,20 +19,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ComboOffering {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private ComboEnum name;
 
-    @Column(nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private Double discount; // %
+    @Column(name = "discount", nullable = false)
+    private Double discount; // porcentaje, ej. 10 = 10%
 
     @ManyToMany
     @JoinTable(
@@ -43,9 +43,11 @@ public class ComboOffering {
     private List<Offering> offerings;
 
     @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Transient // no se guarda en DB

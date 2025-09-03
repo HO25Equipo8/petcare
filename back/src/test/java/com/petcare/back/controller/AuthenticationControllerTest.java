@@ -38,7 +38,7 @@ public class AuthenticationControllerTest {
     void shouldReturnTokenWhenCredentialsAreValid() {
         // Arrange
         UserAuthenticationDTO dto = new UserAuthenticationDTO("test@test.com", "Password1");
-        User fakeUser = new User("test@test.com", "encryptedPass", Role.USER, null);
+        User fakeUser = new User("test@test.com", "encryptedPass", Role.USER);
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);

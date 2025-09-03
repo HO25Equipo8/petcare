@@ -12,6 +12,7 @@ public record ScheduleConfigResponseDTO(
         LocalDate startDate,
         LocalDate endDate,
         List<WeekDayEnum> days,
+        List<ScheduleTurnResponseDTO> turns,
         Integer totalSchedulesGenerated
 ) {
 }
