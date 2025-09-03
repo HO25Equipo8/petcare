@@ -26,15 +26,15 @@ public class Incidents {
     @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> imageIds = new ArrayList<>();
 
-    @ManyToOne(optional = false) // 👈 ahora puede haber muchos incidents por owner
+    @ManyToOne(optional = false)
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @ManyToOne(optional = false) // 👈 ahora puede haber muchos incidents por pet
+    @ManyToOne(optional = false)
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-    @ManyToOne(optional = false) // 👈 ahora puede haber muchos incidents por sitter
+    @ManyToOne(optional = false) //
     @JoinColumn(name = "sitter_id")
     private User sitter;
 

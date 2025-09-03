@@ -1,6 +1,6 @@
 package com.petcare.back.domain.dto.request;
 
-import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
+
 
 import java.math.BigDecimal;
 import java.util.List;

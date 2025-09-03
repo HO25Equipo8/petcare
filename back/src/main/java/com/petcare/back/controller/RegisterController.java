@@ -34,7 +34,6 @@ public class RegisterController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping
-
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
             , UriComponentsBuilder uriComponentsBuilder){
         // Check for empty email
