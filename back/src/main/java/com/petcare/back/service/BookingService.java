@@ -7,10 +7,13 @@ import com.petcare.back.domain.dto.response.BookingSimulationResponseDTO;
 import com.petcare.back.domain.entity.*;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
 import com.petcare.back.domain.enumerated.Role;
+import com.petcare.back.domain.enumerated.ScheduleStatus;
 import com.petcare.back.domain.mapper.request.BookingCreateMapper;
 import com.petcare.back.domain.mapper.response.BookingResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.*;
+import com.petcare.back.validation.ValidationBooking;
+import com.petcare.back.validation.ValidationCombo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -40,6 +43,7 @@ public class BookingService {
     private final BookingResponseMapper mapper;
     private final BookingCreateMapper bookingCreateMapper;
     private final PlanDiscountRuleRepository planDiscountRuleRepository;
+    private final List<ValidationBooking> validations;
 
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
@@ -54,46 +58,74 @@ public class BookingService {
             throw new MyException("Solo los dueños pueden seleccionar su plan");
         }
 
+        // Recorre las validaciones antes de hacer toda la carga de datos
+        for (ValidationBooking v : validations) {
+            v.validate(dto);
+        }
+
         // 2. Cargar owner y mascota
         User owner = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
         Pet pet = petRepository.findById(dto.petId())
                 .orElseThrow(() -> new RuntimeException("Pet not found"));
 
-        // 3. Crear booking
+        // 3. Crear booking desde mapper
         Booking booking = bookingCreateMapper.toEntity(dto);
         booking.setOwner(owner);
         booking.setPet(pet);
 
-        // 4. Asignar offering, combo y plan
+        // 4. Asignar offering, combo y plan con validación explícita
         if (dto.offeringId() != null) {
-            booking.setOffering(offeringRepository.findById(dto.offeringId()).orElse(null));
-        }
-        if (dto.comboOfferingId() != null) {
-            booking.setComboOffering(comboRepository.findById(dto.comboOfferingId()).orElse(null));
-        }
-        if (dto.planId() != null) {
-            booking.setPlan(planRepository.findById(dto.planId()).orElse(null));
+            booking.setOffering(offeringRepository.findById(dto.offeringId())
+                    .orElseThrow(() -> new MyException("El servicio seleccionado no existe")));
         }
 
-        // 5. Asignar horarios
-        booking.setSchedules(scheduleRepository.findAllById(dto.scheduleIds()));
+        if (dto.comboOfferingId() != null) {
+            booking.setComboOffering(comboRepository.findById(dto.comboOfferingId())
+                    .orElseThrow(() -> new MyException("El combo seleccionado no existe")));
+        }
+
+        if (dto.planId() != null) {
+            booking.setPlan(planRepository.findById(dto.planId())
+                    .orElseThrow(() -> new MyException("El plan seleccionado no existe")));
+        }
+
+        // 5. Asignar horarios y marcar como PENDIENTES
+        List<Schedule> schedules = scheduleRepository.findAllById(dto.scheduleIds());
+
+        List<Long> noDisponibles = schedules.stream()
+                .filter(s -> s.getStatus() != ScheduleStatus.DISPONIBLE)
+                .map(Schedule::getScheduleId)
+                .toList();
+
+        if (!noDisponibles.isEmpty()) {
+            throw new MyException("Los siguientes horarios no están disponibles: " + noDisponibles);
+        }
+
+        schedules.forEach(s -> s.setStatus(ScheduleStatus.PENDIENTE));
+        scheduleRepository.saveAll(schedules);
+
+        booking.setSchedules(schedules);
         booking.setReservationDate(Instant.now());
         booking.setStatus(BookingStatusEnum.PENDIENTE);
 
-        // 6. Asignar profesionales
+        // 6. Asignar profesionales (conversión de ids a entidades)
         List<User> professionals = dto.professionals().stream()
-                .map(p -> professionalRepository.findById(p.getId())
-                        .orElseThrow(() -> new RuntimeException("Professional not found: " + p.getId())))
+                .map(id -> professionalRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Professional not found: " + id)))
                 .toList();
+
         booking.setProfessionals(professionals);
 
         // 7. Calcular precio final con descuento del plan
         booking.setFinalPrice(calculateBookingPrice(booking));
 
+        // 8. Guardar booking
         bookingRepository.save(booking);
+
         return mapper.toDTO(booking);
     }
+
     public BigDecimal calculateBookingPrice(Booking booking) {
         BigDecimal totalPrice = BigDecimal.ZERO;
         BigDecimal comboTotal = BigDecimal.ZERO;

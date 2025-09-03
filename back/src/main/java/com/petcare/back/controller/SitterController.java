@@ -172,11 +172,4 @@ public class SitterController {
                 "data", bookingSimulationResponseDTO
         ));
     }
-
-    //Metodo para cambiar el estado a expirado de las reservas anteriores al dia de hoy
-    @PostMapping("/schedules/expire-now")
-    public ResponseEntity<String> expireNow() {
-        int count = scheduleConfigService.expireOldSchedules();
-        return ResponseEntity.ok("Se expiraron " + count + " horarios disponibles anteriores a hoy");
-    }
 }

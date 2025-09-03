@@ -14,7 +14,6 @@ public record ScheduleTurnCreateDTO(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         @Schema(type = "string", example = "07:00")
         LocalTime startTime,
-        @NotNull
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         @Schema(type = "string", example = "12:00")
         LocalTime endTime,
