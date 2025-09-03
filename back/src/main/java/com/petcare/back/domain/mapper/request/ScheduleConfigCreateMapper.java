@@ -9,9 +9,11 @@ import org.mapstruct.Mapping;
 public interface ScheduleConfigCreateMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "sitter", ignore = true) // lo seteás en el service
+    @Mapping(target = "sitter", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "turns", ignore = true)
+        // lo seteás manualmente
     ScheduleConfig toEntity(ScheduleConfigCreateDTO dto);
 }

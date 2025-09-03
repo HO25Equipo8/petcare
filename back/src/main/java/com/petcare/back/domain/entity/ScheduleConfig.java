@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "schedule_config")
@@ -24,29 +25,24 @@ public class ScheduleConfig {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "sitter_id")
+    @JoinColumn(name = "sitter_id", nullable = false)
     private User sitter;
 
+    @Column(name = "configuration_name")
     private String configurationName;
 
+    @Column(name = "start_date")
     private LocalDate startDate;
 
+    @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "start_time", nullable = false)
-    private LocalTime startTime;
-
-    @Column(name = "end_time", nullable = false)
-    private LocalTime endTime;
-
-    @Column(name = "break_start")
-    private LocalTime breakStart;
-
-    @Column(name = "break_end")
-    private LocalTime breakEnd;
+    @OneToMany(mappedBy = "scheduleConfig", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduleTurn> turns;
 
     @Column(name = "service_duration_minutes")
     private Integer serviceDurationMinutes;
@@ -57,16 +53,13 @@ public class ScheduleConfig {
     @Column(nullable = false)
     private Boolean active;
 
-    @ElementCollection(targetClass = WeekDayEnum.class)
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "schedule_days", joinColumns = @JoinColumn(name = "schedule_config_id"))
-    @Column(name = "day")
-    private List<WeekDayEnum> days;
-
     @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
+
 

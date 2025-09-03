@@ -10,6 +10,6 @@ public interface OfferingCreateMapper {
 
     Offering toEntity(OfferingCreateDTO dto);
 
-    OfferingCreateDTO toDo(Offering offering);
+    OfferingCreateDTO toDto(Offering offering);
 }
 

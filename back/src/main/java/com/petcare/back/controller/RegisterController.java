@@ -1,11 +1,8 @@
 package com.petcare.back.controller;
 
-import com.petcare.back.domain.dto.request.LocationDTO;
 import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
-import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.entity.User;
-import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.repository.UserRepository;
 import com.petcare.back.service.LocationService;
@@ -62,9 +59,6 @@ public class RegisterController {
         // Determinar el rol general
         Role role = (userRegisterDTO.role() != null) ? userRegisterDTO.role() : Role.USER;
 
-        // Determinar el rol profesional (puede venir nulo si no aplica)
-        ProfessionalRoleEnum professionalRole = userRegisterDTO.professionalRole();
-
         // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
 
@@ -72,13 +66,10 @@ public class RegisterController {
         User newUser = new User(
                 userRegisterDTO.login(),
                 encryptedPassword,
-                role,
-                professionalRole
-        );
+                role);
 
         userRepository.save(newUser);
 
-        // Respuesta con DTO
         UserDTO userDTO = new UserDTO(newUser.getId());
         URI url = uriComponentsBuilder.path("/users/{id}")
                 .buildAndExpand(newUser.getId())

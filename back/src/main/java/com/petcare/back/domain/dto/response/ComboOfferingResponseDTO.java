@@ -11,5 +11,7 @@ public record ComboOfferingResponseDTO(
         String description,
         Double discount,
         Double finalPrice,
-        List<OfferingCreateDTO> offerings
+        List<OfferingCreateDTO> offerings,
+        List<String> warnings
+
 ) {}

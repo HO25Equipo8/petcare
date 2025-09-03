@@ -22,20 +22,27 @@ public class Plan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "times_per_week", nullable = false)
     private Double timesPerWeek;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "interval_enum", nullable = false)
     private IntervalEnum intervalEnum;
 
+    @Column(name = "promotion")
     private Double promotion;
 
     @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
