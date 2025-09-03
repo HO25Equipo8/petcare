@@ -37,9 +37,8 @@ public class OwnerController {
     private final PlanService planService;
     private final BookingService bookingService;
 
-    @PostMapping("/register/pet/")
-    public ResponseEntity<?> registerPet(@PathVariable Long ownerId,
-                                         @Valid @RequestBody PetCreateDTO petCreateDTO,
+    @PostMapping("/register/pet")
+    public ResponseEntity<?> registerPet(@Valid @RequestBody PetCreateDTO petCreateDTO,
                                          UriComponentsBuilder uriBuilder) {
         try {
             PetResponseDTO pet = petService.createPet(petCreateDTO);
@@ -129,7 +128,7 @@ public class OwnerController {
                     "message", "Reserva registrada con éxito",
                     "data", booking
             ));
-        } catch (RuntimeException e) {
+        } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
                     "message", e.getMessage()

@@ -8,6 +8,7 @@ import com.petcare.back.repository.ScheduleRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,15 +24,17 @@ public class ValidateBookingSchedulesAvailability implements ValidationBooking {
     public void validate(BookingCreateDTO data) throws MyException {
         List<Schedule> schedules = scheduleRepository.findAllById(data.scheduleIds());
 
-        List<Schedule> unavailable = schedules.stream()
+        Map<ScheduleStatus, List<Long>> agrupados = schedules.stream()
                 .filter(s -> s.getStatus() != ScheduleStatus.DISPONIBLE)
-                .toList();
+                .collect(Collectors.groupingBy(Schedule::getStatus,
+                        Collectors.mapping(Schedule::getScheduleId, Collectors.toList())));
 
-        if (!unavailable.isEmpty()) {
-            String ids = unavailable.stream()
-                    .map(s -> String.valueOf(s.getScheduleId()))
-                    .collect(Collectors.joining(", "));
-            throw new MyException("Los siguientes horarios no están disponibles: " + ids);
+        if (!agrupados.isEmpty()) {
+            String mensaje = agrupados.entrySet().stream()
+                    .map(e -> e.getKey().name() + ": " + e.getValue())
+                    .collect(Collectors.joining(" | "));
+            throw new MyException("Horarios no disponibles → " + mensaje);
         }
     }
 }
+

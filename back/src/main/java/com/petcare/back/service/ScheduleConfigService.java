@@ -159,6 +159,17 @@ public class ScheduleConfigService {
         return count;
     }
 
+    @Scheduled(cron = "0 10 2 * * *") // 10 minutos después
+    @Transactional
+    public int deleteUnlinkedExpiredSchedules() {
+        List<Schedule> expiradosSinReserva = scheduleRepository.findExpiredWithoutBookings();
+
+        scheduleRepository.deleteAll(expiradosSinReserva);
+        log.info("Se eliminaron {} horarios expirados sin reservas", expiradosSinReserva.size());
+
+        return expiradosSinReserva.size();
+    }
+
     @Scheduled(cron = "0 0 1 * * *") // Cada día a la 1 AM
     @Transactional
     public void deactivateExpiredConfigs() {
