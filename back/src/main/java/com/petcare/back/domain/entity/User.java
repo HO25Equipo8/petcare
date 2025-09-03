@@ -59,7 +59,7 @@ public class User implements UserDetails {
 
     @ElementCollection(targetClass = ProfessionalRoleEnum.class)
     @CollectionTable(name = "user_professional_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role", nullable = false)
+    @Column(name = "role_proffesional")
     @Enumerated(EnumType.STRING)
     private List<ProfessionalRoleEnum> professionalRoles = new ArrayList<>(); // Ej: PASEADOR, PELUQUERO, VETERINARIO Solo para SITTER
 
