@@ -32,6 +32,20 @@ public class EmailService {
         }
     }
 
+    public void sendPassRecoverEmail(String userEmail) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(userEmail);
+            message.setSubject("¡Te olvidaste la contraseña!");
+            message.setText(buildPassRecoverMessage(userEmail));
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email para recuperar constraseña: " + e.getMessage());
+        }
+    }
+
     public void sendAdminNotification(String userEmail, String userName) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -55,6 +69,17 @@ public class EmailService {
                         "Saludos,\n" +
                         "El equipo de Petcare",
                 userName != null ? userName : "Usuario",
+                userEmail
+        );
+    }
+
+    private String buildPassRecoverMessage(String userEmail) {
+        return String.format(
+                "¡Hola!\n\n" +
+                        "Solicitaste recuperar la contraseña para usuario con email: %s\n\n" +
+                        "En breve podrás setear una nueva contraseña.\n\n" +
+                        "Saludos,\n" +
+                        "El equipo de Petcare",
                 userEmail
         );
     }
