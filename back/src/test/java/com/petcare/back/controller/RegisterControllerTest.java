@@ -51,9 +51,7 @@ public class RegisterControllerTest {
                 "test@test.com",
                 "Password1",
                 "Password1",
-                Role.USER,
-                null,
-                null
+                Role.USER
         );
 
         when(userRepository.findByEmail("test@test.com")).thenReturn(null);
@@ -83,9 +81,7 @@ public class RegisterControllerTest {
                 "test@test.com",
                 "Password1",
                 "Password1",
-                Role.USER,
-                null,
-                null
+                Role.USER
         );
 
         when(userRepository.findByEmail("test@test.com")).thenReturn(new User());
@@ -107,9 +103,7 @@ public class RegisterControllerTest {
                 null,
                 "Password1",
                 "Password1",
-                Role.USER,
-                null,
-                null
+                Role.USER
         );
 
         when(userRepository.findByEmail(null)).thenReturn(null);
@@ -131,9 +125,7 @@ public class RegisterControllerTest {
                 "test@test.com",
                 null,
                 null,
-                Role.USER,
-                null,
-                null
+                Role.USER
         );
 
         when(userRepository.findByEmail("test@test.com")).thenReturn(null);
@@ -157,9 +149,7 @@ public class RegisterControllerTest {
                 "test@test.com",
                 "Peras",
                 "Manzanas",
-                Role.USER,
-                null,
-                null
+                Role.USER
         );
 
         when(userRepository.findByEmail("test@test.com")).thenReturn(null);

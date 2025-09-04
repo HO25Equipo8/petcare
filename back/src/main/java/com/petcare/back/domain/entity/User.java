@@ -57,26 +57,27 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Role role;
 
+    @ElementCollection(targetClass = ProfessionalRoleEnum.class)
+    @CollectionTable(name = "user_professional_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role_proffesional")
     @Enumerated(EnumType.STRING)
-    @Column(name = "roleProfessional")
-    private ProfessionalRoleEnum roleProfessional; // Ej: PASEADOR, PELUQUERO, VETERINARIO Solo para SITTER
+    private List<ProfessionalRoleEnum> professionalRoles = new ArrayList<>(); // Ej: PASEADOR, PELUQUERO, VETERINARIO Solo para SITTER
 
     @OneToMany(mappedBy = "owner")
     private List<Booking> bookingsAsOwner;
-
-    @OneToMany(mappedBy = "professional")
-    private List<BookingProfessional> bookingsAsProfessional = new ArrayList<>();
 
     @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<ScheduleConfig> scheduleConfigs;
 
+    @Column(nullable = false)
+    private Boolean active = true;
+
     //minimum atributes constructor
-    public User(@Email String login, String encryptedPassword, Role role,ProfessionalRoleEnum roleProfessional) {
+    public User(@Email String login, String encryptedPassword, Role role) {
         this.email = login;
         this.password = encryptedPassword;
         this.role = role;
-        this.roleProfessional = roleProfessional;
     }
 
     // OAuth users constructor

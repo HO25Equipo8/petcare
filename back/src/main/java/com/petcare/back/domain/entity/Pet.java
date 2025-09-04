@@ -23,45 +23,63 @@ public class Pet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
     private PetTypeEnum type;
 
+    @Column(name = "breed")
     private String breed;
 
+    @Column(name = "age")
     private Integer age;
 
-    private Double weight; //Peso
+    @Column(name = "weight")
+    private Double weight;
 
-    private String color; // Color del pelaje
-
-    @Enumerated(EnumType.STRING)
-    private PetSizeEnum petSize;  // Tamaño: pequeño, mediano, grande
-
-    private LocalDate birthDate; // Fecha de nacimiento
-
-    private String microchip; // Número de microchip
+    @Column(name = "color")
+    private String color;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "pet_size")
+    private PetSizeEnum petSize;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
+
+    @Column(name = "microchip")
+    private String microchip;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "temperament")
     private TemperamentEnum temperament;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "vaccination")
     private VaccinationEnum vaccination;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "health")
     private HealthStatusEnum health;
 
-    private String allergies; // Alergias conocidas
+    @Column(name = "allergies")
+    private String allergies;
 
-    private String medications; // Medicamentos actuales
+    @Column(name = "medications")
+    private String medications;
 
-    private String specialNeeds; // Necesidades especiales (comportamiento, cuidados)
+    @Column(name = "special_needs")
+    private String specialNeeds;
 
-    private String emergencyContact; // Veterinario o contacto de emergencia
+    @Column(name = "emergency_contact")
+    private String emergencyContact;
 
+    @Column(name = "active", nullable = false)
     private Boolean active = true;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -74,13 +92,15 @@ public class Pet {
     
 
     @ManyToOne
-    @JoinColumn(name = "user_id") // foreign key in pet table
-    @JsonBackReference   // matches with User.pets
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User owner;
 
     @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
