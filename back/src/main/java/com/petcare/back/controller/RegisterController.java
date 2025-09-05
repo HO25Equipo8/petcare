@@ -5,18 +5,16 @@ import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.dto.request.UserUpdateDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
 import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
-import com.petcare.back.domain.entity.Image;
-import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.mapper.response.UserUpdateResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.UserRepository;
+import com.petcare.back.service.EmailService;
 import com.petcare.back.service.LocationService;
 import com.petcare.back.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -25,15 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -52,6 +47,9 @@ public class RegisterController {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private UserUpdateResponseMapper userUpdateResponseMapper;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
@@ -97,6 +95,20 @@ public class RegisterController {
 
         userRepository.save(newUser);
 
+        // Send email notifications
+        try {
+            // Send welcome email to user
+            emailService.sendWelcomeEmail(newUser.getEmail(), getUserName(newUser));
+
+            // Send notification to admin
+            emailService.sendAdminNotification(newUser.getEmail(), getUserName(newUser));
+
+        } catch (Exception e) {
+            // If email fails, return error (as requested)
+            return ResponseEntity.status(500).body("Usuario creado pero error enviando emails: " + e.getMessage());
+        }
+
+        // Respuesta con DTO
         UserDTO userDTO = new UserDTO(newUser.getId());
         URI url = uriComponentsBuilder.path("/users/{id}")
                 .buildAndExpand(newUser.getId())
@@ -165,5 +177,9 @@ public class RegisterController {
                     "message", "Error interno del servidor"
             ));
         }
+    }
+    // Helper method to get user name
+    private String getUserName(User user) {
+        return user.getEmail().split("@")[0]; // Uses part before @ as name
     }
 }
