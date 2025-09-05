@@ -24,7 +24,7 @@ public class EmailService {
             message.setFrom(fromEmail);
             message.setTo(userEmail);
             message.setSubject("¡Petcare te dice Hola!");
-            message.setText(buildWelcomeMessage(userName, userEmail));
+            message.setText(buildWelcomeMessage(userEmail));
 
             mailSender.send(message);
         } catch (Exception e) {
@@ -60,17 +60,20 @@ public class EmailService {
         }
     }
 
-    private String buildWelcomeMessage(String userName, String userEmail) {
-        return String.format(
-                "¡Hola %s!\n\n" +
-                        "Tu cuenta ha sido creada exitosamente con el email: %s\n\n" +
-                        "Ya puedes comenzar a usar todas nuestras funcionalidades.\n\n" +
-                        "¡Gracias por unirte a nosotros!\n\n" +
-                        "Saludos,\n" +
-                        "El equipo de Petcare",
-                userName != null ? userName : "Usuario",
-                userEmail
-        );
+    private String buildWelcomeMessage(String userName) {
+        return """
+            🐾 ¡Bienvenido a PetCare! 🐶🐱🐰
+            
+            Gracias por registrarte en nuestra plataforma, %s. 
+            Ya podés acceder a todas las funcionalidades para cuidar, conectar y disfrutar junto a tus mascotas.
+            
+            ✨ Reservá servicios con profesionales verificados  
+            🦴 Compartí experiencias y opiniones  
+            📅 Organizá tus horarios y seguimientos  
+            💬 Recibí feedback y construí tu reputación  
+            
+            ¡Nos alegra tenerte con nosotros! 💚
+            """.formatted(userName != null ? userName : "Usuario");
     }
 
     private String buildPassRecoverMessage(String userEmail) {
