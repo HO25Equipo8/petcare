@@ -3,6 +3,7 @@ package com.petcare.back.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.dto.request.UserUpdateDTO;
+import com.petcare.back.domain.dto.response.NearbySitterResponseDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
 import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
 import com.petcare.back.domain.entity.User;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -119,41 +121,15 @@ public class RegisterController {
 
     @Operation(
             summary = "Actualizar perfil del usuario autenticado",
-            description = "Permite actualizar datos personales, ubicación, foto de perfil y fotos de verificación (solo para SITTER)"
+            description = "Permite actualizar datos personales y ubicación"
     )
-    @PutMapping(value = "/update-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update-profile", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateProfile(
-            @Parameter(
-                    description = "Datos del usuario en formato JSON",
-                    required = true,
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = UserUpdateDTO.class)
-                    )
-            )
-            @RequestPart("data") String rawJson,   // 👈 recibimos string plano
-
-            @Parameter(
-                    description = "Fotos de verificación de identidad (solo para SITTER)",
-                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
-                            schema = @Schema(type = "string", format = "binary"))
-            )
-            @RequestPart(value = "images", required = false) MultipartFile[] identityPhotos,
-
-            @Parameter(
-                    description = "Foto de perfil",
-                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
-                            schema = @Schema(type = "string", format = "binary"))
-            )
-            @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto,
-
+            @RequestBody UserUpdateDTO dto,
             UriComponentsBuilder uriBuilder
     ) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            UserUpdateDTO dto = mapper.readValue(rawJson, UserUpdateDTO.class);
-
-            User updatedUser = userService.updateProfile(dto, profilePhoto, identityPhotos);
+            User updatedUser = userService.updateProfile(dto);
 
             URI uri = uriBuilder.path("/api/users/{id}")
                     .buildAndExpand(updatedUser.getId())
@@ -178,6 +154,35 @@ public class RegisterController {
             ));
         }
     }
+
+    @PostMapping("/search/nearby-sitters")
+    public ResponseEntity<?> searchNearbySitters(@RequestParam double radiusKm,
+                                                 UriComponentsBuilder uriBuilder) {
+        try {
+            List<NearbySitterResponseDTO> sitters = userService.findNearbySitters(radiusKm);
+
+            URI uri = uriBuilder.path("/sitters/search").build().toUri();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Profesionales encontrados dentro de " + radiusKm + " km",
+                    "data", sitters,
+                    "searchUri", uri.toString()
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+
     // Helper method to get user name
     private String getUserName(User user) {
         return user.getEmail().split("@")[0]; // Uses part before @ as name

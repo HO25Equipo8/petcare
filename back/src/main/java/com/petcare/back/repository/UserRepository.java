@@ -5,6 +5,7 @@ import com.petcare.back.domain.enumerated.Role;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 
@@ -24,4 +25,23 @@ public interface UserRepository extends JpaRepository<User, Long> {
     ORDER BY AVG(f.rating) DESC, COUNT(f.id) DESC
     """, nativeQuery = true)
     List<User> findTopSittersByReputationNative(Pageable pageable);
+
+    //Formula para sacar radio usa el número(6371) que es el radio de la Tierra en kilómetros.
+    @Query("""
+    SELECT u FROM User u
+    WHERE u.role = 'SITTER'
+      AND u.active = true
+      AND u.verified = true
+      AND u.location IS NOT NULL
+      AND (6371 * acos(
+            cos(radians(:lat)) *
+            cos(radians(u.location.latitude)) *
+            cos(radians(u.location.longitude) - radians(:lng)) +
+            sin(radians(:lat)) *
+            sin(radians(u.location.latitude))
+      )) <= :radius
+""")
+    List<User> findVerifiedActiveSittersWithinRadius(@Param("lat") double lat,
+                                                     @Param("lng") double lng,
+                                                     @Param("radius") double radiusKm);
 }
