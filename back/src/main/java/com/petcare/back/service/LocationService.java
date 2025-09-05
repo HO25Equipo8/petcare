@@ -3,6 +3,7 @@ package com.petcare.back.service;
 import com.petcare.back.domain.dto.request.LocationDTO;
 import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.mapper.request.LocationCreateMapper;
+import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 
@@ -65,5 +66,37 @@ public class LocationService {
                 loc.getProvince(),
                 loc.getCountry()
         );
+    }
+
+    public Location update(LocationDTO dto, Location existing) throws MyException {
+        if (existing == null) {
+            throw new MyException("No hay ubicación previa para actualizar.");
+        }
+
+        // Actualizamos los campos básicos
+        existing.setStreet(dto.street());
+        existing.setNumber(dto.number());
+        existing.setCity(dto.city());
+        existing.setProvince(dto.province());
+        existing.setCountry(dto.country());
+
+        // Recalculamos coordenadas
+        String fullAddress = buildAddress(dto.street() + " " + dto.number(), existing);
+        double[] coords = geocodingService.getCoordinatesFromAddress(fullAddress);
+
+        if (isInvalid(coords) && dto.street().contains(" ")) {
+            String reducedStreet = getLastWord(dto.street());
+            fullAddress = buildAddress(reducedStreet + " " + dto.number(), existing);
+            coords = geocodingService.getCoordinatesFromAddress(fullAddress);
+        }
+
+        if (isInvalid(coords)) {
+            throw new MyException("No se encontraron coordenadas para la dirección: " + fullAddress);
+        }
+
+        existing.setLatitude(coords[0]);
+        existing.setLongitude(coords[1]);
+
+        return locationRepository.save(existing);
     }
 }
