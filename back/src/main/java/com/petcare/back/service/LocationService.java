@@ -1,6 +1,8 @@
 package com.petcare.back.service;
 
+import com.petcare.back.domain.dto.request.LocationDTO;
 import com.petcare.back.domain.entity.Location;
+import com.petcare.back.domain.mapper.request.LocationCreateMapper;
 import com.petcare.back.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 
@@ -9,10 +11,18 @@ public class LocationService {
 
     private final LocationRepository locationRepository;
     private final GeocodingService geocodingService;
+    private final LocationCreateMapper locationMapper;
 
-    public LocationService(LocationRepository locationRepository, GeocodingService geocodingService) {
+
+    public LocationService(LocationRepository locationRepository, GeocodingService geocodingService, LocationCreateMapper locationMapper) {
         this.locationRepository = locationRepository;
         this.geocodingService = geocodingService;
+        this.locationMapper = locationMapper;
+    }
+
+    public Location save(LocationDTO dto) {
+        Location location = locationMapper.toEntity(dto);
+        return save(location);
     }
 
     public Location save(Location location) {
@@ -34,7 +44,7 @@ public class LocationService {
 
         location.setLatitude(coords[0]);
         location.setLongitude(coords[1]);
-        location.setNumber(number);
+        location.setNumber(number); // reafirma el número por si fue modificado
 
         return locationRepository.save(location);
     }

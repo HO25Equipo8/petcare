@@ -1,36 +1,59 @@
 package com.petcare.back.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petcare.back.domain.dto.request.UserRegisterDTO;
+import com.petcare.back.domain.dto.request.UserUpdateDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
+import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
+import com.petcare.back.domain.entity.Image;
+import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
+import com.petcare.back.domain.mapper.response.UserUpdateResponseMapper;
+import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.UserRepository;
 import com.petcare.back.service.LocationService;
+import com.petcare.back.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/register")
+@RequestMapping("/user")
+@SecurityRequirement(name = "bearer-key")
 public class RegisterController {
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private UserUpdateResponseMapper userUpdateResponseMapper;
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
             , UriComponentsBuilder uriComponentsBuilder){
         // Check for empty email
@@ -68,6 +91,10 @@ public class RegisterController {
                 encryptedPassword,
                 role);
 
+        if (userRegisterDTO.role() == Role.ADMIN || userRegisterDTO.role() == Role.OWNER) {
+            newUser.setVerified(true);
+        }
+
         userRepository.save(newUser);
 
         UserDTO userDTO = new UserDTO(newUser.getId());
@@ -76,5 +103,67 @@ public class RegisterController {
                 .toUri();
 
         return ResponseEntity.created(url).body(userDTO);
+    }
+
+    @Operation(
+            summary = "Actualizar perfil del usuario autenticado",
+            description = "Permite actualizar datos personales, ubicación, foto de perfil y fotos de verificación (solo para SITTER)"
+    )
+    @PutMapping(value = "/update-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateProfile(
+            @Parameter(
+                    description = "Datos del usuario en formato JSON",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = UserUpdateDTO.class)
+                    )
+            )
+            @RequestPart("data") String rawJson,   // 👈 recibimos string plano
+
+            @Parameter(
+                    description = "Fotos de verificación de identidad (solo para SITTER)",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                            schema = @Schema(type = "string", format = "binary"))
+            )
+            @RequestPart(value = "images", required = false) MultipartFile[] identityPhotos,
+
+            @Parameter(
+                    description = "Foto de perfil",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                            schema = @Schema(type = "string", format = "binary"))
+            )
+            @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto,
+
+            UriComponentsBuilder uriBuilder
+    ) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            UserUpdateDTO dto = mapper.readValue(rawJson, UserUpdateDTO.class);
+
+            User updatedUser = userService.updateProfile(dto, profilePhoto, identityPhotos);
+
+            URI uri = uriBuilder.path("/api/users/{id}")
+                    .buildAndExpand(updatedUser.getId())
+                    .toUri();
+
+            UserUpdateResponseDTO responseDTO = userUpdateResponseMapper.toDTO(updatedUser);
+
+            return ResponseEntity.created(uri).body(Map.of(
+                    "status", "success",
+                    "message", "Perfil actualizado con éxito",
+                    "data", responseDTO
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
     }
 }

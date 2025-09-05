@@ -35,7 +35,7 @@ public class IncidentServiceImpl  implements IncidentsService{
     private final PetRepository petRepository;
     private final UserRepository userRepository;
 
-    private Image processImage(MultipartFile file) throws IOException {
+    public Image processImage(MultipartFile file) throws IOException {
         imageValidator.validate(file);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

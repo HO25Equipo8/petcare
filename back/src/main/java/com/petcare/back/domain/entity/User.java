@@ -51,7 +51,7 @@ public class User implements UserDetails {
     //Fotos del dni del Sitter para verificar la identidad
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
-    private List<Image> photosVerifyIdentity;
+    private List<Image> photosVerifyIdentity = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -72,6 +72,14 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private Boolean active = true;
+
+    private Boolean profileComplete = false;
+
+    @OneToMany(mappedBy = "target")
+    private List<Feedback> feedbackReceived;
+
+    @OneToMany(mappedBy = "author")
+    private List<Feedback> feedbackGiven;
 
     //minimum atributes constructor
     public User(@Email String login, String encryptedPassword, Role role) {

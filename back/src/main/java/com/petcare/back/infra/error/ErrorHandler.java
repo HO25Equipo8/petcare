@@ -1,12 +1,17 @@
 package com.petcare.back.infra.error;
 
+import com.petcare.back.exception.MyException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.Map;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -41,5 +46,29 @@ public class ErrorHandler {
         {
             this(error.getField(), error.getDefaultMessage());
         }
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(Map.of(
+                "status", "error",
+                "message", "El archivo excede el tamaño máximo permitido. Intenta con una imagen más liviana."
+        ));
+    }
+
+    @ExceptionHandler(MyException.class)
+    public ResponseEntity<?> handleMyException(MyException ex) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "status", "error",
+                "message", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "status", "error",
+                "message", "Error inesperado: " + ex.getClass().getSimpleName() + " - " + ex.getMessage()
+        ));
     }
 }
