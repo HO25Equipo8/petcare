@@ -18,14 +18,26 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public void sendWelcomeEmail(String userEmail, String userName) {
+    public void sendWelcomeEmail(String userEmail) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(userEmail);
             message.setSubject("¡Petcare te dice Hola!");
             message.setText(buildWelcomeMessage(userEmail));
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email de bienvenida: " + e.getMessage());
+        }
+    }
 
+    public void sendWelcomeEmail(String userEmail, String userName) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(userEmail);
+            message.setSubject("¡Petcare te dice Hola, " + userName+ "!");
+            message.setText(buildWelcomeMessage(userEmail));
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("Error enviando email de bienvenida: " + e.getMessage());
@@ -39,7 +51,6 @@ public class EmailService {
             message.setTo(userEmail);
             message.setSubject("¡Te olvidaste la contraseña!");
             message.setText(buildPassRecoverMessage(userEmail));
-
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("Error enviando email para recuperar constraseña: " + e.getMessage());
@@ -53,7 +64,6 @@ public class EmailService {
             message.setTo(adminEmail);
             message.setSubject("Nuevo usuario registrado");
             message.setText(buildAdminNotificationMessage(userName, userEmail));
-
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("Error enviando notificación al admin: " + e.getMessage());
