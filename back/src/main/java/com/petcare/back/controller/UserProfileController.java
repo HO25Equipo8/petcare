@@ -4,6 +4,9 @@ import com.petcare.back.domain.entity.Image;
 import com.petcare.back.repository.ImageRepository;
 import com.petcare.back.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @SecurityRequirement(name = "bearer-key")
@@ -27,7 +31,7 @@ public class UserProfileController {
     }
     @Operation(summary = "Subir foto de perfil")
     @PostMapping(value = "/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadProfilePhoto(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadProfilePhoto(@RequestParam("file") MultipartFile file) throws IOException {
         System.out.println(">>>> Entró al controller de profile-photo");
         try {
             userProfileService.uploadProfilePhoto(file);
@@ -37,6 +41,33 @@ public class UserProfileController {
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Error al procesar la imagen");
         }
+    }
+
+    @Operation(summary = "Subir foto de perfil del pet ")
+    @PostMapping(value = "/profile-photo-pet/{petId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<String> uploadProfilePhotoPet(@RequestParam("file") MultipartFile file,@PathVariable Long petId) throws IOException {
+        try {
+            userProfileService.uploadPrifilePhotoPet(petId, file);
+            return ResponseEntity.ok("Foto de perfil subida del  pet");
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body("Error al procesar la imagen" + e.getMessage());
+        }catch (IOException e){
+            return ResponseEntity.internalServerError().body("Error al procesar la imagen" + e.getMessage());
+        }
+    }
+
+    @PostMapping(path = "/{petId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Subir galeria  de imagenes de un pet",
+            description = "Cargar galeria de imagenes para el pet")
+    public ResponseEntity<String> uploadImages(
+            @PathVariable Long petId,
+            @Parameter(description = "Imágenes a subir", required = true, content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(type = "string", format = "binary")))
+            @RequestPart("images") MultipartFile[] images
+    ) throws IOException {
+        userProfileService.uploadPetGallery(petId, Arrays.asList(images));
+        return ResponseEntity.ok("Images uploaded successfully");
     }
 }
 

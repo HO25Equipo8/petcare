@@ -55,6 +55,10 @@ public class Booking {
     @JoinColumn(name = "plan_id")
     private Plan plan;
 
+    @ManyToOne
+    private Incidents incidents;
+
+
     @Column(name = "reservation_date", nullable = false)
     private Instant reservationDate = Instant.now();
 
