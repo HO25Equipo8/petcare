@@ -1,6 +1,8 @@
 package com.petcare.back.validation;
 
+import com.petcare.back.domain.dto.request.PlanDiscountRuleDTO;
 import com.petcare.back.domain.entity.PlanDiscountRule;
+import com.petcare.back.domain.enumerated.CustomerCategory;
 import com.petcare.back.exception.MyException;
 import org.junit.jupiter.api.Test;
 
@@ -15,32 +17,48 @@ class ValidatePlanDiscountRuleDiscountLimitTest {
 
     @Test
     void shouldThrowIfDiscountIsNull() {
-        PlanDiscountRule rule = new PlanDiscountRule();
-        rule.setDiscount(null);
+        PlanDiscountRuleDTO rule = new PlanDiscountRuleDTO(
+                CustomerCategory.FRECUENTE,
+                2.0,
+                4.0,
+                null
+        );
 
         assertThrows(MyException.class, () -> validator.validate(rule));
     }
 
     @Test
     void shouldThrowIfDiscountIsNegative() {
-        PlanDiscountRule rule = new PlanDiscountRule();
-        rule.setDiscount(BigDecimal.valueOf(-5));
+        PlanDiscountRuleDTO rule = new PlanDiscountRuleDTO(
+                CustomerCategory.FRECUENTE,
+                2.0,
+                4.0,
+                BigDecimal.valueOf(-5)
+        );
 
         assertThrows(MyException.class, () -> validator.validate(rule));
     }
 
     @Test
     void shouldThrowIfDiscountIsTooHigh() {
-        PlanDiscountRule rule = new PlanDiscountRule();
-        rule.setDiscount(BigDecimal.valueOf(85));
+        PlanDiscountRuleDTO rule = new PlanDiscountRuleDTO(
+                CustomerCategory.FRECUENTE,
+                2.0,
+                4.0,
+                BigDecimal.valueOf(85)
+        );
 
         assertThrows(MyException.class, () -> validator.validate(rule));
     }
 
     @Test
     void shouldPassIfDiscountIsValid() {
-        PlanDiscountRule rule = new PlanDiscountRule();
-        rule.setDiscount(BigDecimal.valueOf(20));
+        PlanDiscountRuleDTO rule = new PlanDiscountRuleDTO(
+                CustomerCategory.FRECUENTE,
+                2.0,
+                4.0,
+                BigDecimal.valueOf(20)
+        );
 
         assertDoesNotThrow(() -> validator.validate(rule));
     }
