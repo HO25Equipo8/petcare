@@ -30,7 +30,7 @@ class ValidateBookingSchedulesAvailabilityTest {
         Schedule s1 = new Schedule(); s1.setScheduleId(1L); s1.setStatus(ScheduleStatus.DISPONIBLE);
         Schedule s2 = new Schedule(); s2.setScheduleId(2L); s2.setStatus(ScheduleStatus.DISPONIBLE);
 
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, null, List.of(1L, 2L), List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, List.of(1L, 2L), List.of());
         when(scheduleRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(s1, s2));
 
         assertDoesNotThrow(() -> validator.validate(dto));
@@ -39,7 +39,7 @@ class ValidateBookingSchedulesAvailabilityTest {
     @Test
     void shouldThrowWhenSomeSchedulesAreUnavailable() {
         Schedule s1 = new Schedule(); s1.setScheduleId(1L); s1.setStatus(ScheduleStatus.RESERVADO);
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, null, List.of(1L), List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, List.of(1L), List.of());
 
         when(scheduleRepository.findAllById(List.of(1L))).thenReturn(List.of(s1));
 

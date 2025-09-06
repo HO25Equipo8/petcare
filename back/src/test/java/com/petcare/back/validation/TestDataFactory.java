@@ -4,6 +4,7 @@ import com.petcare.back.domain.dto.request.ComboOfferingCreateDTO;
 import com.petcare.back.domain.dto.request.ScheduleConfigCreateDTO;
 import com.petcare.back.domain.dto.request.ScheduleTurnCreateDTO;
 import com.petcare.back.domain.entity.Offering;
+import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.*;
 
 import java.math.BigDecimal;
@@ -15,6 +16,14 @@ import java.util.stream.Collectors;
 
 public class TestDataFactory {
 
+    public static User mockSitter(Long id) {
+        User user = new User();
+        user.setId(id);
+        user.setRole(Role.SITTER);
+        user.setProfessionalRoles(List.of(ProfessionalRoleEnum.CUIDADOR));
+        return user;
+    }
+
     public static Offering mockOffering(Long id, OfferingEnum name, String description) {
         return new Offering(
                 id,
@@ -24,6 +33,7 @@ public class TestDataFactory {
                 List.of(PetTypeEnum.PERRO),
                 ProfessionalRoleEnum.CUIDADOR,
                 true,
+                mockSitter(99L),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -53,6 +63,7 @@ public class TestDataFactory {
                 List.of(tipo),
                 ProfessionalRoleEnum.CUIDADOR,
                 true,
+                mockSitter(99L),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -67,6 +78,7 @@ public class TestDataFactory {
                 List.of(PetTypeEnum.PERRO),
                 ProfessionalRoleEnum.CUIDADOR,
                 true,
+                mockSitter(99L),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -80,6 +92,7 @@ public class TestDataFactory {
                 List.of(PetTypeEnum.PERRO),
                 ProfessionalRoleEnum.CUIDADOR,
                 true,
+                mockSitter(99L),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );

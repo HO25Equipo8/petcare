@@ -1,6 +1,7 @@
 package com.petcare.back.controller;
 
 import com.petcare.back.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,6 +22,10 @@ import java.util.stream.Collectors;
 public class LocationController {
 
     private final UserRepository userRepository;
+    @Operation(
+            summary = "Obtener usuarios con ubicación",
+            description = "Devuelve una lista de usuarios que tienen ubicación registrada, incluyendo su email, latitud y longitud. Útil para visualización en mapas o búsquedas geolocalizadas."
+    )
     @GetMapping("/users-with-location")
     public List<Map<String, Object>> getUsersWithLocation() {
         return userRepository.findAll().stream()

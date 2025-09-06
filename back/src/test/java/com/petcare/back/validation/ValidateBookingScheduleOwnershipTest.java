@@ -40,7 +40,7 @@ class ValidateBookingScheduleOwnershipTest {
         schedule.setScheduleConfig(config);
 
         BookingCreateDTO dto = new BookingCreateDTO(
-                1L, null, null, null,
+                1L, null, null,
                 List.of(100L), // scheduleIds
                 List.of(1L)    // profesionales seleccionados
         );
@@ -66,7 +66,7 @@ class ValidateBookingScheduleOwnershipTest {
         schedule.setScheduleConfig(config);
 
         BookingCreateDTO dto = new BookingCreateDTO(
-                1L, null, null, null,
+                1L, null, null,
                 List.of(101L),
                 List.of(1L)
         );

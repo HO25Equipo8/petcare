@@ -19,10 +19,6 @@ public record BookingCreateDTO(
         @Min(value = 1, message = "ID de combo inválido")
         Long comboOfferingId,
 
-        // Puede ser null, pero si se envia, debe ser >= 1
-        @Min(value = 1, message = "ID de plan inválido")
-        Long planId,
-
         @NotEmpty(message = "Debés seleccionar al menos un horario")
         List<Long> scheduleIds,
 

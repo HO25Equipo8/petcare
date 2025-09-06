@@ -7,17 +7,21 @@ import com.petcare.back.domain.dto.response.BookingResponseDTO;
 import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.dto.response.PetResponseDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
+import com.petcare.back.domain.entity.User;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.BookingService;
 import com.petcare.back.service.ComboOfferingService;
 import com.petcare.back.service.PetService;
 import com.petcare.back.service.PlanService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -37,6 +41,10 @@ public class OwnerController {
     private final PlanService planService;
     private final BookingService bookingService;
 
+    @Operation(
+            summary = "Registrar mascota",
+            description = "Permite registrar una nueva mascota asociada al usuario autenticado, incluyendo datos como nombre, edad, tipo y necesidades especiales."
+    )
     @PostMapping("/register/pet")
     public ResponseEntity<?> registerPet(@Valid @RequestBody PetCreateDTO petCreateDTO,
                                          UriComponentsBuilder uriBuilder) {
@@ -63,11 +71,19 @@ public class OwnerController {
         }
     }
 
+    @Operation(
+            summary = "Listar combos de servicios",
+            description = "Devuelve todos los combos registrados en el sistema, cada uno compuesto por múltiples servicios agrupados."
+    )
     @GetMapping("/list/combo")
     public ResponseEntity<List<ComboOfferingResponseDTO>> findAll() {
         return ResponseEntity.ok(comboOfferingService.findAll());
     }
 
+    @Operation(
+            summary = "Seleccionar plan como dueño",
+            description = "Permite al usuario con rol OWNER elegir un plan de servicios según frecuencia e intervalo. El sistema genera automáticamente el nombre del plan, calcula la cantidad de sesiones semanales y aplica el descuento correspondiente según las reglas configuradas por el profesional."
+    )
     @PostMapping("/register/plan")
     public ResponseEntity<?> create(@RequestBody @Valid PlanCreateDTO dto, UriComponentsBuilder uriBuilder) {
         try {
@@ -93,24 +109,33 @@ public class OwnerController {
         }
     }
 
-    @GetMapping("/list/plan")
-    public ResponseEntity<?> getAll() {
+    @Operation(
+            summary = "Consultar plan actual del usuario",
+            description = "Devuelve el plan de servicios actualmente asignado al usuario autenticado. Incluye frecuencia, intervalo y porcentaje de descuento aplicado. Solo disponible para usuarios con rol OWNER."
+    )
+    @GetMapping("/my-plan")
+    public ResponseEntity<?> getMyPlan() {
         try {
-            List<PlanResponseDTO> plans = planService.getAllPlans();
+            User user = getAuthenticatedUser();
+            PlanResponseDTO plan = planService.getPlanByUser(user.getId());
 
             return ResponseEntity.ok(Map.of(
                     "status", "success",
-                    "message", "Planes obtenidos con éxito",
-                    "data", plans
+                    "message", "Plan del usuario obtenido con éxito",
+                    "data", plan
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "error",
-                    "message", "Error al obtener los planes"
+                    "message", "Error al obtener el plan del usuario"
             ));
         }
     }
 
+    @Operation(
+            summary = "Registrar reserva",
+            description = "Permite al usuario OWNER crear una nueva reserva para una mascota, seleccionando horarios, profesionales y servicios. Si el usuario tiene un plan activo, se aplica automáticamente el descuento correspondiente en el cálculo del precio final."
+    )
     @PostMapping("/register/booking")
     public ResponseEntity<?> createBooking(
             @RequestBody @Valid BookingCreateDTO dto,
@@ -139,5 +164,10 @@ public class OwnerController {
                     "message", "Error interno del servidor"
             ));
         }
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 }

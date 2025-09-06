@@ -51,6 +51,10 @@ public class Offering {
         @Column(name = "active", nullable = false)
         private boolean active = true;
 
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "sitter_id", nullable = false)
+        private User sitter;
+
         @CreationTimestamp
         @Column(name = "created_at", updatable = false)
         private LocalDateTime createdAt;

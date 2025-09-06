@@ -85,10 +85,8 @@ public class BookingService {
                     .orElseThrow(() -> new MyException("El combo seleccionado no existe")));
         }
 
-        if (dto.planId() != null) {
-            booking.setPlan(planRepository.findById(dto.planId())
-                    .orElseThrow(() -> new MyException("El plan seleccionado no existe")));
-        }
+        Plan userPlan = planRepository.findByOwnerId(user.getId()).orElse(null);
+        booking.setPlan(userPlan);
 
         // 5. Asignar horarios y marcar como PENDIENTES
         List<Schedule> schedules = scheduleRepository.findAllById(dto.scheduleIds());
@@ -158,7 +156,7 @@ public class BookingService {
         return totalPrice.max(BigDecimal.ZERO);
     }
 
-    //Simulación para el admin
+    //Simulación para el Profesional para saber si es viable el descuento que aplica
     public BookingSimulationResponseDTO simulateBooking(BookingSimulationRequestDTO dto) {
         BigDecimal servicePrice = BigDecimal.ZERO;
         BigDecimal comboPrice = BigDecimal.ZERO;

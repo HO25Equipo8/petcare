@@ -1,6 +1,12 @@
 package com.petcare.back.domain.dto.request;
 
-public record UserUpdateDTO(
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 
-) {
-}
+import java.util.List;
+
+public record UserUpdateDTO(
+        String name,
+        String phone,
+        LocationDTO location,
+        List<ProfessionalRoleEnum> professionalRoles
+) {}

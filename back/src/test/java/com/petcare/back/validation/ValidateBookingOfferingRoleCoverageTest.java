@@ -38,7 +38,7 @@ class ValidateBookingOfferingRoleCoverageTest {
 
         User prof = new User(); prof.setId(10L); prof.setProfessionalRoles(List.of(ProfessionalRoleEnum.PASEADOR));
 
-        BookingCreateDTO dto = new BookingCreateDTO(1L, 1L, null, null, List.of(1L), List.of(10L));
+        BookingCreateDTO dto = new BookingCreateDTO(1L, 1L, null, List.of(1L), List.of(10L));
 
         when(offeringRepository.findById(1L)).thenReturn(Optional.of(offering));
         when(userRepository.findAllById(List.of(10L))).thenReturn(List.of(prof));
@@ -53,7 +53,7 @@ class ValidateBookingOfferingRoleCoverageTest {
 
         User prof = new User(); prof.setId(10L); prof.setProfessionalRoles(List.of(ProfessionalRoleEnum.CUIDADOR));
 
-        BookingCreateDTO dto = new BookingCreateDTO(1L, 1L, null, null, List.of(1L), List.of(10L));
+        BookingCreateDTO dto = new BookingCreateDTO(1L, 1L, null, List.of(1L), List.of(10L));
 
         when(offeringRepository.findById(1L)).thenReturn(Optional.of(offering));
         when(userRepository.findAllById(List.of(10L))).thenReturn(List.of(prof));
