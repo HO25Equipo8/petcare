@@ -15,19 +15,19 @@ class ValidateBookingSchedulesNotEmptyTest {
 
     @Test
     void shouldPassWhenSchedulesArePresent() throws MyException {
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, null, List.of(1L, 2L), List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, List.of(1L, 2L), List.of());
         assertDoesNotThrow(() -> validator.validate(dto));
     }
 
     @Test
     void shouldThrowWhenSchedulesAreEmpty() {
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, null, List.of(), List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, List.of(), List.of());
         assertThrows(MyException.class, () -> validator.validate(dto));
     }
 
     @Test
     void shouldThrowWhenSchedulesAreNull() {
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, null, null, List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, null, List.of());
         assertThrows(MyException.class, () -> validator.validate(dto));
     }
 }

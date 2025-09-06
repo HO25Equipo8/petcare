@@ -12,6 +12,7 @@ import com.petcare.back.domain.mapper.response.PlanResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PlanDiscountRuleRepository;
 import com.petcare.back.repository.PlanRepository;
+import com.petcare.back.repository.UserRepository;
 import com.petcare.back.service.PlanService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,8 @@ class PlanCreateValidationServiceTest {
     @Mock private ValidatePlanFrecuenciaIntervaloCoherente frecuenciaValidator;
     @Mock(lenient = true) private ValidatePlanNombreDuplicado nombreValidator;
 
+    @Mock private UserRepository userRepository;
+
     private PlanService planService;
 
     @BeforeEach
@@ -47,7 +50,8 @@ class PlanCreateValidationServiceTest {
                 planMapper,
                 planResponseMapper,
                 planDiscountRuleRepository,
-                validators
+                validators,
+                userRepository
         );
 
         User mockUser = new User();

@@ -38,6 +38,9 @@ public class Plan {
     @Column(name = "promotion")
     private Double promotion;
 
+    @OneToOne(mappedBy = "plan")
+    private User owner;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

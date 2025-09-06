@@ -8,7 +8,6 @@ public record PlanResponseDTO(
         Long id,
         String name,
         Integer timesPerWeek,
-        IntervalEnum intervalEnum,
-        Double promotion
+        IntervalEnum intervalEnum
 ) {
 }

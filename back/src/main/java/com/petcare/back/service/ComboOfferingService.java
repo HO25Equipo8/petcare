@@ -14,6 +14,7 @@ import com.petcare.back.repository.ComboOfferingRepository;
 import com.petcare.back.repository.OfferingRepository;
 import com.petcare.back.validation.WarningComboEvaluator;
 import com.petcare.back.validation.ValidationCombo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,24 +35,34 @@ public class ComboOfferingService {
     private final WarningComboEvaluator warningComboEvaluator;
     private final List<ValidationCombo> validations;
 
+    @Transactional
     public ComboOfferingResponseDTO create(ComboOfferingCreateDTO dto) throws MyException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
         if (user.getRole() != Role.SITTER) {
-            throw new MyException("Solo los profesionales pueden registrar combos");
+            throw new MyException("Solo los profesionales pueden registrar combos.");
         }
 
         List<Offering> offerings = offeringRepository.findAllById(dto.offeringIds());
+
+        // Validación crítica: todos los servicios deben pertenecer al profesional autenticado
+        boolean todosSonDelUsuario = offerings.stream()
+                .allMatch(o -> o.getSitter() != null && o.getSitter().getId().equals(user.getId()));
+
+        if (!todosSonDelUsuario) {
+            throw new MyException("Solo podés crear combos con servicios que vos ofrecés. Verificá que todos los IDs correspondan a tus servicios.");
+        }
 
         for (ValidationCombo v : validations) {
             v.validate(dto, offerings);
         }
 
-        ComboOffering combo = comboOfferingRepository.save(mapper.toEntity(dto, offerings));
+        ComboOffering combo = mapper.toEntity(dto, offerings);
+        combo.setSitter(user);
+        comboOfferingRepository.save(combo);
 
         List<String> warnings = warningComboEvaluator.evaluar(dto, offerings);
-
         if (warnings.isEmpty()) {
             warnings.add("✅ No se detectaron contradicciones visibles en este combo.");
         }

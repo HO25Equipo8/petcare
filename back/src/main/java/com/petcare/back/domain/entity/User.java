@@ -57,14 +57,20 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Role role;
 
-    @ElementCollection(targetClass = ProfessionalRoleEnum.class)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_professional_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role_proffesional")
+    @Column(name = "role_professional")
     @Enumerated(EnumType.STRING)
-    private List<ProfessionalRoleEnum> professionalRoles = new ArrayList<>(); // Ej: PASEADOR, PELUQUERO, VETERINARIO Solo para SITTER
+    private List<ProfessionalRoleEnum> professionalRoles = new ArrayList<>();
 
     @OneToMany(mappedBy = "owner")
     private List<Booking> bookingsAsOwner;
+
+    @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Offering> offerings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ComboOffering> combos = new ArrayList<>();
 
     @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -80,6 +86,15 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "author")
     private List<Feedback> feedbackGiven;
+
+    //Owner que elije su plan
+    @OneToOne
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
+
+    //Sitter selecciona la regla de su descuento por plan
+    @OneToMany(mappedBy = "sitter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlanDiscountRule> discountRules = new ArrayList<>();
 
     //minimum atributes constructor
     public User(@Email String login, String encryptedPassword, Role role) {

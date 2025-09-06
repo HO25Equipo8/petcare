@@ -38,4 +38,9 @@ public class PlanDiscountRule {
 
     @Column(name = "discount", precision = 10, scale = 2, nullable = false)
     private BigDecimal discount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sitter_id", nullable = false)
+    private User sitter;
+
 }

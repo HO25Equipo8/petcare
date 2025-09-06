@@ -4,7 +4,6 @@ import com.petcare.back.domain.dto.request.OfferingCreateDTO;
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.service.BookingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,23 +14,27 @@ import java.util.Map;
 public class ValidateOfferingRoleCompatibility implements ValidationOffering {
 
     private static final Map<OfferingEnum, ProfessionalRoleEnum> requiredRoles = Map.of(
-            OfferingEnum.ASEO, ProfessionalRoleEnum.PELUQUERO,
-            OfferingEnum.PASEO, ProfessionalRoleEnum.PASEADOR,
-            OfferingEnum.GUARDERIA, ProfessionalRoleEnum.CUIDADOR,
+            OfferingEnum.ASEO,        ProfessionalRoleEnum.PELUQUERO,
+            OfferingEnum.PASEO,       ProfessionalRoleEnum.PASEADOR,
+            OfferingEnum.GUARDERIA,   ProfessionalRoleEnum.CUIDADOR,
             OfferingEnum.VETERINARIA, ProfessionalRoleEnum.VETERINARIO
     );
-    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
+
+    private static final Logger log = LoggerFactory.getLogger(ValidateOfferingRoleCompatibility.class);
 
     @Override
     public void validate(OfferingCreateDTO dto) throws MyException {
+        // 1) Reglas básicas por DTO
         ProfessionalRoleEnum requiredRole = requiredRoles.get(dto.name());
-        log.debug("Rol recibido: {}", dto.allowedRole()); // o dto.allowedRol() según el nombre
+        log.debug("DTO.allowedRole={} / requiredRole={}", dto.allowedRole(), requiredRole);
 
-        if (requiredRole != null) {
-            if (dto.allowedRole() == null || !dto.allowedRole().equals(requiredRole)) {
-                throw new MyException("El servicio " + dto.name().getLabel() +
-                        " solo puede ser realizado por profesionales con rol " + requiredRole.name() + ".");
-            }
+        if (requiredRole == null) {
+            throw new MyException("El tipo de servicio '" + dto.name() + "' no está reconocido.");
+        }
+        if (dto.allowedRole() == null || !dto.allowedRole().equals(requiredRole)) {
+            throw new MyException("El servicio '" + dto.name().getLabel()
+                    + "' solo puede ser realizado por profesionales con rol '"
+                    + requiredRole.name() + "'.");
         }
     }
 }

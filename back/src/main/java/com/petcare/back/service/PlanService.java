@@ -11,6 +11,7 @@ import com.petcare.back.domain.mapper.response.PlanResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PlanDiscountRuleRepository;
 import com.petcare.back.repository.PlanRepository;
+import com.petcare.back.repository.UserRepository;
 import com.petcare.back.validation.ValidationPlanCreate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,7 @@ public class PlanService {
     private final PlanResponseMapper planResponseMapper;
     private final PlanDiscountRuleRepository planDiscountRuleRepository;
     private final List<ValidationPlanCreate> validationPlanCreates;
+    private final UserRepository userRepository;
 
     public PlanResponseDTO createPlan(PlanCreateDTO dto) throws MyException {
         User user = getAuthenticatedUser();
@@ -57,7 +59,12 @@ public class PlanService {
         BigDecimal discount = calculateDiscountBySessions(sessionsPerWeek);
         plan.setPromotion(discount.doubleValue());
 
-        return planResponseMapper.toDto(planRepository.save(plan));
+        plan = planRepository.save(plan);
+
+        user.setPlan(plan);
+        userRepository.save(user);
+
+        return planResponseMapper.toDto(plan);
     }
 
     /**
@@ -82,5 +89,11 @@ public class PlanService {
         return planRepository.findAll().stream()
                 .map(planResponseMapper::toDto)
                 .toList();
+    }
+
+    public PlanResponseDTO getPlanByUser(Long userId) throws MyException {
+        Plan plan = planRepository.findByOwnerId(userId)
+                .orElseThrow(() -> new MyException("El usuario no tiene un plan asignado"));
+        return planResponseMapper.toDto(plan);
     }
 }

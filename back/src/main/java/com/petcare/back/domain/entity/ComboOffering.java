@@ -42,6 +42,10 @@ public class ComboOffering {
     )
     private List<Offering> offerings;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sitter_id", nullable = false)
+    private User sitter;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

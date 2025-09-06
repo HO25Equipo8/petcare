@@ -155,6 +155,10 @@ public class RegisterController {
         }
     }
 
+    @Operation(
+            summary = "Buscar profesionales cercanos",
+            description = "Devuelve una lista de SITTERs activos dentro del radio especificado en kilómetros, tomando como referencia la ubicación del usuario autenticado."
+    )
     @PostMapping("/search/nearby-sitters")
     public ResponseEntity<?> searchNearbySitters(@RequestParam double radiusKm,
                                                  UriComponentsBuilder uriBuilder) {

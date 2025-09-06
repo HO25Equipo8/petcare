@@ -9,6 +9,7 @@ import com.petcare.back.domain.mapper.request.UserFeedbackMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.FeedbackService;
 import com.petcare.back.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,10 @@ public class UserInteractionController {
     private final UserFeedbackMapper userFeedbackMapper;
 
     //Dar Feedback
+    @Operation(
+            summary = "Enviar feedback",
+            description = "Permite al usuario autenticado enviar una valoración y comentario sobre otro usuario con el que haya interactuado. El sistema valida que el feedback sea legítimo y lo asocia al perfil del destinatario."
+    )
     @PostMapping("/feedback")
     public ResponseEntity<?> giveFeedback(@RequestBody FeedbackDTO dto) throws MyException {
         FeedbackResponseDTO feedback = feedbackService.giveFeedback(dto);
@@ -38,6 +43,10 @@ public class UserInteractionController {
     }
 
     //Ver el perfil público
+    @Operation(
+            summary = "Consultar perfil público",
+            description = "Devuelve el perfil público de un usuario según su ID, incluyendo nombre, rol, servicios ofrecidos y reputación basada en feedback recibido."
+    )
     @GetMapping("/{id}/profile")
     public ResponseEntity<?> getPublicProfile(@PathVariable Long id) throws MyException {
         User user = userService.getPublicProfile(id);
@@ -46,12 +55,20 @@ public class UserInteractionController {
     }
 
     //Ver su listado de feedback recibidos
+    @Operation(
+            summary = "Ver feedback recibido",
+            description = "Devuelve el listado de valoraciones y comentarios que ha recibido el usuario indicado por ID. Útil para evaluar reputación y experiencia previa."
+    )
     @GetMapping("/{id}/feedback")
     public ResponseEntity<?> getFeedback(@PathVariable Long id) throws MyException {
         List<FeedbackResponseDTO> feedbacks = feedbackService.getFeedbackForUser(id); // ✅
         return ResponseEntity.ok(feedbacks);
     }
 
+    @Operation(
+            summary = "Listar perfiles públicos por rol",
+            description = "Devuelve los perfiles públicos de usuarios que tienen el rol especificado. El usuario autenticado no puede consultar perfiles de su mismo rol."
+    )
     @GetMapping("/profiles")
     public ResponseEntity<?> getPublicProfiles(@RequestParam Role role) throws MyException {
         User requester = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -69,6 +86,10 @@ public class UserInteractionController {
         return ResponseEntity.ok(dtos);
     }
 
+    @Operation(
+            summary = "Listar SITTERs destacados",
+            description = "Devuelve los perfiles públicos de los SITTERs mejor valorados, ordenados por reputación. El tamaño del listado puede ajustarse con el parámetro 'size'."
+    )
     @GetMapping("/sitters/top")
     public ResponseEntity<?> getTopSitters(@RequestParam(defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(0, size);

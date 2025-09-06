@@ -1,15 +1,13 @@
 package com.petcare.back.controller;
 
-import com.petcare.back.domain.dto.request.BookingSimulationRequestDTO;
-import com.petcare.back.domain.dto.request.ComboOfferingCreateDTO;
-import com.petcare.back.domain.dto.request.OfferingCreateDTO;
-import com.petcare.back.domain.dto.request.ScheduleConfigCreateDTO;
+import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.PlanDiscountRule;
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.OfferingVariantDescriptionEnum;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.*;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +36,10 @@ public class SitterController {
     private final PlanDiscountRuleService planDiscountRuleService;
     private final BookingService bookingService;
 
+    @Operation(
+            summary = "Registrar configuración de horarios",
+            description = "Crea una nueva configuración de disponibilidad para el SITTER y genera los horarios correspondientes."
+    )
     @PostMapping("/register/schedule")
     public ResponseEntity<?> create(@RequestBody @Valid ScheduleConfigCreateDTO dto, UriComponentsBuilder uriBuilder) {
         try {
@@ -63,6 +65,10 @@ public class SitterController {
         }
     }
 
+    @Operation(
+            summary = "Consultar estado de configuración de horarios",
+            description = "Devuelve el estado actual de la configuración de horarios del SITTER, incluyendo si está activa y cuántos turnos tiene."
+    )
     @GetMapping("/schedule-config/status")
     public ResponseEntity<?> getScheduleStatus() {
         try {
@@ -79,6 +85,10 @@ public class SitterController {
         }
     }
 
+    @Operation(
+            summary = "Registrar servicio",
+            description = "Permite registrar un nuevo servicio individual ofrecido por el SITTER, como paseo, peluquería o veterinaria."
+    )
     @PostMapping("/register/offering")
     public ResponseEntity<?> createOfering(@Valid @RequestBody OfferingCreateDTO dto, UriComponentsBuilder uriBuilder){
         try {
@@ -104,6 +114,10 @@ public class SitterController {
         }
     }
 
+    @Operation(
+            summary = "Registrar combo de servicios",
+            description = "Permite registrar un combo que agrupa varios servicios en una sola oferta, con lógica de precios y variantes."
+    )
     @PostMapping("/register/combo")
     public ResponseEntity<?> create(@RequestBody @Valid ComboOfferingCreateDTO dto, UriComponentsBuilder uriBuilder) {
         try {
@@ -129,9 +143,13 @@ public class SitterController {
         }
     }
 
+    @Operation(
+            summary = "Registrar regla de descuento",
+            description = "Crea una nueva regla de descuento aplicable a planes o servicios, según condiciones definidas."
+    )
     @PostMapping("/register/discount/rule")
-    public ResponseEntity<?> createRule(@RequestBody PlanDiscountRule rule) throws MyException {
-        PlanDiscountRule created = planDiscountRuleService.createRule(rule);
+    public ResponseEntity<?> createRule(@RequestBody PlanDiscountRuleDTO rule) throws MyException {
+        PlanDiscountRuleResponseDTO created = planDiscountRuleService.createRule(rule);
         return ResponseEntity.ok(Map.of(
                 "status", "success",
                 "message", "Regla de descuento creada con éxito",
@@ -139,22 +157,35 @@ public class SitterController {
         ));
     }
 
+    @Operation(
+            summary = "Listar reglas de descuento del profesional",
+            description = "Devuelve las reglas de descuento creadas por el profesional autenticado, con sus condiciones y valores."
+    )
     @GetMapping("/list/discount/rule")
-    public ResponseEntity<?> getAllRules() {
+    public ResponseEntity<?> getRulesForSitter() throws MyException {
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "data", planDiscountRuleService.getAllRules()
+                "data", planDiscountRuleService.getRulesForSitter()
         ));
     }
 
+    @Operation(
+            summary = "Eliminar regla de descuento",
+            description = "Elimina una regla de descuento existente según su ID. Solo accesible si no está en uso."
+    )
     @DeleteMapping("/delete/discount/rule/{id}")
-    public ResponseEntity<?> deleteRule(@PathVariable Long id) {
+    public ResponseEntity<?> deleteRule(@PathVariable Long id) throws MyException {
         planDiscountRuleService.deleteRule(id);
         return ResponseEntity.ok(Map.of(
                 "status", "success",
                 "message", "Regla de descuento eliminada con éxito"
         ));
     }
+
+    @Operation(
+            summary = "Listar descripciones por tipo de servicio",
+            description = "Devuelve las variantes descriptivas disponibles para cada tipo de servicio, agrupadas por categoría base."
+    )
     @GetMapping("/list/variant/descriptions")
     public Map<OfferingEnum, List<String>> getDescriptionsByOffering() {
         return Arrays.stream(OfferingVariantDescriptionEnum.values())
@@ -163,6 +194,11 @@ public class SitterController {
                         Collectors.mapping(OfferingVariantDescriptionEnum::getDescription, Collectors.toList())
                 ));
     }
+
+    @Operation(
+            summary = "Simular reserva",
+            description = "Calcula una simulación de reserva con precios, descuentos y lógica de turnos, sin generar una reserva real."
+    )
     @PostMapping("/simulation")
     public ResponseEntity<?> simulate(@RequestBody BookingSimulationRequestDTO dto) {
         BookingSimulationResponseDTO bookingSimulationResponseDTO = bookingService.simulateBooking(dto);

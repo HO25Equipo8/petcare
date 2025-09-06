@@ -15,7 +15,6 @@ import java.io.IOException;
 @RequestMapping("/me")
 public class UserProfileController {
 
-
     private final UserProfileService userProfileService;
 
     public UserProfileController(UserProfileService userProfileService) {
