@@ -1,14 +1,10 @@
 import { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card.jsx';
 import { Button } from './ui/Button.jsx';
-import { Label } from './ui/Label.jsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
 import { Badge } from './ui/Badge.jsx';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/Tooltip.jsx';
 import { Alert, AlertDescription } from './ui/Alert.jsx';
-import { Calculator, CheckCircle, AlertTriangle, DollarSign, Settings, TrendingUp, Info } from 'lucide-react';
-
-// SimulationData and SimulationResults are now plain objects (JSX version)
+import { Calculator, CheckCircle, AlertTriangle, DollarSign, Settings, TrendingUp } from 'lucide-react';
 
 // Mock data para la simulación
 const mockServices = [
@@ -169,20 +165,6 @@ export default function SimulatorSubTabSitter() {
           <CardContent className="space-y-6">
             {/* Service Selector */}
             <div className="space-y-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Label className="flex items-center gap-2">
-                      Servicio Base
-                      <Info className="h-4 w-4 text-neutral-400" />
-                    </Label>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Selecciona el servicio principal que será parte del combo</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
               <Select 
                 value={simulationData.serviceId} 
                 onValueChange={(value) => setSimulationData(prev => ({ ...prev, serviceId: value }))}
@@ -212,21 +194,7 @@ export default function SimulatorSubTabSitter() {
             </div>
 
             {/* Combo Selector */}
-            <div className="space-y-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Label className="flex items-center gap-2">
-                      Tipo de Combo
-                      <Info className="h-4 w-4 text-neutral-400" />
-                    </Label>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Define el combo que incluirá servicios adicionales con descuento</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
+            <div className="space-y-2">              
               <Select 
                 value={simulationData.comboId} 
                 onValueChange={(value) => setSimulationData(prev => ({ ...prev, comboId: value }))}
@@ -259,20 +227,6 @@ export default function SimulatorSubTabSitter() {
 
             {/* Plan Category Selector */}
             <div className="space-y-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Label className="flex items-center gap-2">
-                      Categoría de Plan
-                      <Info className="h-4 w-4 text-neutral-400" />
-                    </Label>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Categoría del cliente que define descuentos adicionales por reglas de negocio</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
               <Select 
                 value={simulationData.planCategory} 
                 onValueChange={(value) => setSimulationData(prev => ({ ...prev, planCategory: value }))}
