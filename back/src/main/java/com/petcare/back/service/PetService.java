@@ -1,11 +1,13 @@
 package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.PetCreateDTO;
+import com.petcare.back.domain.dto.request.PetUpdateDTO;
 import com.petcare.back.domain.dto.response.PetResponseDTO;
 import com.petcare.back.domain.entity.Pet;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.mapper.request.PetCreateMapper;
+import com.petcare.back.domain.mapper.request.PetUpdateMapper;
 import com.petcare.back.domain.mapper.response.PetResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PetRepository;
@@ -23,13 +25,16 @@ public class PetService {
 
     private final PetRepository petRepository;
     private final PetCreateMapper petCreateMapper;
+    private final PetUpdateMapper petUpdateMapper;
     private final PetResponseMapper petResponseMapper;
 
     public PetService(PetRepository petRepository,
                       PetCreateMapper petCreateMapper,
+                      PetUpdateMapper petUpdateMapper,
                       PetResponseMapper petResponseMapper) {
         this.petRepository = petRepository;
         this.petCreateMapper = petCreateMapper;
+        this.petUpdateMapper = petUpdateMapper;
         this.petResponseMapper = petResponseMapper;
     }
 
@@ -56,5 +61,39 @@ public class PetService {
 
         Pet savedPet = petRepository.save(pet);
         return petResponseMapper.toDto(savedPet);
+    }
+
+    @Transactional
+    public PetResponseDTO updatePet(Long petId, PetUpdateDTO dto) throws MyException {
+
+        // 1. Get current user and validate permissions
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        if (user.getRole() != Role.OWNER && user.getRole() != Role.ADMIN) {
+            throw new MyException("Tu rol no permite editar mascotas");
+        }
+
+        // 2. Find existing pet and verify it exists
+        Pet existingPet = petRepository.findById(petId)
+                .orElseThrow(() -> new MyException("Mascota no encontrada"));
+
+        // 3. Verify ownership (only for OWNER role, ADMIN can edit any pet)
+        if (user.getRole() == Role.OWNER && !existingPet.getOwner().getId().equals(user.getId())) {
+            throw new MyException("No tienes permisos para editar esta mascota");
+        }
+
+        // 4. Update the pet with new data (MapStruct will ignore null values)
+        petUpdateMapper.updateEntity(existingPet, dto);
+
+        // 5. Recalculate age if birth date was updated
+        if (dto.birthDate() != null) {
+            int years = Period.between(dto.birthDate(), LocalDate.now()).getYears();
+            existingPet.setAge(years);
+        }
+
+        // 6. Save and return response (updatedAt will be automatically set by @UpdateTimestamp)
+        Pet updatedPet = petRepository.save(existingPet);
+        return petResponseMapper.toDto(updatedPet);
     }
 }
