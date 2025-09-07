@@ -42,6 +42,19 @@ public class UserProfileController {
             return ResponseEntity.internalServerError().body("Error al procesar la imagen");
         }
     }
+    @PutMapping(value = "/profile-photo-pet",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateProfilePhoto(@RequestParam("file") MultipartFile file) throws IOException {
+        userProfileService.updateProfilePhoto(file);
+        return ResponseEntity.ok("Foto de perfil actualizado del usuario");
+    }
+
+
+    @PutMapping(value = "/profile-photo-pet/{petId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateProfilePhotoPet(@PathVariable("petId") Long petId, @RequestParam("file") MultipartFile file) throws IOException {
+   userProfileService.updateProfilePhotoPet(petId, file);
+   return ResponseEntity.ok("Foto de perfil actualizado del pet");
+    }
+
 
     @Operation(summary = "Subir foto de perfil del pet ")
     @PostMapping(value = "/profile-photo-pet/{petId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

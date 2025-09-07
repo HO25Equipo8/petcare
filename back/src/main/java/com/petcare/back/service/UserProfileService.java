@@ -67,6 +67,35 @@ public class UserProfileService {
         user.setProfilePhoto(img);
         userRepository.save(user);
     }
+    public void updateProfilePhoto(MultipartFile file) throws IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) auth.getPrincipal();
+
+        User user = userRepository.findById(principal.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Image image = user.getProfilePhoto();
+        if (image == null) {
+            image = new Image(); // si no tenía antes
+        }
+
+        imageValidator.validate(file);
+        byte[] processedBytes = imageTreatment.process(file);
+
+        image.setImageName(file.getOriginalFilename());
+        image.setImageType(file.getContentType());
+        image.setData(processedBytes);
+
+        imageRepository.save(image);
+
+        // Si antes no tenía, asignamos al user
+        if (user.getProfilePhoto() == null) {
+            user.setProfilePhoto(image);
+            userRepository.save(user);
+        }
+    }
+
+
 
     public void uploadPrifilePhotoPet(Long petId, MultipartFile file) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -106,6 +135,49 @@ public class UserProfileService {
         petRepository.save(pet);
     }
 
+    public void updateProfilePhotoPet(Long petId, MultipartFile file) throws IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) auth.getPrincipal();
+
+        // Buscar el dueño
+        User user = userRepository.findById(principal.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (user.getRole() != Role.OWNER) {
+            throw new IllegalArgumentException("Solo los owner pueden actualizar foto de perfil a sus mascotas");
+        }
+
+        // Buscar la mascota
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+
+        // Validar que esa mascota sea del dueño autenticado
+        if (!pet.getOwner().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("No puedes actualizar una mascota que no es tuya");
+        }
+
+        // Tomar o crear la imagen
+        Image image = pet.getImagePet();
+        if (image == null) {
+            image = new Image(); // si no tenía antes
+        }
+
+        // Validar y procesar la imagen
+        imageValidator.validate(file);
+        byte[] processedBytes = imageTreatment.process(file);
+
+        image.setImageName(file.getOriginalFilename());
+        image.setImageType(file.getContentType());
+        image.setData(processedBytes);
+
+        imageRepository.save(image);
+
+        // Asignar si era la primera vez
+        if (pet.getImagePet() == null) {
+            pet.setImagePet(image);
+            petRepository.save(pet);
+        }
+    }
     public void uploadPetGallery(Long petId, List<MultipartFile> imageFiles) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) auth.getPrincipal();
