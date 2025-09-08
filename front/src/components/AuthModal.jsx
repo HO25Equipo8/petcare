@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { login as loginService } from '../services/login.js';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog.jsx';
 import { Button } from './ui/Button.jsx';
 import { Input } from './ui/Input.jsx';
@@ -8,8 +9,6 @@ import { Card, CardContent } from './ui/Card.jsx';
 import { User, Mail, Lock } from 'lucide-react';
 import { Logo } from './ui/Logo.jsx';
 
-
-
 export function AuthModal({ isOpen, onClose, onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,32 +17,6 @@ export function AuthModal({ isOpen, onClose, onLogin }) {
   const [address, setAddress] = useState('');
   const [selectedRole, setSelectedRole] = useState('owner');
   const [isLoading, setIsLoading] = useState(false);
-
-  // Mock users for demonstration
-  const mockUsers = [
-    {
-      id: '1',
-      email: 'admin@petcare.com',
-      name: 'Admin PetCare',
-      role: 'admin'
-    },
-    {
-      id: '2', 
-      email: 'owner@petcare.com',
-      name: 'Juan Pérez',
-      role: 'owner',
-      phone: '+1234567890',
-      address: 'Calle Principal 123'
-    },
-    {
-      id: '3',
-      email: 'sitter@petcare.com', 
-      name: 'María García',
-      role: 'sitter',
-      phone: '+0987654321',
-      address: 'Av. Central 456'
-    }
-  ];
 
   const roleInfo = {
     owner: {
@@ -62,21 +35,30 @@ export function AuthModal({ isOpen, onClose, onLogin }) {
 
   const handleLogin = async () => {
     setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const user = mockUsers.find(u => u.email === email);
-      
-      if (user) {
+    try {
+      const data = await loginService(email, password);
+      if (data && data.jwToken) {
+        localStorage.setItem('token', data.jwToken);
+        // Decodificación
+        const payload = data.jwToken.split('.')[1];
+        const decoded = JSON.parse(atob(payload));
+        // Mapping de back a front
+        const user = {
+          id: decoded.id,
+          email: decoded.sub,
+          name: decoded.sub, // Solución temporal para nombre
+          role: (decoded.role || '').toLowerCase()
+        };
         onLogin(user);
         onClose();
         resetForm();
       } else {
-        alert('Usuario no encontrado. Intenta con:\n- admin@petcare.com\n- owner@petcare.com\n- sitter@petcare.com');
+        alert('No se recibió token.');
       }
-      
-      setIsLoading(false);
-    }, 1000);
+    } catch (error) {
+      alert('Error al iniciar sesión: ' + (error.message || error));
+    }
+    setIsLoading(false);
   };
 
   const handleRegister = async () => {
@@ -179,8 +161,8 @@ export function AuthModal({ isOpen, onClose, onLogin }) {
                 <p className="mb-2">Usuarios de prueba:</p>
                 <div className="space-y-1 text-xs">
                   <p>• <strong>Admin:</strong> admin@petcare.com</p>
-                  <p>• <strong>Dueño:</strong> owner@petcare.com</p>
-                  <p>• <strong>Cuidador:</strong> sitter@petcare.com</p>
+                  <p>• <strong>Dueño:</strong> owner1@petcare.com</p>
+                  <p>• <strong>Cuidador:</strong> sitter1@petcare.com</p>
                 </div>
               </div>
             </div>
