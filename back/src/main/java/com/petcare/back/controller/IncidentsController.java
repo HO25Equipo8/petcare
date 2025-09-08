@@ -3,6 +3,7 @@ package com.petcare.back.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petcare.back.domain.dto.request.IncidentsDTO;
 
+import com.petcare.back.domain.dto.response.IncidentsResponseDTO;
 import com.petcare.back.domain.entity.Image;
 import com.petcare.back.service.IncidentsService;
 
@@ -66,9 +67,9 @@ public class IncidentsController {
     // 3️⃣ Obtener incidente (solo datos del incidente)
     @GetMapping("/{incidentId}")
     @Operation(summary = "Obtener incidente", description = "Devuelve los datos de un incidente sin imágenes")
-    public ResponseEntity<IncidentsDTO> getIncident(@PathVariable Long incidentId) {
-        IncidentsDTO incidentsDTO = incidentsService.getIncidentsDTO(incidentId);
-        return ResponseEntity.ok(incidentsDTO);
+    public ResponseEntity<IncidentsResponseDTO> getIncident(@PathVariable Long incidentId) {
+        IncidentsResponseDTO incidentsResponseDTO = incidentsService.getIncidentsDTO(incidentId);
+        return ResponseEntity.ok(incidentsResponseDTO);
     }
 
     // 4️⃣ Obtener imágenes del incidente

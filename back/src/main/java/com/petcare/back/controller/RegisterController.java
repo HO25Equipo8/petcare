@@ -85,6 +85,9 @@ public class RegisterController {
         // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
 
+        // mapear role profesional de el user
+
+
         // Crear el usuario con el nuevo constructor
         User newUser = new User(
                 userRegisterDTO.login(),

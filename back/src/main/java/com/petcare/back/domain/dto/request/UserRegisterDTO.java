@@ -1,5 +1,6 @@
 package com.petcare.back.domain.dto.request;
 
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +23,8 @@ public record UserRegisterDTO(
                 message = "Contraseña deber tener 8 caracteres, con al menos un digito y una mayúscula"
         )
         String pass2,
-        Role role) {
+        Role role,
+ProfessionalRoleEnum professionalRoleEnum) {
 }
 
 
