@@ -1,36 +1,59 @@
 package com.petcare.back.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petcare.back.domain.dto.request.UserRegisterDTO;
+import com.petcare.back.domain.dto.request.UserUpdateDTO;
+import com.petcare.back.domain.dto.response.NearbySitterResponseDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
+import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
+import com.petcare.back.domain.mapper.response.UserUpdateResponseMapper;
+import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.UserRepository;
+import com.petcare.back.service.EmailService;
 import com.petcare.back.service.LocationService;
+import com.petcare.back.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/register")
+@RequestMapping("/user")
+@SecurityRequirement(name = "bearer-key")
 public class RegisterController {
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private UserUpdateResponseMapper userUpdateResponseMapper;
 
-    @PostMapping
+    @Autowired
+    private EmailService emailService;
+
+    @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
             , UriComponentsBuilder uriComponentsBuilder){
         // Check for empty email
@@ -71,18 +94,105 @@ public class RegisterController {
                 encryptedPassword,
                 role);
 
-        // 🔹 Mapear el rol profesional si viene en el DTO
-        if (userRegisterDTO.professionalRoleEnum() != null) {
-            newUser.getProfessionalRoles().add(userRegisterDTO.professionalRoleEnum());
+
+        if (userRegisterDTO.role() == Role.ADMIN || userRegisterDTO.role() == Role.OWNER) {
+            newUser.setVerified(true);
         }
 
         userRepository.save(newUser);
 
+        // Send email notifications
+        try {
+            // Send welcome email to user
+            emailService.sendWelcomeEmail(newUser.getEmail(), getUserName(newUser));
+
+            // Send notification to admin
+            emailService.sendAdminNotification(newUser.getEmail(), getUserName(newUser));
+
+        } catch (Exception e) {
+            // If email fails, return error (as requested)
+            return ResponseEntity.status(500).body("Usuario creado pero error enviando emails: " + e.getMessage());
+        }
+
+        // Respuesta con DTO
         UserDTO userDTO = new UserDTO(newUser.getId());
         URI url = uriComponentsBuilder.path("/users/{id}")
                 .buildAndExpand(newUser.getId())
                 .toUri();
 
         return ResponseEntity.created(url).body(userDTO);
+    }
+
+    @Operation(
+            summary = "Actualizar perfil del usuario autenticado",
+            description = "Permite actualizar datos personales y ubicación"
+    )
+    @PutMapping(value = "/update-profile", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateProfile(
+            @RequestBody UserUpdateDTO dto,
+            UriComponentsBuilder uriBuilder
+    ) {
+        try {
+            User updatedUser = userService.updateProfile(dto);
+
+            URI uri = uriBuilder.path("/api/users/{id}")
+                    .buildAndExpand(updatedUser.getId())
+                    .toUri();
+
+            UserUpdateResponseDTO responseDTO = userUpdateResponseMapper.toDTO(updatedUser);
+
+            return ResponseEntity.created(uri).body(Map.of(
+                    "status", "success",
+                    "message", "Perfil actualizado con éxito",
+                    "data", responseDTO
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Buscar profesionales cercanos",
+            description = "Devuelve una lista de SITTERs activos dentro del radio especificado en kilómetros, tomando como referencia la ubicación del usuario autenticado."
+    )
+    @PostMapping("/search/nearby-sitters")
+    public ResponseEntity<?> searchNearbySitters(@RequestParam double radiusKm,
+                                                 UriComponentsBuilder uriBuilder) {
+        try {
+            List<NearbySitterResponseDTO> sitters = userService.findNearbySitters(radiusKm);
+
+            URI uri = uriBuilder.path("/sitters/search").build().toUri();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Profesionales encontrados dentro de " + radiusKm + " km",
+                    "data", sitters,
+                    "searchUri", uri.toString()
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+
+    // Helper method to get user name
+    private String getUserName(User user) {
+        return user.getEmail().split("@")[0]; // Uses part before @ as name
     }
 }

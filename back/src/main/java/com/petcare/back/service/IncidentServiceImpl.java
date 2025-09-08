@@ -36,6 +36,23 @@ public class IncidentServiceImpl  implements IncidentsService{
     private final ImageTreatment imageTreatment;
 
 
+    public Image processImage(MultipartFile file) throws IOException {
+        imageValidator.validate(file);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Thumbnails.of(file.getInputStream())
+                .size(1280, 720)    // resolución máxima
+                .outputQuality(0.7) // calidad comprimida
+                .toOutputStream(baos);
+
+        Image image = new Image();
+        image.setImageName(file.getOriginalFilename());
+        image.setImageType(file.getContentType());
+        image.setData(baos.toByteArray());
+
+        return image;
+    }
+
     // 1️⃣ Crear incidente sin imágenes
     @Override
     public Long createIncident(IncidentsDTO incidentsDTO) {
