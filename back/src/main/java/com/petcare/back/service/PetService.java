@@ -11,6 +11,7 @@ import com.petcare.back.domain.mapper.request.PetUpdateMapper;
 import com.petcare.back.domain.mapper.response.PetResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PetRepository;
+import com.petcare.back.validation.ValidationPetUpdate;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.List;
 
 @Service
 public class PetService {
@@ -27,15 +29,18 @@ public class PetService {
     private final PetCreateMapper petCreateMapper;
     private final PetUpdateMapper petUpdateMapper;
     private final PetResponseMapper petResponseMapper;
+    private final List<ValidationPetUpdate> validators;
 
     public PetService(PetRepository petRepository,
                       PetCreateMapper petCreateMapper,
                       PetUpdateMapper petUpdateMapper,
-                      PetResponseMapper petResponseMapper) {
+                      PetResponseMapper petResponseMapper,
+                      List<ValidationPetUpdate> validators) {
         this.petRepository = petRepository;
         this.petCreateMapper = petCreateMapper;
         this.petUpdateMapper = petUpdateMapper;
         this.petResponseMapper = petResponseMapper;
+        this.validators = validators;
     }
 
     @Transactional
@@ -83,16 +88,21 @@ public class PetService {
             throw new MyException("No tienes permisos para editar esta mascota");
         }
 
-        // 4. Update the pet with new data (MapStruct will ignore null values)
+        // 4. Run all validators
+        for (ValidationPetUpdate validator : validators) {
+            validator.validate(existingPet, dto);
+        }
+
+        // 5. Update the pet with new data (MapStruct will ignore null values)
         petUpdateMapper.updateEntity(existingPet, dto);
 
-        // 5. Recalculate age if birth date was updated
+        // 6. Recalculate age if birth date was updated
         if (dto.birthDate() != null) {
             int years = Period.between(dto.birthDate(), LocalDate.now()).getYears();
             existingPet.setAge(years);
         }
 
-        // 6. Save and return response (updatedAt will be automatically set by @UpdateTimestamp)
+        // 7. Save and return response (updatedAt will be automatically set by @UpdateTimestamp)
         Pet updatedPet = petRepository.save(existingPet);
         return petResponseMapper.toDto(updatedPet);
     }
