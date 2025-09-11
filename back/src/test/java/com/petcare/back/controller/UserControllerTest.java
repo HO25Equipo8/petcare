@@ -19,16 +19,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class RegisterControllerTest {
+public class UserControllerTest {
 
     @InjectMocks
-    private RegisterController registerController;
+    private UserController userController;
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private LocationService locationService;
 
     @Mock
     private EmailService emailService;
@@ -39,9 +36,8 @@ public class RegisterControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(registerController, "userRepository", userRepository);
-        ReflectionTestUtils.setField(registerController, "locationService", locationService);
-        ReflectionTestUtils.setField(registerController, "passwordEncoder", passwordEncoder);
+        ReflectionTestUtils.setField(userController, "userRepository", userRepository);
+        ReflectionTestUtils.setField(userController, "passwordEncoder", passwordEncoder);
     }
 
     @Test
@@ -63,7 +59,7 @@ public class RegisterControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/");
 
         // Act
-        ResponseEntity response = registerController.registerUser(dto, uriBuilder);
+        ResponseEntity response = userController.registerUser(dto, uriBuilder);
 
         // Assert
         assertEquals(201, response.getStatusCode().value());
@@ -89,7 +85,7 @@ public class RegisterControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/");
 
         // Act
-        ResponseEntity response = registerController.registerUser(dto, uriBuilder);
+        ResponseEntity response = userController.registerUser(dto, uriBuilder);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
@@ -111,7 +107,7 @@ public class RegisterControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/");
 
         // Act
-        ResponseEntity response = registerController.registerUser(dto, uriBuilder);
+        ResponseEntity response = userController.registerUser(dto, uriBuilder);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
@@ -133,7 +129,7 @@ public class RegisterControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/");
 
         // Act
-        ResponseEntity response = registerController.registerUser(dto, uriBuilder);
+        ResponseEntity response = userController.registerUser(dto, uriBuilder);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());
@@ -157,7 +153,7 @@ public class RegisterControllerTest {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/");
 
         // Act
-        ResponseEntity response = registerController.registerUser(dto, uriBuilder);
+        ResponseEntity response = userController.registerUser(dto, uriBuilder);
 
         // Assert
         assertEquals(400, response.getStatusCode().value());

@@ -2,17 +2,12 @@ package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
 import com.petcare.back.domain.dto.request.PetCreateDTO;
+import com.petcare.back.domain.dto.request.PetUpdateDTO;
 import com.petcare.back.domain.dto.request.PlanCreateDTO;
-import com.petcare.back.domain.dto.response.BookingResponseDTO;
-import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
-import com.petcare.back.domain.dto.response.PetResponseDTO;
-import com.petcare.back.domain.dto.response.PlanResponseDTO;
+import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.service.BookingService;
-import com.petcare.back.service.ComboOfferingService;
-import com.petcare.back.service.PetService;
-import com.petcare.back.service.PlanService;
+import com.petcare.back.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -40,6 +35,7 @@ public class OwnerController {
     private final ComboOfferingService comboOfferingService;
     private final PlanService planService;
     private final BookingService bookingService;
+    private final UserService userService;
 
     @Operation(
             summary = "Registrar mascota",
@@ -57,6 +53,34 @@ public class OwnerController {
                     "status", "success",
                     "message", "Mascota registrada con éxito",
                     "data", pet
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Actualizar mascota",
+            description = "Permite actualizar los datos de una mascota existente. Solo el propietario de la mascota o un administrador pueden realizar esta acción. Los campos no proporcionados mantendrán sus valores actuales."
+    )
+    @PutMapping("/pet/{petId}")
+    public ResponseEntity<?> updatePet(@PathVariable Long petId,
+                                       @Valid @RequestBody PetUpdateDTO petUpdateDTO) {
+        try {
+            PetResponseDTO updatedPet = petService.updatePet(petId, petUpdateDTO);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Mascota actualizada con éxito",
+                    "data", updatedPet
             ));
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -152,6 +176,37 @@ public class OwnerController {
                     "status", "success",
                     "message", "Reserva registrada con éxito",
                     "data", booking
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Buscar profesionales cercanos",
+            description = "Devuelve una lista de SITTERs activos dentro del radio especificado en kilómetros, tomando como referencia la ubicación del usuario autenticado."
+    )
+    @PostMapping("/search/nearby-sitters")
+    public ResponseEntity<?> searchNearbySitters(@RequestParam double radiusKm,
+                                                 UriComponentsBuilder uriBuilder) {
+        try {
+            List<NearbySitterResponseDTO> sitters = userService.findNearbySitters(radiusKm);
+
+            URI uri = uriBuilder.path("/sitters/search").build().toUri();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Profesionales encontrados dentro de " + radiusKm + " km",
+                    "data", sitters,
+                    "searchUri", uri.toString()
             ));
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of(

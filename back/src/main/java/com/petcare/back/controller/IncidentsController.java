@@ -3,9 +3,13 @@ package com.petcare.back.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petcare.back.domain.dto.request.IncidentsDTO;
 
-import com.petcare.back.domain.dto.response.IncidentsResponseDTO;
+
 import com.petcare.back.domain.entity.Image;
+
 import com.petcare.back.exception.MyException;
+
+import com.petcare.back.domain.enumerated.IncidentsTypes;
+
 import com.petcare.back.service.IncidentsService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SecurityRequirement(name = "bearer-key")
 @RestController
@@ -86,5 +91,14 @@ public class IncidentsController {
     public ResponseEntity<List<Image>> getIncidentImages(@PathVariable Long incidentId) {
         List<Image> images = incidentsService.getIncidentImages(incidentId);
         return ResponseEntity.ok(images);
+    }
+
+    //Obtener tipos de incidentes
+    @GetMapping("/incident/types")
+    public ResponseEntity<List<String>> getIncidentTypes() {
+        List<String> types = Arrays.stream(IncidentsTypes.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(types);
     }
 }

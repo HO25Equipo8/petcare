@@ -1,81 +1,156 @@
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/Avatar.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card.jsx';
 import { Badge } from '../components/ui/Badge.jsx';
-import { MapPin, Clock, Shield, Star, Heart } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Award, Camera, Calendar, CheckCircle, Globe, MapPin, Play, Shield, Smartphone, Star, Heart, Users, Zap } from 'lucide-react';
 import { Logo } from '../components/ui/Logo.jsx';
 
-
-
 export function LandingPage({ onNavigate, onLogin }) {
-  const features = [
+
+  const services = [
     {
       icon: MapPin,
-  title: "Rastreo GPS en Vivo",
-  description: "Sigue el paseo de tu mascota en tiempo real con nuestra tecnología GPS avanzada",
-      color: "text-primary-500"
-    },
-    {
-      icon: Shield,
-  title: "Cuidadores de Confianza",
-  description: "Todos nuestros cuidadores están verificados, asegurados y con antecedentes revisados",
-      color: "text-secondary-500"
-    },
-    {
-      icon: Clock,
-  title: "Horarios Flexibles",
-  description: "Reserva servicios que se adapten a tu agenda, desde paseos diarios hasta estancias nocturnas",
-      color: "text-accent-500"
+      title: "Paseo de Perros",
+      description: "Servicio profesional de paseo con rastreo GPS en tiempo real y fotos actualizadas",
+      price: "Desde $25",
+      duration: "30-60 min",
+      features: ["Rastreo GPS", "Fotos en tiempo real", "Horarios flexibles", "Reporte del clima"],
+      popular: true,
+      color: "text-primary-500",
+      bgColor: "bg-primary-50"
     },
     {
       icon: Heart,
-  title: "Cuidado Personalizado",
-  description: "Cada mascota recibe atención personalizada según sus necesidades únicas",
+      title: "Cuidado en Casa",
+      description: "Cuidado amoroso en tu hogar cuando no estás, incluye alimentación y juegos",
+      price: "Desde $50",
+      duration: "Día completo",
+      features: ["Visitas a domicilio", "Alimentación y medicinas", "Sesiones de juego", "Seguridad en casa"],
+      popular: false,
+      color: "text-coral-500",
+      bgColor: "bg-coral-50"
+    },
+    {
+      icon: Shield,
+      title: "Hospedaje de Mascotas",
+      description: "Cuidado nocturno en hogares verificados con atención 24/7 y actualizaciones",
+      price: "Desde $75",
+      duration: "Por noche",
+      features: ["Ambiente hogareño", "Cuidado 24/7", "Reportes diarios", "Contacto de emergencia"],
+      popular: false,
+      color: "text-secondary-500",
+      bgColor: "bg-secondary-50"
+    },
+    {
+      icon: AlertTriangle,
+      title: "Atención de Emergencia",
+      description: "Cuidado de último minuto para situaciones inesperadas con respuesta inmediata",
+      price: "Desde $40",
+      duration: "Según necesidad",
+      features: ["Reserva el mismo día", "Protocolo de emergencia", "Coordinación con veterinario", "Soporte 24/7"],
+      popular: false,
+      color: "text-accent-500",
+      bgColor: "bg-accent-50"
+    }
+  ];
+
+    const howItWorks = [
+    {
+      step: 1,
+      title: "Crea tu Perfil",
+      description: "Cuéntanos sobre las necesidades, preferencias y horarios de tu mascota",
+      icon: Users,
+      color: "text-primary-500"
+    },
+    {
+      step: 2,
+      title: "Busca Cuidadores",
+      description: "Mira perfiles, calificaciones y disponibilidad de cuidadores verificados cerca de ti",
+      icon: Globe,
+      color: "text-secondary-500"
+    },
+    {
+      step: 3,
+      title: "Reserva y Conecta",
+      description: "Agenda servicios, chatea con tu cuidador y deja instrucciones especiales",
+      icon: Calendar,
+      color: "text-accent-500"
+    },
+    {
+      step: 4,
+      title: "Sigue y Disfruta",
+      description: "Recibe actualizaciones, fotos y rastreo GPS en tiempo real durante el servicio",
+      icon: Smartphone,
       color: "text-coral-500"
     }
   ];
 
-  const services = [
+  const popularSitters = [
     {
-  title: "Paseo de Perros",
-  description: "Servicio profesional de paseo con rastreo GPS en tiempo real",
-  price: "Desde $25/paseo",
-  duration: "30-60 minutos",
-  features: ["Rastreo GPS", "Actualizaciones con fotos", "Horarios flexibles"]
+      id: 1,
+      name: "Ernesto Tapia",
+      location: "Centro",
+      rating: 4.9,
+      reviews: 127,
+      specialties: ["Perros grandes", "Mascotas mayores", "Medicación"],
+      experience: "5 años",
+      price: "$30/paseo",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+      verified: true,
+      responseTime: "< 1 hora",
+      completedJobs: 850
     },
     {
-  title: "Cuidado en Casa",
-  description: "Cuidado de mascotas en tu hogar cuando no estás",
-  price: "Desde $50/día",
-  duration: "Cuidado todo el día",
-  features: ["Visitas a domicilio", "Alimentación y medicación", "Tiempo de juego"]
+      id: 2,
+      name: "Marcos Juárez",
+      location: "Zona Media",
+      rating: 4.8,
+      reviews: 89,
+      specialties: ["Cachorros", "Entrenamiento", "Multi-mascota"],
+      experience: "3 años",
+      price: "$28/paseo",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      verified: true,
+      responseTime: "< 2 horas",
+      completedJobs: 520
     },
     {
-  title: "Guardería de Mascotas",
-  description: "Estancia nocturna en hogares certificados de nuestros socios",
-  price: "Desde $75/noche",
-  duration: "Estancias nocturnas",
-  features: ["Ambiente hogareño", "Cuidado 24/7", "Actualizaciones diarias"]
+      id: 3,
+      name: "Sara Martinez",
+      location: "Zona Oeste",
+      rating: 5.0,
+      reviews: 203,
+      specialties: ["Gatos", "Perros pequeños", "Mascotas ansiosas"],
+      experience: "4 años",
+      price: "$32/paseo",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+      verified: true,
+      responseTime: "< 30 min",
+      completedJobs: 920
     }
   ];
 
-  const testimonials = [
+  const dashboardFeatures = [
     {
-      name: "Sara Juárez",
-      role: "Dog Owner",
-  content: "¡PetCare ha sido un salvavidas! El rastreo GPS me da tranquilidad y Max ama sus paseos diarios con Emma.",
-      rating: 5
+      title: "Panel de Dueño",
+      description: "Administra tus mascotas, reserva servicios y sigue sus actividades",
+      features: ["Perfiles de mascotas", "Calendario de reservas", "Seguimiento en vivo", "Historial de pagos"],
+      icon: Users,
+      color: "border-primary-200 bg-primary-50"
     },
     {
-      name: "Miguel Restrepo",
-      role: "Cat Owner",
-  content: "El servicio de cuidado en casa es fantástico. Luna recibe atención personalizada mientras viajo por trabajo.",
-      rating: 5
+      title: "Panel de Cuidador",
+      description: "Acepta reservas, comunícate con clientes y gestiona tu agenda",
+      features: ["Solicitudes de trabajo", "Mensajería con clientes", "Seguimiento de ganancias", "Planificador de agenda"],
+      icon: Calendar,
+      color: "border-secondary-200 bg-secondary-50"
     },
     {
-      name: "Lisa Rodriguez",
-      role: "Pet Sitter",
-  content: "Trabajar con PetCare ha sido increíble. La plataforma facilita conectar con dueños y gestionar reservas.",
-      rating: 5
+      title: "Seguimiento en Vivo",
+      description: "Rastreo GPS en tiempo real con fotos y actualizaciones durante los paseos",
+      features: ["Mapa de ruta GPS", "Fotos con hora", "Resumen de actividad", "Reportes de incidentes"],
+      icon: MapPin,
+      color: "border-accent-200 bg-accent-50"
     }
   ];
 
@@ -114,53 +189,55 @@ export function LandingPage({ onNavigate, onLogin }) {
               >
                 Empieza Hoy
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                onClick={() => onNavigate('caregivers')}
-                className="px-8 py-3"
-              >
-                Encuentra Cuidadores
-              </Button>
             </div>
           </div>
         </div>
-
-        {/* Decorative background elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-20 h-20 bg-primary-200 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-16 h-16 bg-secondary-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-20 w-24 h-24 bg-accent-200 rounded-full opacity-20 animate-pulse delay-2000"></div>
-        </div>
       </section>
 
-      {/* Features Section */}
+      {/* Services Overview */}
       <section className="py-20 bg-background-secondary">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4 font-headings">
-              ¿Por qué elegir PetCare?
+              Servicios Profesionales para Mascotas
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              Somos más que un simple servicio de cuidado de mascotas. Somos tu aliado de confianza para mantener a tus peludos amigos felices, sanos y seguros.
+              Desde paseos diarios hasta hospedaje nocturno, ofrecemos atención integral adaptada a las necesidades únicas de tu mascota.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((service, index) => {
+              const Icon = service.icon;
               return (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader>
-                    <div className={`w-12 h-12 ${feature.color} mx-auto mb-4 flex items-center justify-center rounded-lg bg-background-emphasis`}>
+                <Card key={index} className={`relative hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${service.bgColor} border-0`}>
+                  {service.popular && (
+                    <span className="absolute -top-2 -right-2 text-white bg-accent-500 rounded px-2 py-1 text-xs font-semibold shadow">
+                      Más Popular
+                    </span>
+                  )}
+                  <CardHeader className="text-center">
+                    <div className={`w-12 h-12 ${service.color} mx-auto mb-4 flex items-center justify-center rounded-lg bg-white shadow-sm`}>
                       <Icon className="w-6 h-6" />
                     </div>
-                    <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
+                    <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
+                    <div className="flex justify-between items-center text-sm text-text-secondary mb-2">
+                      <span className="font-mono text-primary-600 font-medium">{service.price}</span>
+                      <span>{service.duration}</span>
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-text-secondary">
-                      {feature.description}
+                    <CardDescription className="text-text-secondary mb-4 text-center">
+                      {service.description}
                     </CardDescription>
+                    <ul className="space-y-2">
+                      {service.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center text-sm text-text-secondary">
+                          <CheckCircle className="w-4 h-4 text-primary-500 mr-2 flex-shrink-0" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
                   </CardContent>
                 </Card>
               );
@@ -169,85 +246,208 @@ export function LandingPage({ onNavigate, onLogin }) {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* How It Works */}
       <section className="py-20 bg-background-emphasis">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4 font-headings">
-              Nuestros Servicios
+              ¿Cómo funciona PetCare?
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              Servicios integrales de cuidado de mascotas adaptados a las necesidades de tu mascota y a su estilo de vida.
+              Comenzar es muy fácil. Sigue estos pasos para conectar con el cuidador ideal para tu mascota.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <div className="flex justify-between items-start mb-2">
-                    <CardTitle className="text-xl">{service.title}</CardTitle>
-                    <Badge variant="secondary" className="bg-primary-100 text-primary-700">
-                      {service.duration}
-                    </Badge>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {howItWorks.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <div key={index} className="text-center">
+                  <div className={`w-16 h-16 ${step.color} mx-auto mb-6 flex items-center justify-center rounded-full bg-white shadow-md relative`}>
+                    <Icon className="w-8 h-8" />
                   </div>
-                  <CardDescription className="text-text-secondary mb-4">
-                    {service.description}
-                  </CardDescription>
-                  <div className="text-2xl font-bold text-primary-600 font-headings">
-                    {service.price}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center text-text-secondary">
-                        <div className="w-1.5 h-1.5 bg-primary-500 rounded-full mr-3"></div>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button className="w-full mt-6" onClick={onLogin}>
-                    Book Now
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                  <h3 className="text-xl font-bold text-text-primary mb-3 font-headings">
+                    {step.title}
+                  </h3>
+                  <p className="text-text-secondary">
+                    {step.description}
+                  </p>
+                  {index < howItWorks.length - 1 && (
+                    <div className="hidden lg:block absolute top-8 left-full w-full">
+                      <ArrowRight className="w-6 h-6 text-primary-300 mx-auto" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Popular Sitters */}
       <section className="py-20 bg-background-secondary">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4 font-headings">
-              Lo Que Dice Nuestra Comunidad
+              Conoce a nuestros cuidadores mejor valorados
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              Únete a miles de dueños y cuidadores de mascotas felices que confían en PetCare.
+              Nuestra comunidad de cuidadores verificados son profesionales apasionados que tratan a tus mascotas como familia.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+            {popularSitters.map((sitter) => (
+              <Card key={sitter.id} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <CardHeader>
-                  <div className="flex items-center space-x-1 mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-accent-500 text-accent-500" />
-                    ))}
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage src={sitter.image} alt={sitter.name} />
+                        <AvatarFallback>{sitter.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      {sitter.verified && (
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-bold text-text-primary">{sitter.name}</h3>
+                        <span className="badge badge-secondary text-xs">
+                          {sitter.experience}
+                        </span>
+                      </div>
+                      <div className="flex items-center text-sm text-text-secondary">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        {sitter.location}
+                      </div>
+                      <div className="flex items-center space-x-4 mt-1">
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 fill-accent-500 text-accent-500 mr-1" />
+                          <span className="font-medium text-sm">{sitter.rating}</span>
+                          <span className="text-xs text-text-secondary ml-1">({sitter.reviews})</span>
+                        </div>
+                        <div className="text-primary-600 font-mono font-medium text-sm">
+                          {sitter.price}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <CardDescription className="text-text-primary italic text-base leading-relaxed">
-                    "{testimonial.content}"
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="font-medium text-text-primary">{testimonial.name}</div>
-                  <div className="text-text-secondary text-sm">{testimonial.role}</div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-text-secondary mb-2">Especialidades:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {sitter.specialties.map((specialty, index) => (
+                          <span key={index} className="inline-block border border-primary-200 bg-primary-50 rounded px-2 py-1 text-xs">
+                            {specialty}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-xs text-text-secondary">
+                      <span>Respuesta: {sitter.responseTime}</span>
+                      <span>{sitter.completedJobs} trabajos completados</span>
+                    </div>
+                    <Button 
+                      className="w-full mt-4" 
+                      onClick={onLogin}
+                      size="sm"
+                    >
+                      Ver perfil
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={onLogin}
+              className="px-8 py-3"
+            >
+              Ver todos los cuidadores
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Dashboard Preview */}
+      <section className="py-20 bg-background-emphasis">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4 font-headings">
+              Un panel poderoso para ti
+            </h2>
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Administra todo desde un solo lugar. Seas dueño o cuidador, nuestros paneles intuitivos hacen el cuidado de mascotas simple y transparente.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {dashboardFeatures.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={index} className={`${feature.color} border-2 hover:shadow-lg transition-shadow duration-300`}>
+                  <CardHeader>
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                        <Icon className="w-5 h-5 text-primary-600" />
+                      </div>
+                      <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    </div>
+                    <CardDescription className="text-text-secondary">
+                      {feature.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {feature.features.map((item, itemIndex) => (
+                        <li key={itemIndex} className="flex items-center text-sm text-text-secondary">
+                          <Zap className="w-4 h-4 text-accent-500 mr-2 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust & Safety */}
+      <section className="py-20 bg-background-secondary">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-8 font-headings">
+              La seguridad de tu mascota es nuestra prioridad
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <div className="text-center">
+                <Shield className="w-12 h-12 text-primary-500 mx-auto mb-4" />
+                <h3 className="font-bold text-text-primary mb-2">Verificación de antecedentes</h3>
+                <p className="text-text-secondary text-sm">Todos los cuidadores pasan por una verificación exhaustiva de antecedentes y referencias.</p>
+              </div>
+              <div className="text-center">
+                <Award className="w-12 h-12 text-secondary-500 mx-auto mb-4" />
+                <h3 className="font-bold text-text-primary mb-2">Asegurados y certificados</h3>
+                <p className="text-text-secondary text-sm">Cada reserva está cubierta por seguro y protección certificada.</p>
+              </div>
+              <div className="text-center">
+                <Camera className="w-12 h-12 text-accent-500 mx-auto mb-4" />
+                <h3 className="font-bold text-text-primary mb-2">Actualizaciones en tiempo real</h3>
+                <p className="text-text-secondary text-sm">Rastreo GPS, fotos y mensajería instantánea para mantenerte siempre conectado.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

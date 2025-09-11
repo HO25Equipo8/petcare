@@ -7,6 +7,6 @@ import java.util.List;
 public record UserUpdateDTO(
         String name,
         String phone,
-        LocationDTO location,
+        AutocompleteSuggestion location,
         List<ProfessionalRoleEnum> professionalRoles
 ) {}

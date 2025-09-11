@@ -32,12 +32,17 @@ public class Incidents {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
+
     @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private IncidentResolvedStatus incidentResolvedStatus;
 
+
+    @OneToOne
+    @JoinColumn(name = "session_id", nullable = false)
+    private ServiceSession serviceSession;
 
 }
 

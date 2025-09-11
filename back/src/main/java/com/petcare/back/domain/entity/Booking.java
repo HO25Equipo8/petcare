@@ -77,6 +77,9 @@ public class Booking {
     @Column(name = "final_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal finalPrice;
 
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ServiceSession serviceSession;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

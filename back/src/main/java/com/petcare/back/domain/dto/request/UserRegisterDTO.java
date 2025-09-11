@@ -23,8 +23,11 @@ public record UserRegisterDTO(
                 message = "Contraseña deber tener 8 caracteres, con al menos un digito y una mayúscula"
         )
         String pass2,
+
         Role role
 ) {
+
 }
+
 
 

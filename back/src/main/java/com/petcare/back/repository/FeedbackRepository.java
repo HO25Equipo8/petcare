@@ -22,4 +22,9 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
             @Param("target") User target,
             @Param("booking") Booking booking
     );
+    @Query("SELECT AVG(f.rating) FROM Feedback f WHERE f.target.id = :userId")
+    Double getAverageRatingForUser(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(f) FROM Feedback f WHERE f.target.id = :userId")
+    Integer getFeedbackCountForUser(@Param("userId") Long userId);
 }
