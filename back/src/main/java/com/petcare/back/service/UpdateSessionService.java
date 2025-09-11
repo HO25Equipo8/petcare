@@ -9,12 +9,16 @@ import com.petcare.back.domain.dto.response.IncidentsResponseDTO;
 import com.petcare.back.domain.dto.response.ServiceSessionResponseDTO;
 import com.petcare.back.domain.dto.response.UpdateServiceNotificationDTO;
 import com.petcare.back.domain.entity.*;
+import com.petcare.back.domain.enumerated.BookingStatusEnum;
+import com.petcare.back.domain.enumerated.IncidentsTypes;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.enumerated.ServiceSessionStatus;
 import com.petcare.back.domain.mapper.request.ServiceSessionMapper;
 import com.petcare.back.domain.mapper.request.UpdateServiceCreateMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.*;
+import com.petcare.back.validation.ValidationBooking;
+import com.petcare.back.validation.ValidationSessionServices;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -41,6 +45,35 @@ public class UpdateSessionService {
     private final IncidentsRepository incidentsRepository;
     private final IncidentsTableRepository incidentsTableRepository;
     private final ServiceSessionMapper serviceSessionMapper;
+    private final List<ValidationSessionServices> validations;
+
+    @Transactional
+    public ServiceSession startSession(StartSessionDTO dto) throws MyException {
+
+        User user = getAuthenticatedUser();
+
+        if (user.getRole() != Role.SITTER) {
+            throw new MyException("Solo el profesional puede iniciar la sesión");
+        }
+
+        Booking booking = bookingRepository.findById(dto.bookingId())
+                .orElseThrow(() -> new RuntimeException("Booking no encontrado"));
+
+        // Si ya existe, la eliminamos (o finalizamos)
+        sessionRepository.findByBookingId(booking.getId())
+                .ifPresent(sessionRepository::delete);
+
+        ServiceSession session = new ServiceSession();
+        session.setBooking(booking);
+        session.setStatus(ServiceSessionStatus.EN_PROGRESO);
+        session.setStartTime(LocalDateTime.now());
+
+        for (ValidationSessionServices v : validations) {
+            v.validate(user, session);
+        }
+
+        return sessionRepository.save(session);
+    }
 
     @Transactional
     public UpdateService addUpdate(Long sessionId, UpdateServiceRequestDTO dto) throws IOException, MyException {
@@ -51,6 +84,10 @@ public class UpdateSessionService {
 
         if (user.getRole() != Role.SITTER) {
             throw new MyException("Solo el profesional puede actualizar la sesión");
+        }
+
+        for (ValidationSessionServices v : validations) {
+            v.validate(user, session);
         }
 
         // Crear el update
@@ -71,30 +108,6 @@ public class UpdateSessionService {
     }
 
     @Transactional
-    public ServiceSession startSession(StartSessionDTO dto) throws MyException {
-
-        User user = getAuthenticatedUser();
-
-        if (user.getRole() != Role.SITTER) {
-            throw new MyException("Solo el profesional puede iniciar la sesión");
-        }
-
-        Booking booking = bookingRepository.findById(dto.bookingId())
-                .orElseThrow(() -> new RuntimeException("Booking no encontrado"));
-
-        // Si ya existe, la eliminamos (o finalizamos)
-        sessionRepository.findByBookingId(booking.getId())
-                .ifPresent(existing -> sessionRepository.delete(existing));
-
-        ServiceSession session = new ServiceSession();
-        session.setBooking(booking);
-        session.setStatus(ServiceSessionStatus.EN_PROGRESO);
-        session.setStartTime(LocalDateTime.now());
-
-        return sessionRepository.save(session);
-    }
-
-    @Transactional
     public ServiceSession finish(Long sessionId) throws MyException {
 
         ServiceSession session = sessionRepository.findById(sessionId)
@@ -107,6 +120,65 @@ public class UpdateSessionService {
         }
         session.setStatus(ServiceSessionStatus.FINALIZADO);
         session.setEndTime(LocalDateTime.now());
+
+        for (ValidationSessionServices v : validations) {
+            v.validate(user, session);
+        }
+
+        Booking booking = bookingRepository.getReferenceById(session.getBooking().getId());
+        booking.setStatus(BookingStatusEnum.COMPLETADO);
+        bookingRepository.save(booking);
+
+        return sessionRepository.save(session);
+    }
+
+    @Transactional
+    public ServiceSession postponeSession(Long sessionId, String reason) throws MyException {
+        ServiceSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+
+        User user = getAuthenticatedUser();
+        if (user.getRole() != Role.SITTER) {
+            throw new MyException("Solo el profesional puede postergar la sesión");
+        }
+
+        if (session.getStatus() != ServiceSessionStatus.EN_PROGRESO) {
+            throw new MyException("Solo se puede postergar una sesión en progreso");
+        }
+
+        session.setStatus(ServiceSessionStatus.POSTERGADO);
+        session.setEndTime(LocalDateTime.now());
+
+        UpdateService update = new UpdateService();
+        update.setTitle("Sesión postergada");
+        update.setMessage(reason);
+        update.setServiceSession(session);
+        updateRepository.save(update);
+
+        return sessionRepository.save(session);
+    }
+    @Transactional
+    public ServiceSession cancelSession(Long sessionId, String reason) throws MyException {
+        ServiceSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+
+        User user = getAuthenticatedUser();
+        if (user.getRole() != Role.SITTER) {
+            throw new MyException("Solo el profesional puede cancelar la sesión");
+        }
+
+        if (session.getStatus() == ServiceSessionStatus.FINALIZADO) {
+            throw new MyException("No se puede cancelar una sesión ya finalizada");
+        }
+
+        session.setStatus(ServiceSessionStatus.CANCELADO);
+        session.setEndTime(LocalDateTime.now());
+
+        UpdateService update = new UpdateService();
+        update.setTitle("Sesión cancelada");
+        update.setMessage(reason);
+        update.setServiceSession(session);
+        updateRepository.save(update);
 
         return sessionRepository.save(session);
     }
