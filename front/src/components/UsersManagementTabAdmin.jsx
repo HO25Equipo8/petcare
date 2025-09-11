@@ -1,9 +1,9 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/Card.jsx';
-import { Button } from './ui/Button.jsx';
-import { Badge } from './ui/Badge.jsx';
-import { Input } from './ui/Input.jsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/Table.jsx';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../shared/ui/Card';
+import { Button } from '../shared/ui/Button';
+import { Badge } from '../shared/ui/Badge';
+import { Input } from '../shared/ui/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../shared/ui/Select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../shared/ui/Table';
 import { Eye, Edit, Ban, CheckCircle } from 'lucide-react';
 
 export default function UsersManagementSubTabAdmin({ recentUsers, getStatusColor, setSelectedUser, setIsUserModalOpen, handleUserAction }) {

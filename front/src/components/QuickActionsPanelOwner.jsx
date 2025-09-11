@@ -1,4 +1,4 @@
-import { Button } from '../components/ui/Button.jsx';
+import { Button } from '../shared/ui/Button';
 import { Heart, MapPin, Calendar, Star, AlertTriangle } from 'lucide-react';
 
 /**

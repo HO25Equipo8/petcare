@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/Card.jsx';
-import { Button } from './ui/Button.jsx';
-import { Badge } from './ui/Badge.jsx';
-import { Input } from './ui/Input.jsx';
-import { Label } from './ui/Label.jsx';
-import { Textarea } from './ui/Textarea.jsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/Dialog.jsx';
+import { Card, CardHeader, CardTitle, CardContent } from '../shared/ui/Card';
+import { Button } from '../shared/ui/Button';
+import { Badge } from '../shared/ui/Badge';
+import { Input } from '../shared/ui/Input';
+import { Label } from '../shared/ui/Label';
+import { Textarea } from '../shared/ui/Textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../shared/ui/Select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../shared/ui/Dialog';
 import { Plus, Edit, Calendar, Heart, Weight, Info } from 'lucide-react';
 
 

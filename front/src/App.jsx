@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { PetHeader } from './components/PetHeader';
 import { AppRoutes } from './AppRoutes';
-import { AuthModal } from './components/AuthModal';
+import { AuthModal } from './features/auth/AuthModal';
 import { BrowserRouter } from 'react-router-dom';
 
 

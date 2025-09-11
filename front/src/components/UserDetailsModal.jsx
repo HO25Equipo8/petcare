@@ -1,7 +1,7 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog.jsx';
-import { Label } from './ui/Label.jsx';
-import { Badge } from './ui/Badge.jsx';
-import { Button } from './ui/Button.jsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../shared/ui/Dialog';
+import { Label } from '../shared/ui/Label';
+import { Badge } from '../shared/ui/Badge';
+import { Button } from '../shared/ui/Button';
 
 export default function UserDetailsModal({ open, onOpenChange, selectedUser, getStatusColor }) {
   return (

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Card, CardContent } from './ui/Card.jsx';
-import { Button } from './ui/Button.jsx';
-import { Badge } from './ui/Badge.jsx';
-import { Avatar, AvatarFallback } from './ui/Avatar.jsx';
-import { Input } from './ui/Input.jsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs.jsx';
+import { Card, CardContent } from '../shared/ui/Card';
+import { Button } from '../shared/ui/Button';
+import { Badge } from '../shared/ui/Badge';
+import { Avatar, AvatarFallback } from '../shared/ui/Avatar';
+import { Input } from '../shared/ui/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../shared/ui/Select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../shared/ui/Tabs';
 import { Star, MapPin, Phone, MessageCircle, Filter, Search } from 'lucide-react';
 
 
