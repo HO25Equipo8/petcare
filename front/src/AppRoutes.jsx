@@ -1,8 +1,8 @@
 
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { LandingPage } from './pages/LandingPage';
+import { LandingPage } from './features/landing-page/LandingPage';
 import { OwnerDashboard } from './pages/OwnerDashboard';
-import { SitterDashboard } from './pages/SitterDashboard';
+import { SitterDashboard } from './features/dashboard/sitter/Dashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { PetProfiles } from './components/PetProfiles';
 import { CaregiverDirectory } from './components/CaregiverDirectory';

@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from './ui/Card.jsx';
+import { Card, CardHeader, CardTitle, CardContent } from '../shared/ui/Card';
 
 const AnalyticsSubTabAdmin = ({ stats }) => {
   return (

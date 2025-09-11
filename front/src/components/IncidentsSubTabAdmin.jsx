@@ -1,6 +1,6 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/Card.jsx';
-import { Badge } from './ui/Badge.jsx';
-import { Button } from './ui/Button.jsx';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../shared/ui/Card';
+import { Badge } from '../shared/ui/Badge';
+import { Button } from '../shared/ui/Button';
 import { AlertTriangle } from 'lucide-react';
 
 export default function IncidentsSubTabAdmin({ pendingIncidents, getSeverityColor, onNavigate }) {

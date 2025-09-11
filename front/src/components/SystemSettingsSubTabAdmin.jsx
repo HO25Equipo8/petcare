@@ -1,8 +1,8 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/Card.jsx';
-import { Button } from './ui/Button.jsx';
-import { Input } from './ui/Input.jsx';
-import { Label } from './ui/Label.jsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../shared/ui/Card';
+import { Button } from '../shared/ui/Button';
+import { Input } from '../shared/ui/Input';
+import { Label } from '../shared/ui/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../shared/ui/Select';
 
 export default function SystemSettingsSubTabAdmin() {
   return (
