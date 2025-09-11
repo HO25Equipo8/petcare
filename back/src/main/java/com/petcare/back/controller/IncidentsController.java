@@ -66,6 +66,7 @@ public class IncidentsController {
     }
 
   @PutMapping("/{incidentId}")
+  @Operation(summary = "Resolver incidente", description = "Marcar si el incidente esta resueleto")
   public ResponseEntity<String> updateIncident(@PathVariable Long incidentId) throws IOException {
         incidentsService.ResolvedIncidents(incidentId);
         return ResponseEntity.ok("Incidente  resuelto");
