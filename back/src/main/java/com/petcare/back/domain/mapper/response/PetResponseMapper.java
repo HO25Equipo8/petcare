@@ -9,5 +9,6 @@ import org.mapstruct.Mapping;
 public interface PetResponseMapper {
     @Mapping(source = "owner.id", target = "ownerId")
     @Mapping(source = "owner.email", target = "ownerEmail")
+    @Mapping(source = "imagePet.id", target = "imageId")
     PetResponseDTO toDto(Pet pet);
 }

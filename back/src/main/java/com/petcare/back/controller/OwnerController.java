@@ -2,6 +2,7 @@ package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
 import com.petcare.back.domain.dto.request.PetCreateDTO;
+import com.petcare.back.domain.dto.request.PetUpdateDTO;
 import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.User;
@@ -52,6 +53,34 @@ public class OwnerController {
                     "status", "success",
                     "message", "Mascota registrada con éxito",
                     "data", pet
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Actualizar mascota",
+            description = "Permite actualizar los datos de una mascota existente. Solo el propietario de la mascota o un administrador pueden realizar esta acción. Los campos no proporcionados mantendrán sus valores actuales."
+    )
+    @PutMapping("/pet/{petId}")
+    public ResponseEntity<?> updatePet(@PathVariable Long petId,
+                                       @Valid @RequestBody PetUpdateDTO petUpdateDTO) {
+        try {
+            PetResponseDTO updatedPet = petService.updatePet(petId, petUpdateDTO);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Mascota actualizada con éxito",
+                    "data", updatedPet
             ));
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of(
