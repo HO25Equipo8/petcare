@@ -39,7 +39,7 @@ export default function EditService({ open, onOpenChange, selectedService, setSe
                 />
               </div>
               <div>
-                <Label htmlFor="edit-service-price">Precio Base (ARS) *</Label>
+                <Label htmlFor="edit-service-price">Precio Base (USD) *</Label>
                 <Input
                   id="edit-service-price"
                   type="number"

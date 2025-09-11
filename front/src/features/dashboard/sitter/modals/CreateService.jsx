@@ -56,7 +56,7 @@ export default function CreateService({ open, onOpenChange, newService, setNewSe
               />
             </div>
             <div>
-              <Label htmlFor="service-price">Precio Base (ARS) *</Label>
+              <Label htmlFor="service-price">Precio Base (USD) *</Label>
               <Input
                 id="service-price"
                 type="number"
@@ -79,15 +79,13 @@ export default function CreateService({ open, onOpenChange, newService, setNewSe
                   <SelectItem value="VETERINARIO">Veterinario</SelectItem>
                   <SelectItem value="PELUQUERO">Peluquero</SelectItem>
                   <SelectItem value="CUIDADOR">Cuidador</SelectItem>
-                  <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
-                  <SelectItem value="USUARIO">Usuario</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Tipos de Mascota Aplicables</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                {['Perros', 'Gatos', 'Aves', 'Conejos', 'Roedores', 'Peces'].map((petType) => (
+                {['PERRO', 'GATO', 'OTRO'].map((petType) => (
                   <div key={petType} className="flex items-center space-x-2">
                     <Checkbox
                       id={petType}

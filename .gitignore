@@ -6,6 +6,7 @@ logs
 *.local
 
 # SCV / IDE
+front/.env
 .idea/
 *.iws
 *.iml
