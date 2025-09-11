@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = """
     SELECT u.* FROM users u
-    LEFT JOIN feedback f ON f.target_id = u.id
+    LEFT JOIN feedbacks f ON f.target_id = u.id
     WHERE u.role = 'SITTER'
     GROUP BY u.id
     ORDER BY AVG(f.rating) DESC, COUNT(f.id) DESC

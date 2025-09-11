@@ -4,9 +4,10 @@ import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 
 import java.util.List;
 
-public record UserUpdateDTO(
+public record UserUpdateBackendDTO(
         String name,
         String phone,
-        AutocompleteSuggestion location,
+        LocationDTO location,
         List<ProfessionalRoleEnum> professionalRoles
-) {}
+) {
+}

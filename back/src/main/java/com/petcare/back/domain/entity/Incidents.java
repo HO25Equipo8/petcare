@@ -29,4 +29,8 @@ public class Incidents {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
+    @ManyToOne
+    @JoinColumn(name = "session_id", nullable = false)
+    private ServiceSession serviceSession;
+
 }

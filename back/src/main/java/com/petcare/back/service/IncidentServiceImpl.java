@@ -34,7 +34,7 @@ public class IncidentServiceImpl  implements IncidentsService{
     private final BookingRepository bookingRepository;
     private final IncidentsTableRepository incidentsTableRepository;
     private final ImageTreatment imageTreatment;
-    
+
     public Image processImage(MultipartFile file) throws IOException {
         imageValidator.validate(file);
 
