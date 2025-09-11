@@ -26,7 +26,7 @@ public class Image {
 
     @ManyToOne
     @JoinColumn(name = "incident_id")
-    private IncidentsTable incident;
+    private Incidents incident;
 
     @ManyToOne
     @JoinColumn(name = "pet_id")

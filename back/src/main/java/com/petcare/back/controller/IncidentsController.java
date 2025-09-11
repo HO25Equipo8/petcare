@@ -5,6 +5,7 @@ import com.petcare.back.domain.dto.request.IncidentsDTO;
 
 import com.petcare.back.domain.dto.response.IncidentsResponseDTO;
 import com.petcare.back.domain.entity.Image;
+import com.petcare.back.exception.MyException;
 import com.petcare.back.service.IncidentsService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +36,7 @@ public class IncidentsController {
     // 1️⃣ Crear incidente (sin imágenes todavía)
     @PostMapping
     @Operation(summary = "Crear incidente", description = "Crea un incidente sin imágenes")
-    public ResponseEntity<Long> createIncident(@RequestBody IncidentsDTO incidentsDTO) throws IOException {
+    public ResponseEntity<Long> createIncident(@RequestBody IncidentsDTO incidentsDTO) throws MyException {
         Long incidentId = incidentsService.createIncident(incidentsDTO);
         return ResponseEntity.ok(incidentId);
     }
@@ -64,12 +65,18 @@ public class IncidentsController {
         return ResponseEntity.ok("Images uploaded successfully");
     }
 
+  @PutMapping("/{incidentId}")
+  public ResponseEntity<String> updateIncident(@PathVariable Long incidentId) throws IOException {
+        incidentsService.ResolvedIncidents(incidentId);
+        return ResponseEntity.ok("Incidente  resuelto");
+  }
+
     // 3️⃣ Obtener incidente (solo datos del incidente)
     @GetMapping("/{incidentId}")
     @Operation(summary = "Obtener incidente", description = "Devuelve los datos de un incidente sin imágenes")
-    public ResponseEntity<IncidentsResponseDTO> getIncident(@PathVariable Long incidentId) {
-        IncidentsResponseDTO incidentsResponseDTO = incidentsService.getIncidentsDTO(incidentId);
-        return ResponseEntity.ok(incidentsResponseDTO);
+    public ResponseEntity<IncidentsDTO> getIncident(@PathVariable Long incidentId) {
+        IncidentsDTO incidentsDTO = incidentsService.getIncidentsDTO(incidentId);
+        return ResponseEntity.ok(incidentsDTO);
     }
 
     // 4️⃣ Obtener imágenes del incidente
