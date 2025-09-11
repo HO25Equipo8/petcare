@@ -1,13 +1,13 @@
 package com.petcare.back.controller;
 
+import com.petcare.back.domain.dto.request.AutocompleteSuggestion;
 import com.petcare.back.repository.UserRepository;
+import com.petcare.back.service.GeocodingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class LocationController {
 
     private final UserRepository userRepository;
+    private final GeocodingService geocodingService;
     @Operation(
             summary = "Obtener usuarios con ubicación",
             description = "Devuelve una lista de usuarios que tienen ubicación registrada, incluyendo su email, latitud y longitud. Útil para visualización en mapas o búsquedas geolocalizadas."
@@ -38,5 +39,14 @@ public class LocationController {
                     return map;
                 })
                 .collect(Collectors.toList());
+    }
+    @Operation(
+            summary = "Autocompletar dirección",
+            description = "Devuelve una lista de sugerencias de direcciones basadas en el texto ingresado. Utiliza la API de Google Places para ofrecer resultados en tiempo real mientras el usuario escribe."
+    )
+    @GetMapping("/autocomplete")
+    public ResponseEntity<?> autocomplete(@RequestParam String input) {
+        List<AutocompleteSuggestion> suggestions = geocodingService.getAutocompleteSuggestions(input);
+        return ResponseEntity.ok(suggestions);
     }
 }

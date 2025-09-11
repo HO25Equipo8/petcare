@@ -23,8 +23,13 @@ public class Image {
     @Column(columnDefinition = "LONGBLOB")
     private byte[] data;
 
+
     @ManyToOne
     @JoinColumn(name = "incident_id")
-    private Incidents incident;
+    private IncidentsTable incident;
+
+    @ManyToOne
+    @JoinColumn(name = "pet_id")
+    private Pet pet;
 
 }

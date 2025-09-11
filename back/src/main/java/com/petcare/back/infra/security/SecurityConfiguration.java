@@ -2,6 +2,7 @@ package com.petcare.back.infra.security;
 
 import com.petcare.back.infra.gsignin.OAuth2AuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,10 +47,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/login", "/user/register").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/upload").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Allow OAuth2 endpoints
-
+                        .requestMatchers("/api/autocomplete/**").permitAll()
                         //.requestMatchers(HttpMethod.GET, "/", "/api/sitter/{id}", "/api/owner/{id}","/api/pet/{id}").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**")
+                        .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/ws/**","/topic/**", "/app/**").permitAll() //Agregue esta linea para el websocket
                         // Role-based endpoints
 
                         //.requestMatchers(HttpMethod.POST, "/api/cursos").hasRole("ADMIN")
@@ -63,11 +65,10 @@ public class SecurityConfiguration {
                         //.requestMatchers(HttpMethod.GET,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
                         //.requestMatchers(HttpMethod.PUT,"/users/**").hasAnyRole("USER", "ADMIN", "OWNER", "SITTER")
                         //.requestMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
-                        .permitAll()
                         .anyRequest().authenticated())
-                // .oauth2Login(oauth2 -> oauth2
-                //        .successHandler(oAuth2AuthenticationSuccessHandler)
-                //)
+                 .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -88,43 +89,43 @@ public class SecurityConfiguration {
 //                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
 //                .build();
 //    }
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // For production, use specific origins:
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8080/swagger-ui/index.html", "http://v3/api-docs", "https://ourdomain.com"));
-        //configuration.setAllowedOrigins(Arrays.asList("https://ourdomain.com"));
-        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // For development
-
-
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    // Puse esto porque me daba error de cors
-
-//    @Value("${url.front.deploy}")
-//    private String urlFront;
-//
 //    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {
 //        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Arrays.asList(urlFront));
+//        // For production, use specific origins:
+//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8080/swagger-ui/index.html", "http://v3/api-docs", "https://ourdomain.com"));
+//        //configuration.setAllowedOrigins(Arrays.asList("https://ourdomain.com"));
+//        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // For development
+//
+//
 //        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 //        configuration.setAllowedHeaders(Arrays.asList("*"));
 //        configuration.setAllowCredentials(true);
+//        configuration.setMaxAge(3600L);
+//
 //
 //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 //        source.registerCorsConfiguration("/**", configuration);
 //        return source;
 //    }
+
+    // Puse esto porque me daba error de cors
+
+    @Value("${url.front.deploy}")
+    private String urlFront;
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList(urlFront));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)

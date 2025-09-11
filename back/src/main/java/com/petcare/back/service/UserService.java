@@ -1,5 +1,9 @@
 package com.petcare.back.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.petcare.back.domain.dto.request.AutocompleteSuggestion;
+import com.petcare.back.domain.dto.request.LocationDTO;
+import com.petcare.back.domain.dto.request.UserUpdateBackendDTO;
 import com.petcare.back.domain.dto.request.UserUpdateDTO;
 import com.petcare.back.domain.dto.response.NearbySitterResponseDTO;
 import com.petcare.back.domain.entity.Location;
@@ -14,6 +18,8 @@ import com.petcare.back.validation.ValidationOffering;
 import com.petcare.back.validation.ValidationUserProfile;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,7 +32,7 @@ public class UserService {
 
     private final LocationService locationService;
     private final UserRepository userRepository;
-
+    private final GeocodingService geocodingService;
     private final List<ValidationUserProfile> validations;
     private final ImageRepository imageRepository;
     private final NearbySitterResponseMapper responseMapper;
@@ -41,6 +47,69 @@ public class UserService {
 
         for (ValidationUserProfile v : validations) {
             v.validate(dto,user);
+        }
+
+        LocationDTO locationDTO = geocodingService.getLocationFromPlaceId((dto.location().placeId()));
+
+        // ✅ Ubicación
+        if (dto.location() != null) {
+            Location updatedLocation;
+            if (user.getLocation() != null) {
+                updatedLocation = locationService.update(locationDTO, user.getLocation());
+            } else {
+                updatedLocation = locationService.save(locationDTO);
+            }
+            user.setLocation(updatedLocation);
+        }
+
+        // ✅ Roles profesionales (si aplica)
+        if (user.getRole() == Role.SITTER) {
+            user.setProfessionalRoles(dto.professionalRoles());
+        } else {
+            user.setProfessionalRoles(new ArrayList<>());
+        }
+
+        // ✅ Verificación de imágenes
+        boolean tieneFotoPerfil = user.getProfilePhoto() != null;
+
+        boolean tieneFotosVerificacion = true;
+        if (user.getRole() == Role.SITTER) {
+            int cantidadFotos = imageRepository.countByUserId(user.getId());
+            tieneFotosVerificacion = cantidadFotos > 0;
+        }
+
+        // ✅ Estado del perfil
+        boolean completo = user.getName() != null &&
+                user.getPhone() != null &&
+                user.getLocation() != null &&
+                tieneFotoPerfil &&
+                tieneFotosVerificacion;
+
+        user.setProfileComplete(completo);
+        user.setVerified(user.getRole() == Role.OWNER);
+
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User updateProfileBackend(UserUpdateBackendDTO dto) throws MyException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // ✅ Datos básicos
+        user.setName(dto.name());
+        user.setPhone(dto.phone());
+
+        AutocompleteSuggestion autocompleteSuggestion = geocodingService.getPlaceIdFromLocationDTO(dto.location());
+
+        UserUpdateDTO userUpdateDTO = new UserUpdateDTO(
+                dto.name(),
+                dto.phone(),
+                autocompleteSuggestion,
+                dto.professionalRoles()
+        );
+
+        for (ValidationUserProfile v : validations) {
+            v.validate(userUpdateDTO,user);
         }
 
         // ✅ Ubicación

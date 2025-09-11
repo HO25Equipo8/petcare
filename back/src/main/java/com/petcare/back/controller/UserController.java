@@ -1,9 +1,8 @@
 package com.petcare.back.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petcare.back.domain.dto.request.UserRegisterDTO;
+import com.petcare.back.domain.dto.request.UserUpdateBackendDTO;
 import com.petcare.back.domain.dto.request.UserUpdateDTO;
-import com.petcare.back.domain.dto.response.NearbySitterResponseDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
 import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
 import com.petcare.back.domain.entity.User;
@@ -12,12 +11,8 @@ import com.petcare.back.domain.mapper.response.UserUpdateResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.UserRepository;
 import com.petcare.back.service.EmailService;
-import com.petcare.back.service.LocationService;
 import com.petcare.back.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,30 +21,24 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
 @SecurityRequirement(name = "bearer-key")
-public class RegisterController {
+public class UserController {
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private LocationService locationService;
-    @Autowired
     private UserService userService;
-
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private UserUpdateResponseMapper userUpdateResponseMapper;
-
     @Autowired
     private EmailService emailService;
 
@@ -84,6 +73,9 @@ public class RegisterController {
 
         // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
+
+        // mapear role profesional de el user
+
 
         // Crear el usuario con el nuevo constructor
         User newUser = new User(
@@ -121,16 +113,16 @@ public class RegisterController {
 
     @Operation(
             summary = "Actualizar perfil del usuario autenticado",
-            description = "Permite actualizar datos personales y ubicación"
+            description = "Permite actualizar datos personales y ubicación con autocompletado de google"
     )
-    @PutMapping(value = "/update-profile", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/update-profile-frontend", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateProfile(
             @RequestBody UserUpdateDTO dto,
             UriComponentsBuilder uriBuilder
     ) {
         try {
-            User updatedUser = userService.updateProfile(dto);
 
+            User updatedUser = userService.updateProfile(dto);
             URI uri = uriBuilder.path("/api/users/{id}")
                     .buildAndExpand(updatedUser.getId())
                     .toUri();
@@ -156,22 +148,27 @@ public class RegisterController {
     }
 
     @Operation(
-            summary = "Buscar profesionales cercanos",
-            description = "Devuelve una lista de SITTERs activos dentro del radio especificado en kilómetros, tomando como referencia la ubicación del usuario autenticado."
+            summary = "Actualizar perfil del usuario autenticado para pruebas en el backend",
+            description = "Permite actualizar datos personales y ubicación"
     )
-    @PostMapping("/search/nearby-sitters")
-    public ResponseEntity<?> searchNearbySitters(@RequestParam double radiusKm,
-                                                 UriComponentsBuilder uriBuilder) {
+    @PutMapping(value = "/update-profile-backend", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateProfile(
+            @RequestBody UserUpdateBackendDTO dto,
+            UriComponentsBuilder uriBuilder
+    ) {
         try {
-            List<NearbySitterResponseDTO> sitters = userService.findNearbySitters(radiusKm);
 
-            URI uri = uriBuilder.path("/sitters/search").build().toUri();
+            User updatedUser = userService.updateProfileBackend(dto);
+            URI uri = uriBuilder.path("/api/users/{id}")
+                    .buildAndExpand(updatedUser.getId())
+                    .toUri();
 
-            return ResponseEntity.ok(Map.of(
+            UserUpdateResponseDTO responseDTO = userUpdateResponseMapper.toDTO(updatedUser);
+
+            return ResponseEntity.created(uri).body(Map.of(
                     "status", "success",
-                    "message", "Profesionales encontrados dentro de " + radiusKm + " km",
-                    "data", sitters,
-                    "searchUri", uri.toString()
+                    "message", "Perfil actualizado con éxito",
+                    "data", responseDTO
             ));
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -185,7 +182,6 @@ public class RegisterController {
             ));
         }
     }
-
 
     // Helper method to get user name
     private String getUserName(User user) {

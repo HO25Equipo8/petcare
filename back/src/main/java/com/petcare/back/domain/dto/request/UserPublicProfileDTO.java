@@ -9,7 +9,6 @@ public record UserPublicProfileDTO(
         String location,
         String profilePhotoUrl,
         List<ProfessionalRoleEnum> professionalRoles,
-        Double averageRating,
         Integer feedbackCount
 ) {}
 

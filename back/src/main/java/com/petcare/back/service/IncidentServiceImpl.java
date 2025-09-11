@@ -1,17 +1,13 @@
 package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.IncidentsDTO;
-import com.petcare.back.domain.entity.Image;
-import com.petcare.back.domain.entity.Incidents;
-import com.petcare.back.domain.entity.Pet;
-import com.petcare.back.domain.entity.User;
+import com.petcare.back.domain.dto.response.IncidentsResponseDTO;
+import com.petcare.back.domain.entity.*;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.exception.MyException;
+import com.petcare.back.infra.error.ImageTreatment;
 import com.petcare.back.infra.error.ImageValidator;
-import com.petcare.back.repository.ImageRepository;
-import com.petcare.back.repository.IncidentsRepository;
-import com.petcare.back.repository.PetRepository;
-import com.petcare.back.repository.UserRepository;
+import com.petcare.back.repository.*;
 import lombok.AllArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
@@ -22,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
 
@@ -34,6 +31,9 @@ public class IncidentServiceImpl  implements IncidentsService{
     private final ImageValidator imageValidator;
     private final PetRepository petRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final IncidentsTableRepository incidentsTableRepository;
+    private final ImageTreatment imageTreatment;
 
     public Image processImage(MultipartFile file) throws IOException {
         imageValidator.validate(file);
@@ -56,79 +56,111 @@ public class IncidentServiceImpl  implements IncidentsService{
     @Override
     public Long createIncident(IncidentsDTO incidentsDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        User sitterAuth = (User) authentication.getPrincipal();
 
-        if (user.getRole() != Role.SITTER) {
+        if (sitterAuth.getRole() != Role.SITTER) {
             throw new IllegalArgumentException("Solo las sitter pueden reportar incidentes");
         }
 
-        User owner = userRepository.findById(incidentsDTO.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("Owner not found"));
-        User sitter = userRepository.findById(incidentsDTO.getSitterId())
-                .orElseThrow(() -> new RuntimeException("Sitter not found"));
-        Pet pet = petRepository.findById(incidentsDTO.getPetId())
-                .orElseThrow(() -> new RuntimeException("Pet not found"));
+        // 🔹 Buscar la reserva
+        Booking booking = bookingRepository.findById(incidentsDTO.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
 
+
+        // 🔹 Sacar las demás entidades desde el booking
+        User owner = booking.getOwner();
+        Pet pet = booking.getPet();
+
+        // 🔹 Crear el incidente
         Incidents incident = new Incidents();
         incident.setIncidentsType(incidentsDTO.getIncidentsType());
         incident.setDescription(incidentsDTO.getDescription());
-        incident.setOwner(owner);
-        incident.setPet(pet);
-        incident.setSitter(sitter);
-        incident.setIncidentsDate(incidentsDTO.getIncidentsDate());
+        incident.setBooking(booking);
+        incident.setIncidentsDate(incidentsDTO.getIncidentsDate() != null
+                ? incidentsDTO.getIncidentsDate()
+                : Instant.now());
+
 
         incidentsRepository.save(incident);
+
+        // 🔹 Guardar en tu tabla "IncidentsTable"
+        IncidentsTable relation = new IncidentsTable();
+        relation.setOwnerId(owner.getId());
+        relation.setSitterId(sitterAuth.getId());
+        relation.setPetId(pet.getId());
+        relation.setIncidentId(incident.getId());
+        incidentsTableRepository.save(relation);
+
         return incident.getId();
     }
 
     // 2️⃣ Agregar imágenes a incidente ya creado
     @Override
     public void addImagesToIncident(Long incidentId, List<MultipartFile> imageFiles) throws IOException {
-        Incidents incident = incidentsRepository.findById(incidentId)
-                .orElseThrow(() -> new RuntimeException("Incident not found"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User sitterAuth = (User) authentication.getPrincipal();
 
-        if (incident.getImageIds().size() + imageFiles.size() > 3) {
+        if (sitterAuth.getRole() != Role.SITTER) {
+            throw new IllegalArgumentException("Solo las sitter pueden reportar incidentes");
+        }
+
+        // 1️⃣ Buscar el IncidentsTable asociado al incidente
+        IncidentsTable incidentsTable = incidentsTableRepository.findByIncidentId(incidentId)
+                .orElseThrow(() -> new RuntimeException("IncidentsTable not found"));
+
+        // 2️⃣ Validar límite de 3
+        if (incidentsTable.getImages().size() + imageFiles.size() > 3) {
             throw new IllegalArgumentException("Un incidente no puede tener más de 3 imágenes");
         }
 
+        // 3️⃣ Procesar imágenes
         for (MultipartFile file : imageFiles) {
             if (!file.isEmpty()) {
-                Image image = processImage(file);
-                image.setIncident(incident);
-                incident.getImageIds().add(image);
+                imageValidator.validate(file); // Validar formato/tamaño
+                byte[] optimizedImage = imageTreatment.process(file); // Comprimir
+
+                Image image = new Image();
+                image.setImageName(file.getOriginalFilename());
+                image.setImageType(file.getContentType());
+                image.setData(optimizedImage);
+                image.setIncident(incidentsTable);
+
+                incidentsTable.getImages().add(image);
             }
         }
 
-        incidentsRepository.save(incident);
+        // 4️⃣ Guardar con cascada
+        incidentsTableRepository.save(incidentsTable);
     }
 
-    // 3️⃣ Obtener incidente (sin imágenes pesadas)
+    // 3️⃣ Obtener incidente
     @Override
-    public IncidentsDTO getIncidentsDTO(Long incidentId) {
-        return incidentsRepository.findById(incidentId)
-                .map(incident -> {
-                    List<Long> ids = incident.getImageIds()
-                            .stream()
-                            .map(Image::getId)  // 🔹 solo IDs
-                            .toList();
-
-                    return new IncidentsDTO(
-                            incident.getIncidentsType(),
-                            incident.getDescription(),
-                            incident.getIncidentsDate(),
-                            ids,                           // ✅ lista de IDs
-                            incident.getOwner().getId(),   // ✅ solo ID del dueño
-                            incident.getPet().getId(),     // ✅ solo ID de la mascota
-                            incident.getSitter().getId()   // ✅ solo ID del cuidador
-                    );
-                })
+    public IncidentsResponseDTO getIncidentsDTO(Long incidentId) {
+        // 1️⃣ Buscar incidente
+        Incidents incident = incidentsRepository.findById(incidentId)
                 .orElseThrow(() -> new RuntimeException("Incident not found"));
+
+        // 2️⃣ Buscar tabla de IDs
+        IncidentsTable table = incidentsTableRepository.findByIncidentId(incidentId)
+                .orElseThrow(() -> new RuntimeException("IncidentsTable not found"));
+
+        // 3️⃣ Mapear a DTO
+        IncidentsResponseDTO dto = new IncidentsResponseDTO();
+        dto.setDescription(incident.getDescription());
+        dto.setIncidentsType(incident.getIncidentsType());
+        dto.setIncidentsDate(incident.getIncidentsDate());
+
+        dto.setOwnerId(table.getOwnerId());
+        dto.setSitterId(table.getSitterId());
+        dto.setPetId(table.getPetId());
+
+        return dto;
     }
     // 4️⃣ Obtener imágenes de un incidente
     @Override
     public List<Image> getIncidentImages(Long incidentId) {
-        Incidents incident = incidentsRepository.findById(incidentId)
+        IncidentsTable incidentsTable = incidentsTableRepository.findByIncidentId(incidentId)
                 .orElseThrow(() -> new RuntimeException("Incident not found"));
-        return incident.getImageIds();
+        return incidentsTable.getImages();
     }
 }

@@ -31,5 +31,7 @@ public class ImageValidator {
             throw new IllegalArgumentException("La imagen excede el tamaño máximo de 5MB.");
         }
     }
+
+
 }
 

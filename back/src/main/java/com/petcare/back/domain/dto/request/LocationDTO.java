@@ -5,6 +5,8 @@ public record LocationDTO(
         String number,
         String city,
         String province,
-        String country
+        String country,
+        Double lat,
+        Double lgn
 ) {}
 
