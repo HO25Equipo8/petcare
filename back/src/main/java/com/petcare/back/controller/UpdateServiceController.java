@@ -7,6 +7,7 @@ import com.petcare.back.domain.dto.response.UpdateServiceResponseDTO;
 import com.petcare.back.domain.entity.ServiceSession;
 import com.petcare.back.domain.entity.UpdateService;
 import com.petcare.back.domain.enumerated.IncidentsTypes;
+import com.petcare.back.domain.mapper.request.ServiceSessionMapper;
 import com.petcare.back.domain.mapper.response.UpdateServiceResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.UpdateSessionService;
@@ -87,6 +88,40 @@ public class UpdateServiceController {
                 "status", "success",
                 "message", "Incidente registrado",
                 "incidentId", incidentId
+        ));
+    }
+
+    @Operation(
+            summary = "Cancelar sesión",
+            description = "Permite al cuidador (SITTER) cancelar una sesión en curso por motivos justificados. La sesión se marca como CANCELADA y se registra el motivo como actualización interna."
+    )
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelSession(
+            @PathVariable Long id,
+            @RequestParam String reason
+    ) throws MyException {
+        ServiceSession session = updateSessionService.cancelSession(id, reason);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Sesión cancelada",
+                "data", ServiceSessionMapper.INSTANCE.toDto(session)
+        ));
+    }
+
+    @Operation(
+            summary = "Postergar sesión",
+            description = "Permite al cuidador (SITTER) postergar una sesión en curso por retrasos u otros motivos. La sesión se marca como POSTERGADA y se registra el motivo como actualización interna."
+    )
+    @PutMapping("/{id}/postpone")
+    public ResponseEntity<?> postponeSession(
+            @PathVariable Long id,
+            @RequestParam String reason
+    ) throws MyException {
+        ServiceSession session = updateSessionService.postponeSession(id, reason);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Sesión postergada",
+                "data", ServiceSessionMapper.INSTANCE.toDto(session)
         ));
     }
 }
