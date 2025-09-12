@@ -49,6 +49,11 @@ public class UserProfileService {
         User user = userRepository.findById(principal.getId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        if (user.getProfilePhoto() != null) {
+            throw new IllegalStateException("El usuario ya tiene una foto de perfil. Use el servicio de actualización.");
+        }
+
+
         // Validar formato/tamaño
         imageValidator.validate(file);
 
@@ -115,6 +120,10 @@ public class UserProfileService {
         // Verificar que la mascota le pertenece al owner autenticado
         if (!pet.getOwner().getId().equals(user.getId())) {
             throw new IllegalArgumentException("No puedes modificar mascotas de otro usuario");
+        }
+
+        if(pet.getImagePet() != null) {
+            throw new IllegalArgumentException("la mascota ya tiene una foto de perfil ");
         }
 
         // Validar formato/tamaño

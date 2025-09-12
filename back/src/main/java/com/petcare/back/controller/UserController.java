@@ -90,6 +90,8 @@ public class UserController {
                 encryptedPassword,
                 role);
 
+
+
         if (userRegisterDTO.role() == Role.ADMIN || userRegisterDTO.role() == Role.OWNER) {
             newUser.setVerified(true);
         }
