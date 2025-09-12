@@ -2,7 +2,7 @@ package com.petcare.back.domain.enumerated;
 
 public enum IncidentResolvedStatus {
 
-    RESULETO,
-    NO_RESULETO,
+    RESUELTO,
+    NO_RESUELTO,
 
 }

@@ -39,7 +39,7 @@ public class Incidents {
     private IncidentResolvedStatus incidentResolvedStatus;
 
     @OneToOne
-    @JoinColumn(name = "session_id", nullable = false)
+    @JoinColumn(name = "session_id", nullable = true)
     private ServiceSession serviceSession;
 
 }

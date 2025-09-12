@@ -1,7 +1,6 @@
 package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.IncidentsDTO;
-import com.petcare.back.domain.dto.response.IncidentsResponseDTO;
 import com.petcare.back.domain.entity.*;
 import com.petcare.back.domain.enumerated.IncidentResolvedStatus;
 import com.petcare.back.domain.enumerated.Role;
@@ -13,7 +12,6 @@ import com.petcare.back.validation.ValidationReportIncidents;
 import lombok.AllArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -77,7 +75,7 @@ public class IncidentServiceImpl  implements IncidentsService{
         Incidents incident = new Incidents();
         incident.setIncidentsType(incidentsDTO.getIncidentsType());
         incident.setDescription(incidentsDTO.getDescription());
-        incident.setIncidentResolvedStatus(IncidentResolvedStatus.NO_RESULETO);
+        incident.setIncidentResolvedStatus(IncidentResolvedStatus.NO_RESUELTO);
         incident.setBooking(booking);
         incident.setIncidentsDate(
                 incidentsDTO.getIncidentsDate() != null
@@ -142,7 +140,7 @@ public class IncidentServiceImpl  implements IncidentsService{
         Incidents incident = incidentsRepository.findById(incidentId)
                 .orElseThrow(() -> new RuntimeException("Incident not found"));
 
-        incident.setIncidentResolvedStatus(IncidentResolvedStatus.RESULETO);
+        incident.setIncidentResolvedStatus(IncidentResolvedStatus.RESUELTO);
         incidentsRepository.save(incident);
     }
 

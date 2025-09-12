@@ -40,10 +40,9 @@ public class UpdateSessionService {
     private final UpdateServiceRepository updateRepository;
     private final ImageRepository imageRepository;
     private final BookingRepository bookingRepository;
-    private final IncidentServiceImpl image;
+    private final IncidentServiceImpl incidentService;
     private final WebSocketController webSocketController;
     private final IncidentsRepository incidentsRepository;
-    private final IncidentsTableRepository incidentsTableRepository;
     private final ServiceSessionMapper serviceSessionMapper;
     private final List<ValidationSessionServices> validations;
 
@@ -98,7 +97,7 @@ public class UpdateSessionService {
 
         // Guardar la imagen si existe
         if (dto.file() != null && !dto.file().isEmpty()) {
-            Image img = image.processImage(dto.file()); // guarda/comprime la imagen
+            Image img = incidentService.processImage(dto.file()); // guarda/comprime la imagen
             imageRepository.save(img);
             update.setImage(img); // asociar la imagen al update
         }
@@ -193,25 +192,23 @@ public class UpdateSessionService {
         }
 
         // 1️⃣ Crear incidente
-        Incidents incident = new Incidents();
-        incident.setIncidentsType(dto.getIncidentsType());
-        incident.setDescription(dto.getDescription());
-        incident.setBooking(session.getBooking());
-        incident.setIncidentsDate(dto.getIncidentsDate());
+        Long incidentId = incidentService.createIncident(dto);
+        Incidents incident = incidentsRepository.getReferenceById(incidentId);
+
         incident.setServiceSession(session);
 
         incidentsRepository.save(incident);
 
         // 2️⃣ Obtener datos para notificar
-        IncidentSessionResponseDTO response = getIncidentsDTO(incident.getId());
+        IncidentsDTO response = incidentService.getIncidentsDTO(incident.getId());
 
         // 3️⃣ Notificar por WebSocket
         UpdateServiceNotificationDTO notification = new UpdateServiceNotificationDTO(
                 session.getId(),
-                "⚠️ Incidente: " + response.incidentsType().name().replace("_", " "),
-                response.description(),
+                "⚠️ Incidente: " + response.getIncidentsType().name().replace("_", " "),
+                response.getDescription(),
                 null,
-                response.incidentsDate().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                response.getIncidentsDate().atZone(ZoneId.systemDefault()).toLocalDateTime()
         );
         webSocketController.notifyUpdate(session.getId(), notification);
 
@@ -222,39 +219,6 @@ public class UpdateSessionService {
                 .orElseThrow(() -> new RuntimeException("Session no encontrada"));
     }
 
-    public IncidentSessionResponseDTO getIncidentsDTO(Long incidentId) {
-        return incidentsTableRepository.findById(incidentId)
-                .map(table -> mapFromTable(table))
-                .orElseGet(() -> {
-                    Incidents incident = incidentsRepository.findById(incidentId)
-                            .orElseThrow(() -> new RuntimeException("Incidente no encontrado"));
-                    return mapToSessionDTO(incident);
-                });
-    }
-    private IncidentSessionResponseDTO mapToSessionDTO(Incidents incident) {
-        return new IncidentSessionResponseDTO(
-                incident.getId(),
-                incident.getIncidentsType(),
-                incident.getDescription(),
-                incident.getIncidentsDate(),
-                incident.getServiceSession().getId(),
-                incident.getBooking().getId(),
-                incident.getBooking().getPet().getName(),
-                incident.getBooking().getOwner().getName()
-        );
-    }
-    private IncidentSessionResponseDTO mapFromTable(IncidentsTable table) {
-        return new IncidentSessionResponseDTO(
-                table.getIncidentId(),
-                null,
-                "Incidente registrado (sin detalles)",
-                Instant.now(),
-                null,
-                null,
-                null,
-                null
-        );
-    }
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
