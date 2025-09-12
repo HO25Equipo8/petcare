@@ -42,7 +42,8 @@ public class User implements UserDetails {
     @JsonManagedReference   // prevents recursion
     private List<Pet> pets = new ArrayList<>();
 
-    private boolean verified;
+    @Column(nullable = false)
+    private boolean isVerified;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "photo_perfil_id")
@@ -88,7 +89,7 @@ public class User implements UserDetails {
     private List<Feedback> feedbackGiven;
 
     //Owner que elije su plan
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan plan;
 

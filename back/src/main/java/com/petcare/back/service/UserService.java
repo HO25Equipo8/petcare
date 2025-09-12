@@ -1,25 +1,21 @@
 package com.petcare.back.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.petcare.back.domain.dto.request.AutocompleteSuggestion;
-import com.petcare.back.domain.dto.request.LocationDTO;
-import com.petcare.back.domain.dto.request.UserUpdateBackendDTO;
-import com.petcare.back.domain.dto.request.UserUpdateDTO;
+import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.NearbySitterResponseDTO;
+import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
 import com.petcare.back.domain.entity.Location;
 import com.petcare.back.domain.entity.User;
+import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.mapper.response.NearbySitterResponseMapper;
+import com.petcare.back.domain.mapper.response.UserUpdateResponseMapper;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.infra.error.ImageValidator;
+import com.petcare.back.repository.FeedbackRepository;
 import com.petcare.back.repository.ImageRepository;
 import com.petcare.back.repository.UserRepository;
-import com.petcare.back.validation.ValidationOffering;
 import com.petcare.back.validation.ValidationUserProfile;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -36,6 +32,8 @@ public class UserService {
     private final List<ValidationUserProfile> validations;
     private final ImageRepository imageRepository;
     private final NearbySitterResponseMapper responseMapper;
+    private final UserUpdateResponseMapper userUpdateResponseMapper;
+    private final FeedbackRepository feedbackRepository;
 
     @Transactional
     public User updateProfile(UserUpdateDTO dto) throws MyException {
@@ -179,5 +177,51 @@ public class UserService {
         return sitters.stream()
                 .map(responseMapper::toDto)
                 .toList();
+    }
+
+    public List<UserPublicProfileDTO> getAllPublicProfiles() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::toPublicProfileDTO)
+                .toList();
+    }
+
+    public UserUpdateResponseDTO getUserProfileById(Long id) throws MyException {
+        return userRepository.findById(id)
+                .map(userUpdateResponseMapper::toDTO)
+                .orElseThrow(() -> new MyException("Usuario no encontrado"));
+    }
+
+    public UserPublicProfileDTO toPublicProfileDTO(User user) {
+        String locationLabel;
+
+        if (user.getLocation() != null) {
+            Location loc = user.getLocation();
+            locationLabel = String.format("%s %s, %s, %s",
+                    loc.getStreet() != null ? loc.getStreet() : "",
+                    loc.getNumber() != null ? loc.getNumber() : "",
+                    loc.getCity() != null ? loc.getCity() : "",
+                    loc.getProvince() != null ? loc.getProvince() : "").trim();
+        } else {
+            locationLabel = "Ubicación no especificada";
+        }
+
+        String photoUrl = (user.getProfilePhoto() != null)
+                ? user.getProfilePhoto().getImageName()
+                : null;
+
+        List<ProfessionalRoleEnum> roles = (user.getProfessionalRoles() != null)
+                ? user.getProfessionalRoles()
+                : List.of();
+
+        Integer feedbackCount = feedbackRepository.getFeedbackCountForUser(user.getId());
+
+        return new UserPublicProfileDTO(
+                user.getName(),
+                locationLabel,
+                photoUrl,
+                roles,
+                feedbackCount
+        );
     }
 }

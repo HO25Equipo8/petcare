@@ -13,10 +13,11 @@ import java.util.Optional;
 public interface PlanDiscountRuleRepository extends JpaRepository<PlanDiscountRule, Long> {
     Optional<PlanDiscountRule> findByCategory(CustomerCategory category);
 
-    List<PlanDiscountRule> findAllByCategory(CustomerCategory category);
     boolean existsByCategoryAndSitter(CustomerCategory category, User sitter);
 
     List<PlanDiscountRule> findBySitterId(Long sitterId);
 
     List<PlanDiscountRule> findAllByCategoryAndSitter(CustomerCategory category, User user);
+
+    Optional<PlanDiscountRule> findByCategoryAndSitter(CustomerCategory category, User sitter);
 }

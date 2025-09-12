@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { AlertTriangle, DollarSign, Heart, UserCheck, Users } from 'lucide-react';
-import AnalyticsSubTabAdmin from '../components/AnalyticsSubTabAdmin.jsx';
-import IncidentsSubTabAdmin from '../components/IncidentsSubTabAdmin.jsx';
-import StatsCard from '../components/StatsCard.jsx';
-import SystemSettingsSubTabAdmin from '../components/SystemSettingsSubTabAdmin.jsx';
-import TabsPanel from '../components/TabsPanel.jsx';
-import UserDetailsModal from '../components/UserDetailsModal.jsx';
-import UsersManagementSubTabAdmin from '../components/UsersManagementTabAdmin.jsx';
+import AnalyticsSubTabAdmin from '../components/AnalyticsSubTabAdmin';
+import IncidentsSubTabAdmin from '../components/IncidentsSubTabAdmin';
+import StatsCard from '../components/StatsCard';
+import SystemSettingsSubTabAdmin from '../components/SystemSettingsSubTabAdmin';
+import TabsPanel from '../components/TabsPanel';
+import UserDetailsModal from '../components/UserDetailsModal';
+import UsersManagementSubTabAdmin from '../components/UsersManagementTabAdmin';
 import {
   stats,
   recentUsers,

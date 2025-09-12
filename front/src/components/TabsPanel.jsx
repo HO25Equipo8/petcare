@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../shared/ui/Tabs';
 
 /**
  * TabsPanel - Reusable tab panel component

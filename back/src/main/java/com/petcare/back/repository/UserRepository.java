@@ -32,7 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     SELECT u FROM User u
     WHERE u.role = 'SITTER'
       AND u.active = true
-      AND u.verified = true
+      AND u.isVerified = true
       AND u.location IS NOT NULL
       AND (6371 * acos(
             cos(radians(:lat)) *

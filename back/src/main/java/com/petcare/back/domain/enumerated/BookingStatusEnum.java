@@ -2,7 +2,9 @@ package com.petcare.back.domain.enumerated;
 
 public enum BookingStatusEnum {
     PENDIENTE("Pendiente"),
+    PENDIENTE_REPROGRAMAR("Pendiente de reprogamar"),
     CONFIRMADO("Confirmado"),
+    REPROGRAMAR("Reprogramar"),
     CANCELADO("Cancelado"),
     COMPLETADO("Completado");
 

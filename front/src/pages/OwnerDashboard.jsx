@@ -1,12 +1,12 @@
 
-import { Button } from '../components/ui/Button.jsx';
-import { Card, CardContent } from '../components/ui/Card.jsx';
+import { Button } from '../shared/ui/Button';
+import { Card, CardContent } from '../shared/ui/Card';
 import { Heart, Clock, Star, AlertTriangle } from 'lucide-react';
-import MyPetsCardOwner from '../components/MyPetsCardOwner.jsx';
-import QuickActionsPanelOwner from '../components/QuickActionsPanelOwner.jsx';
-import RecentActivityCardOwner from '../components/RecentActivityCardOwner.jsx';
-import StatsCard from '../components/StatsCard.jsx';
-import UpcomingServicesCardOwner from '../components/UpcomingServicesCardOwner.jsx';
+import MyPetsCardOwner from '../components/MyPetsCardOwner';
+import QuickActionsPanelOwner from '../components/QuickActionsPanelOwner';
+import RecentActivityCardOwner from '../components/RecentActivityCardOwner';
+import StatsCard from '../components/StatsCard';
+import UpcomingServicesCardOwner from '../components/UpcomingServicesCardOwner';
 import {
   pets,
   upcomingServices,

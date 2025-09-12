@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/Card.jsx';
-import { Button } from './ui/Button.jsx';
-import { Input } from './ui/Input.jsx';
-import { Textarea } from './ui/Textarea.jsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select.jsx';
-import { Label } from './ui/Label.jsx';
-import { Badge } from './ui/Badge.jsx';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/Dialog.jsx';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../shared/ui/Card';
+import { Button } from '../shared/ui/Button';
+import { Input } from '../shared/ui/Input';
+import { Textarea } from '../shared/ui/Textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../shared/ui/Select';
+import { Label } from '../shared/ui/Label';
+import { Badge } from '../shared/ui/Badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../shared/ui/Dialog';
 import { AlertTriangle, Camera, CheckCircle, Clock, Plus } from 'lucide-react';
-import { FallbackImage } from './common/FallbackImage';
-import StatsCard from '../components/StatsCard.jsx';
+import { FallbackImage } from '../shared/ui/FallbackImage';
+import StatsCard from '../components/StatsCard';
 
 export function IncidentManagement({ onNavigate }) {
   const [incidents, setIncidents] = useState([

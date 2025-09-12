@@ -50,6 +50,14 @@ public class ScheduleConfigService {
             throw new MyException("Solo los profesionales pueden configurar sus horarios");
         }
 
+        if(!user.isVerified()){
+            if (user.getProfileComplete()) {
+                throw new MyException("Debes estar verificado para poder crear combos, tu perfil está en evaluación");
+            }else{
+                throw new MyException("Debes completa tu perfil para poder estar verificado");
+            }
+        }
+
         for (ValidationScheduleConfig v : validations) {
             v.validate(dto);
         }

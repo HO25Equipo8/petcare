@@ -2,10 +2,12 @@ package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
 import com.petcare.back.domain.dto.request.BookingSimulationRequestDTO;
+import com.petcare.back.domain.dto.response.BookingListDTO;
 import com.petcare.back.domain.dto.response.BookingResponseDTO;
 import com.petcare.back.domain.dto.response.BookingSimulationResponseDTO;
 import com.petcare.back.domain.entity.*;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
+import com.petcare.back.domain.enumerated.CustomerCategory;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.enumerated.ScheduleStatus;
 import com.petcare.back.domain.mapper.request.BookingCreateMapper;
@@ -13,7 +15,6 @@ import com.petcare.back.domain.mapper.response.BookingResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.*;
 import com.petcare.back.validation.ValidationBooking;
-import com.petcare.back.validation.ValidationCombo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,13 +39,13 @@ public class BookingService {
     private final PetRepository petRepository;
     private final OfferingRepository offeringRepository;
     private final ComboOfferingRepository comboRepository;
-    private final PlanRepository planRepository;
+    private final PlanDiscountRuleRepository planDiscountRuleRepository;
     private final ScheduleRepository scheduleRepository;
     private final UserRepository professionalRepository;
     private final BookingResponseMapper mapper;
     private final BookingCreateMapper bookingCreateMapper;
-    private final PlanDiscountRuleRepository planDiscountRuleRepository;
     private final List<ValidationBooking> validations;
+
 
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
@@ -84,9 +86,6 @@ public class BookingService {
             booking.setComboOffering(comboRepository.findById(dto.comboOfferingId())
                     .orElseThrow(() -> new MyException("El combo seleccionado no existe")));
         }
-
-        Plan userPlan = planRepository.findByOwnerId(user.getId()).orElse(null);
-        booking.setPlan(userPlan);
 
         // 5. Asignar horarios y marcar como PENDIENTES
         List<Schedule> schedules = scheduleRepository.findAllById(dto.scheduleIds());
@@ -147,13 +146,161 @@ public class BookingService {
             totalPrice = totalPrice.add(comboTotal.subtract(discountAmount));
         }
 
-        // Plan
-        if (booking.getPlan() != null && booking.getPlan().getPromotion() != null && totalPrice.compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal promotionRate = BigDecimal.valueOf(booking.getPlan().getPromotion()).divide(BigDecimal.valueOf(100));
-            promotionAmount = totalPrice.multiply(promotionRate);
-            totalPrice = totalPrice.subtract(promotionAmount);
+        // Descuento por categoría del cliente según reglas del SITTER
+        if (booking.getOwner() != null && booking.getProfessionals() != null && !booking.getProfessionals().isEmpty()) {
+            User sitter = booking.getProfessionals().get(0);
+            CustomerCategory category = calculateCustomerCategory(booking.getOwner(), sitter);
+
+            Optional<PlanDiscountRule> ruleOpt = planDiscountRuleRepository.findByCategoryAndSitter(category, sitter);
+            if (ruleOpt.isPresent()) {
+                BigDecimal rate = ruleOpt.get().getDiscount().divide(BigDecimal.valueOf(100));
+                BigDecimal categoryDiscount = totalPrice.multiply(rate);
+                totalPrice = totalPrice.subtract(categoryDiscount);
+            }
         }
+
         return totalPrice.max(BigDecimal.ZERO);
+    }
+
+    public CustomerCategory calculateCustomerCategory(User owner, User sitter) {
+
+        int totalBookings = bookingRepository.countByOwnerAndSitter(owner.getId(), sitter.getId());
+        List<PlanDiscountRule> rules = planDiscountRuleRepository.findBySitterId(sitter.getId());
+
+        for (PlanDiscountRule rule : rules) {
+            double min = rule.getMinSessionsPerWeek();
+            double max = rule.getMaxSessionsPerWeek();
+
+            if (totalBookings >= min && totalBookings <= max) {
+                return rule.getCategory();
+            }
+        }
+
+        return CustomerCategory.NORMAL; // o BASE si querés agregarlo como default
+    }
+
+    @Transactional
+    public BookingResponseDTO updateBookingStatus(Long bookingId, BookingStatusEnum newStatus, User actor) throws MyException {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new MyException("Reserva no encontrada"));
+
+        boolean isOwner = booking.getOwner().equals(actor);
+        boolean isProfessional = booking.getProfessionals().contains(actor);
+
+        if (!isOwner && !isProfessional) {
+            throw new MyException("No tienes permisos para modificar esta reserva");
+        }
+
+        if (booking.getStatus() == BookingStatusEnum.CANCELADO || booking.getStatus() == BookingStatusEnum.COMPLETADO) {
+            throw new MyException("No se puede modificar una reserva cancelada o completada");
+        }
+
+        booking.setStatus(newStatus);
+
+        // Si se cancela, liberar horarios
+        if (newStatus == BookingStatusEnum.CANCELADO) {
+            booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.DISPONIBLE));
+            scheduleRepository.saveAll(booking.getSchedules());
+        }
+
+        bookingRepository.save(booking);
+        return mapper.toDTO(booking);
+    }
+
+    public BookingResponseDTO confirmBooking(Long bookingId, User sitter) throws MyException {
+        return updateBookingStatus(bookingId, BookingStatusEnum.CONFIRMADO, sitter);
+    }
+
+    public BookingResponseDTO cancelBooking(Long bookingId, User sitter) throws MyException {
+        return updateBookingStatus(bookingId, BookingStatusEnum.CANCELADO, sitter);
+    }
+
+    //Metodo para que el sitter pueda reprogramar una reserva
+    @Transactional
+    public BookingResponseDTO rescheduleBooking(Long bookingId, List<Long> newScheduleIds, User sitter) throws MyException {
+        //Validar y actualizar estado a REPROGRAMAR
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new MyException("Reserva no encontrada"));
+
+        if (!booking.getProfessionals().contains(sitter)) {
+            throw new MyException("No tienes permisos para reprogramar esta reserva");
+        }
+
+        if (booking.getStatus() != BookingStatusEnum.CONFIRMADO && booking.getStatus() != BookingStatusEnum.PENDIENTE) {
+            throw new MyException("Solo se pueden reprogramar reservas activas");
+        }
+
+        booking.setStatus(BookingStatusEnum.REPROGRAMAR);
+        bookingRepository.save(booking);
+
+        //Aplicar nuevos horarios y pasar a PENDIENTE_REPROGRAMAR
+        List<Schedule> nuevosHorarios = scheduleRepository.findAllById(newScheduleIds);
+        nuevosHorarios.forEach(s -> s.setStatus(ScheduleStatus.PENDIENTE));
+        scheduleRepository.saveAll(nuevosHorarios);
+
+        booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.DISPONIBLE));
+        booking.setSchedules(nuevosHorarios);
+
+        booking.setStatus(BookingStatusEnum.PENDIENTE_REPROGRAMAR);
+        bookingRepository.save(booking);
+
+        return mapper.toDTO(booking);
+    }
+
+    //Metodo para que el dueño acepte la reprogramacion de la reserva
+    @Transactional
+    public BookingResponseDTO respondToReschedule(Long bookingId, boolean accept, User owner) throws MyException {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new MyException("Reserva no encontrada"));
+
+        if (!booking.getOwner().equals(owner)) {
+            throw new MyException("Solo el dueño puede responder esta reprogramación");
+        }
+
+        if (booking.getStatus() != BookingStatusEnum.PENDIENTE_REPROGRAMAR) {
+            throw new MyException("La reserva no está esperando reprogramación");
+        }
+
+        if (accept) {
+            booking.setStatus(BookingStatusEnum.CONFIRMADO);
+        } else {
+            booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.DISPONIBLE));
+            scheduleRepository.saveAll(booking.getSchedules());
+            booking.setStatus(BookingStatusEnum.CANCELADO); // o volver a PENDIENTE si querés permitir otro intento
+        }
+
+        bookingRepository.save(booking);
+        return mapper.toDTO(booking);
+    }
+
+    public List<BookingListDTO> getBookingsForUser(User user) {
+        List<Booking> bookings;
+
+        if (user.getRole() == Role.OWNER) {
+            bookings = bookingRepository.findByOwnerId(user.getId());
+        } else if (user.getRole() == Role.SITTER || user.getRole() == Role.ADMIN) {
+            bookings = bookingRepository.findByProfessionalsContaining(user);
+        } else {
+            bookings = List.of(); // o lanzar excepción si querés limitar
+        }
+
+        return bookings.stream()
+                .map(this::toSummaryDTO)
+                .toList();
+    }
+
+    private BookingListDTO toSummaryDTO(Booking booking) {
+        return new BookingListDTO(
+                booking.getId(),
+                booking.getPet().getName(),
+                booking.getOffering() != null ? booking.getOffering().getName().getLabel() : "Combo",
+                booking.getReservationDate(),
+                booking.getStatus(),
+                booking.getSchedules().stream()
+                        .map(Schedule::getEstablishedTime)
+                        .min(Comparator.naturalOrder())
+                        .orElse(null)
+        );
     }
 
     //Simulación para el Profesional para saber si es viable el descuento que aplica

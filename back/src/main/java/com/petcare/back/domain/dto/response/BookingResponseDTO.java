@@ -12,7 +12,6 @@ public record BookingResponseDTO(
         String petName,                  // nombre de la mascota
         String offeringName,             // nombre del servicio
         String comboOfferingName,        // nombre del combo, si aplica
-        String planName,                 // nombre del plan, si aplica
         List<String> scheduleDescription,      // descripción o rango horario
         Instant reservationDate,
         BookingStatusEnum status,

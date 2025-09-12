@@ -29,7 +29,7 @@ public class Incidents {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "session_id", nullable = false)
     private ServiceSession serviceSession;
 

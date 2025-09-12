@@ -1,6 +1,6 @@
 package com.petcare.back.domain.entity;
 
-import com.petcare.back.domain.enumerated.IntervalEnum;
+import com.petcare.back.domain.enumerated.PlanType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "plans")
@@ -22,30 +22,30 @@ public class Plan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "times_per_week", nullable = false)
-    private Double timesPerWeek;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "interval_enum", nullable = false)
-    private IntervalEnum intervalEnum;
+    @Column(name = "type", nullable = false)
+    private PlanType type; // BASE, PREMIUM, PRO
 
-    @Column(name = "promotion")
-    private Double promotion;
+    @Column(name = "price", nullable = false)
+    private Double price;
 
-    @OneToOne(mappedBy = "plan")
-    private User owner;
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "tracking_enabled")
+    private boolean trackingEnabled;
+
+    @Column(name = "live_updates_enabled")
+    private boolean liveUpdatesEnabled;
+
+    @OneToMany(mappedBy = "plan")
+    private List<User> subscribers;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

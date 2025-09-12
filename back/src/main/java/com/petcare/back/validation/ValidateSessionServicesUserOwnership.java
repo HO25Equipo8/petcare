@@ -11,7 +11,7 @@ public class ValidateSessionServicesUserOwnership implements ValidationSessionSe
     @Override
     public void validate(User user, ServiceSession session) {
         boolean isOwner = session.getBooking().getOwner().equals(user);
-        boolean isProfessional = session.getBooking().getProfessionals().equals(user);
+        boolean isProfessional = session.getBooking().getProfessionals().contains(user);
 
         if (!isOwner && !isProfessional) {
             throw new ValidationException("El usuario no tiene permisos sobre esta sesión.");

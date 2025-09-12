@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/Card.jsx';
-import { Button } from './ui/Button.jsx';
-import { Badge } from './ui/Badge.jsx';
-import { Avatar, AvatarFallback } from './ui/Avatar.jsx';
+import { Card, CardHeader, CardTitle, CardContent } from '../shared/ui/Card';
+import { Button } from '../shared/ui/Button';
+import { Badge } from '../shared/ui/Badge';
+import { Avatar, AvatarFallback } from '../shared/ui/Avatar';
 import { MapPin, Navigation, Phone, MessageCircle, Camera, Play, Pause } from 'lucide-react';
 
 export function LiveTracking({ onNavigate }) {

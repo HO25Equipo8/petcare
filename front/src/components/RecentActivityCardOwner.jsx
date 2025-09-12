@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card.jsx';
+import { Card, CardHeader, CardTitle, CardContent } from '../shared/ui/Card';
 import { Star } from 'lucide-react';
 
 export default function RecentActivityCardOwner({ recentActivity }) {

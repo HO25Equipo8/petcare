@@ -1,7 +1,7 @@
 
-import { Button } from './ui/Button.jsx';
+import { Button } from '../shared/ui/Button';
 import { User, MapPin, Calendar, Users, AlertTriangle, Shield } from 'lucide-react';
-import { Logo } from './ui/Logo.jsx';
+import { Logo } from '../shared/ui/Logo';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export function PetHeader({ isLoggedIn, user, onLogin, onLogout }) {

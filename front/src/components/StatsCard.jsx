@@ -1,4 +1,4 @@
-import { Card, CardContent } from '../components/ui/Card.jsx';
+import { Card, CardContent } from '../shared/ui/Card';
 
 const StatsCard = ({
   title,
