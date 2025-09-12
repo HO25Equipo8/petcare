@@ -106,4 +106,52 @@ public class PetService {
         Pet updatedPet = petRepository.save(existingPet);
         return petResponseMapper.toDto(updatedPet);
     }
+
+    @Transactional
+    public void deletePet(Long petId) throws MyException {
+
+        // 1. Get current user and validate permissions
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        if (user.getRole() != Role.OWNER && user.getRole() != Role.ADMIN) {
+            throw new MyException("Tu rol no permite eliminar mascotas");
+        }
+
+        // 2. Find existing pet and verify it exists
+        Pet existingPet = petRepository.findById(petId)
+                .orElseThrow(() -> new MyException("Mascota no encontrada"));
+
+        // 3. Verify ownership (only for OWNER role, ADMIN can delete any pet)
+        if (user.getRole() == Role.OWNER && !existingPet.getOwner().getId().equals(user.getId())) {
+            throw new MyException("No tienes permisos para eliminar esta mascota");
+        }
+
+        // 4. Check if pet is already inactive
+        if (!existingPet.getActive()) {
+            throw new MyException("La mascota ya está inactiva");
+        }
+
+        // 5. Check for active/pending bookings and notify professionals if needed
+        // TODO: Implement notification system
+        // if (existingPet.getBookings() != null && !existingPet.getBookings().isEmpty()) {
+        //     List<Booking> activeBookings = existingPet.getBookings().stream()
+        //         .filter(booking -> booking.getStatus() == BookingStatus.ACTIVE ||
+        //                           booking.getStatus() == BookingStatus.PENDING)
+        //         .collect(Collectors.toList());
+        //
+        //     if (!activeBookings.isEmpty()) {
+        //         // Send notification emails to professionals
+        //         for (Booking booking : activeBookings) {
+        //             emailService.sendPetDeletionNotification(booking.getProfessional(), existingPet);
+        //         }
+        //     }
+        // }
+
+        // 6. Set pet as inactive (logical deletion)
+        existingPet.setActive(false);
+
+        // 7. Save the changes (updatedAt will be automatically set by @UpdateTimestamp)
+        petRepository.save(existingPet);
+    }
 }
