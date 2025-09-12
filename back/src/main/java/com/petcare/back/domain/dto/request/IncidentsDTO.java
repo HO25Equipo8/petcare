@@ -1,6 +1,10 @@
 package com.petcare.back.domain.dto.request;
 
+
+
 import com.petcare.back.domain.enumerated.IncidentsTypes;
+
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +21,15 @@ public class IncidentsDTO {
 
     private IncidentsTypes incidentsType;
     private String description;
-    private Instant incidentsDate = Instant.now();
+
+    private Instant incidentsDate;
+
+
     private Long bookingId;
+
+
 }
+
+
+
+
