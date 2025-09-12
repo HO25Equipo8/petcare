@@ -14,8 +14,7 @@ public interface BookingResponseMapper {
             expression = "java(booking.getOffering() != null ? booking.getOffering().getName().name() : null)")
     @Mapping(target = "comboOfferingName",
             expression = "java(booking.getComboOffering() != null ? booking.getComboOffering().getName().name() : null)")
-    @Mapping(target = "planName", expression = "java(booking.getPlan() != null ? booking.getPlan().getName() : null)")
-    @Mapping(target = "scheduleDescription", expression =
+   @Mapping(target = "scheduleDescription", expression =
             "java(booking.getSchedules().stream()" +
                     ".map(s -> s.getEstablishedTime() + \" - \" + s.getStatus())" +
                     ".toList())")

@@ -42,6 +42,14 @@ public class OfferingService {
             throw new MyException("Solo los profesionales pueden registrar servicios");
         }
 
+        if(!user.isVerified()){
+            if (user.getProfileComplete()) {
+                throw new MyException("Debes estar verificado para poder crear servicios, tu perfil está en evaluación");
+            }else{
+                throw new MyException("Debes completa tu perfil para poder estar verificado");
+            }
+        }
+
         List<ProfessionalRoleEnum> roles = user.getProfessionalRoles();
         if (roles == null || !roles.contains(dto.allowedRole())) {
             throw new MyException("No tenés el rol '" + dto.allowedRole().name() + "' habilitado en tu perfil para registrar este servicio.");

@@ -3,6 +3,7 @@ package com.petcare.back.controller;
 import com.petcare.back.domain.dto.request.UserRegisterDTO;
 import com.petcare.back.domain.dto.request.UserUpdateBackendDTO;
 import com.petcare.back.domain.dto.request.UserUpdateDTO;
+import com.petcare.back.domain.dto.response.BookingListDTO;
 import com.petcare.back.domain.dto.response.UserDTO;
 import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
 import com.petcare.back.domain.entity.User;
@@ -10,6 +11,7 @@ import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.mapper.response.UserUpdateResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.UserRepository;
+import com.petcare.back.service.BookingService;
 import com.petcare.back.service.EmailService;
 import com.petcare.back.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,11 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -41,6 +46,8 @@ public class UserController {
     private UserUpdateResponseMapper userUpdateResponseMapper;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private BookingService bookingService;
 
     @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
@@ -187,4 +194,30 @@ public class UserController {
     private String getUserName(User user) {
         return user.getEmail().split("@")[0]; // Uses part before @ as name
     }
+
+    @Operation(summary = "Obtener perfil del usuario autenticado")
+    @GetMapping("/me-profile")
+    public ResponseEntity<?> getAuthenticatedUserProfile() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        UserUpdateResponseDTO responseDTO = userUpdateResponseMapper.toDTO(user);
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "data", responseDTO
+        ));
+    }
+
+    @Operation(
+            summary = "Obtener reservas del usuario autenticado",
+            description = "Devuelve todas las reservas asociadas al dueño o profesional autenticado"
+    )
+    @GetMapping("/my-bookings")
+    public ResponseEntity<?> getMyBookings() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<BookingListDTO> bookings = bookingService.getBookingsForUser(user);
+        return ResponseEntity.ok(Map.of("data", bookings));
+    }
+
 }

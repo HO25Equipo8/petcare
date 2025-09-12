@@ -1,14 +1,12 @@
 package com.petcare.back.domain.dto.response;
 
-import com.petcare.back.domain.enumerated.IntervalEnum;
-
-import java.time.LocalDate;
+import com.petcare.back.domain.enumerated.PlanType;
 
 public record PlanResponseDTO(
         Long id,
-        String name,
-        Integer timesPerWeek,
-        IntervalEnum intervalEnum,
-        Double promotion
-) {
-}
+        PlanType type,
+        Double price,
+        String description,
+        boolean trackingEnabled,
+        boolean liveUpdatesEnabled
+) {}

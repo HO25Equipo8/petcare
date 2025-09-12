@@ -3,9 +3,9 @@ package com.petcare.back.controller;
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
 import com.petcare.back.domain.dto.request.PetCreateDTO;
 import com.petcare.back.domain.dto.request.PetUpdateDTO;
-import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.User;
+import com.petcare.back.domain.enumerated.PlanType;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -105,19 +104,16 @@ public class OwnerController {
     }
 
     @Operation(
-            summary = "Seleccionar plan como dueño",
-            description = "Permite al usuario con rol OWNER elegir un plan de servicios según frecuencia e intervalo. El sistema genera automáticamente el nombre del plan, calcula la cantidad de sesiones semanales y aplica el descuento correspondiente según las reglas configuradas por el profesional."
+            summary = "Suscribirse a un plan",
+            description = "Permite al usuario con rol OWNER elegir un plan de suscripción disponible en la plataforma. El plan determina el acceso a funcionalidades como actualizaciones en vivo y tracking."
     )
-    @PostMapping("/register/plan")
-    public ResponseEntity<?> create(@RequestBody @Valid PlanCreateDTO dto, UriComponentsBuilder uriBuilder) {
+    @PutMapping("/subscribe/plan")
+    public ResponseEntity<?> subscribe(@RequestParam PlanType type) {
         try {
-            PlanResponseDTO plan = planService.createPlan(dto);
-
-            URI uri = uriBuilder.path("/api/plans/{id}").buildAndExpand(plan.id()).toUri();
-
-            return ResponseEntity.created(uri).body(Map.of(
+            PlanResponseDTO plan = planService.subscribeToPlan(type);
+            return ResponseEntity.ok(Map.of(
                     "status", "success",
-                    "message", "Plan registrado con éxito",
+                    "message", "Suscripción actualizada a " + type.name(),
                     "data", plan
             ));
         } catch (MyException e) {
@@ -125,28 +121,26 @@ public class OwnerController {
                     "status", "error",
                     "message", e.getMessage()
             ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "status", "error",
-                    "message", "Error interno del servidor"
-            ));
         }
     }
 
     @Operation(
             summary = "Consultar plan actual del usuario",
-            description = "Devuelve el plan de servicios actualmente asignado al usuario autenticado. Incluye frecuencia, intervalo y porcentaje de descuento aplicado. Solo disponible para usuarios con rol OWNER."
+            description = "Devuelve el plan de suscripción actualmente asignado al usuario autenticado. Incluye tipo de plan, precio y funcionalidades habilitadas."
     )
     @GetMapping("/my-plan")
     public ResponseEntity<?> getMyPlan() {
         try {
-            User user = getAuthenticatedUser();
-            PlanResponseDTO plan = planService.getPlanByUser(user.getId());
-
+            PlanResponseDTO plan = planService.getMyPlan();
             return ResponseEntity.ok(Map.of(
                     "status", "success",
-                    "message", "Plan del usuario obtenido con éxito",
+                    "message", "Plan actual obtenido con éxito",
                     "data", plan
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
@@ -218,6 +212,24 @@ public class OwnerController {
                     "status", "error",
                     "message", "Error interno del servidor"
             ));
+        }
+    }
+
+    @Operation(
+            summary = "Responder propuesta de reprogramación",
+            description = "Permite al dueño aceptar o rechazar la reprogramación propuesta por el profesional"
+    )
+    @PutMapping("/booking/{id}/respond-reprogram")
+    public ResponseEntity<?> respondToReprogramBooking(
+            @PathVariable Long id,
+            @RequestParam boolean accept
+    ) {
+        User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            BookingResponseDTO response = bookingService.respondToReschedule(id, accept, owner);
+            return ResponseEntity.ok(response);
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 

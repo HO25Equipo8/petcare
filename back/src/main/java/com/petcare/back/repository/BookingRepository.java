@@ -28,4 +28,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("target") User target
     );
 
+    @Query("""
+    SELECT COUNT(b) 
+    FROM Booking b 
+    JOIN b.professionals p 
+    WHERE b.owner.id = :ownerId 
+      AND p.id = :sitterId
+""")
+    int countByOwnerAndSitter(@Param("ownerId") Long ownerId, @Param("sitterId") Long sitterId);
+
+    List<Booking> findByOwnerId(Long id);
+
+    List<Booking> findByProfessionalsContaining(User user);
 }

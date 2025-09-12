@@ -43,6 +43,13 @@ public class ComboOfferingService {
         if (user.getRole() != Role.SITTER) {
             throw new MyException("Solo los profesionales pueden registrar combos.");
         }
+        if(!user.isVerified()){
+            if (user.getProfileComplete()) {
+                throw new MyException("Debes estar verificado para poder crear combos, tu perfil está en evaluación");
+            }else{
+                throw new MyException("Debes completa tu perfil para poder estar verificado");
+            }
+        }
 
         List<Offering> offerings = offeringRepository.findAllById(dto.offeringIds());
 

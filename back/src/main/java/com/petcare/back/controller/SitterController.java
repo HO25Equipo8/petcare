@@ -3,6 +3,7 @@ package com.petcare.back.controller;
 import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.PlanDiscountRule;
+import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.OfferingVariantDescriptionEnum;
 import com.petcare.back.exception.MyException;
@@ -13,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -207,5 +209,53 @@ public class SitterController {
                 "message", "Simulacion creada con éxito",
                 "data", bookingSimulationResponseDTO
         ));
+    }
+
+    @Operation(
+            summary = "Confirmar reserva",
+            description = "Permite al profesional confirmar una reserva pendiente o reprogramada"
+    )
+    @PutMapping("/booking/{id}/confirm")
+    public ResponseEntity<?> confirmBooking(@PathVariable Long id) {
+        User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            BookingResponseDTO response = bookingService.confirmBooking(id, sitter);
+            return ResponseEntity.ok(response);
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Operation(
+            summary = "Cancelar reserva",
+            description = "Permite al profesional cancelar una reserva activa. Libera los horarios asignados"
+    )
+    @PutMapping("/booking/{id}/cancel")
+    public ResponseEntity<?> cancelBooking(@PathVariable Long id) {
+        User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            BookingResponseDTO response = bookingService.cancelBooking(id, sitter);
+            return ResponseEntity.ok(response);
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Operation(
+            summary = "Proponer reprogramación",
+            description = "Permite al profesional modificar los horarios de una reserva activa. El dueño deberá aceptar o rechazar la propuesta"
+    )
+    @PutMapping("/booking/{id}/reschedule")
+    public ResponseEntity<?> rescheduleBooking(
+            @PathVariable Long id,
+            @RequestBody List<Long> newScheduleIds
+    ) {
+        User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            BookingResponseDTO response = bookingService.rescheduleBooking(id, newScheduleIds, sitter);
+            return ResponseEntity.ok(response);
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

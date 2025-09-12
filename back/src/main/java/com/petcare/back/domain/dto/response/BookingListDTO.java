@@ -1,4 +1,15 @@
 package com.petcare.back.domain.dto.response;
 
-public record BookingListDTO() {
+import com.petcare.back.domain.enumerated.BookingStatusEnum;
+
+import java.time.Instant;
+
+public record BookingListDTO(
+        Long bookingId,
+        String petName,
+        String serviceTitle,
+        Instant reservationDate,
+        BookingStatusEnum status,
+        Instant firstScheduleStart
+) {
 }

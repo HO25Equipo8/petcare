@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ValidatePlanNombreDuplicado implements ValidationPlanCreate {
+public class ValidatePlanTypeDuplicado implements ValidationPlanCreate {
 
     private final PlanRepository repository;
 
     @Override
     public void validate(PlanCreateDTO dto) throws MyException {
-        String generatedName = "Plan " + dto.frequencyEnum().getLabel() + " " + dto.intervalEnum().getLabel();
-        if (repository.existsByName(generatedName)) {
-            throw new MyException("Ya existe un plan con esa combinación de frecuencia e intervalo.");
+        boolean exists = repository.existsByType(dto.type());
+        if (exists) {
+            throw new MyException("Ya existe un plan con el tipo " + dto.type().name());
         }
     }
 }
