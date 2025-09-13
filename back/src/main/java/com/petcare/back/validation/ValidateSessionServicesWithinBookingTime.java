@@ -16,16 +16,16 @@ public class ValidateSessionServicesWithinBookingTime implements ValidationSessi
 
     @Override
     public void validate(User user, ServiceSession session) {
-//        Booking booking = session.getBooking();
-//        LocalDateTime now = LocalDateTime.now();
-//
-//        LocalDateTime[] range = getBookingTimeRange(booking);
-//        LocalDateTime start = range[0].minusMinutes(EXTRA_MINUTES);
-//        LocalDateTime end = range[1].plusMinutes(EXTRA_MINUTES);
-//
-//        if (now.isBefore(start) || now.isAfter(end)) {
-//            throw new ValidationException("La sesión no puede gestionarse fuera del horario de la reserva.");
-//        }
+        Booking booking = session.getBooking();
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime[] range = getBookingTimeRange(booking);
+        LocalDateTime start = range[0].minusMinutes(EXTRA_MINUTES);
+        LocalDateTime end = range[1].plusMinutes(EXTRA_MINUTES);
+
+        if (now.isBefore(start) || now.isAfter(end)) {
+            throw new ValidationException("La sesión no puede gestionarse fuera del horario de la reserva.");
+        }
     }
 
     private LocalDateTime[] getBookingTimeRange(Booking booking) {
