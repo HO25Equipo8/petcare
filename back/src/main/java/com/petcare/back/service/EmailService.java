@@ -70,6 +70,49 @@ public class EmailService {
         }
     }
 
+    public void sendBookingConfirmationEmail(String userEmail, String ownerName, String professionalName,
+                                             String petName, String sessionDate, String startTime, String endTime) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(userEmail);
+            message.setSubject("Reserva Confirmada - PetCare");
+            message.setText(buildConfirmationMessage(ownerName, professionalName, petName, sessionDate, startTime, endTime));
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email de confirmación: " + e.getMessage());
+        }
+    }
+
+    public void sendBookingCancellationEmail(String userEmail, String ownerName, String professionalName,
+                                             String petName, String sessionDate, String startTime, String endTime, String reason) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(userEmail);
+            message.setSubject("Reserva Cancelada - PetCare");
+            message.setText(buildCancellationMessage(ownerName, professionalName, petName, sessionDate, startTime, endTime, reason));
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email de cancelación: " + e.getMessage());
+        }
+    }
+
+    public void sendBookingRescheduleEmail(String userEmail, String ownerName, String professionalName,
+                                           String petName, String newDate, String newStartTime, String newEndTime) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(userEmail);
+            message.setSubject("Propuesta de Reprogramación - PetCare");
+            message.setText(buildRescheduleMessage(ownerName, professionalName, petName, newDate, newStartTime, newEndTime));
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email de reprogramación: " + e.getMessage());
+        }
+    }
+
+
     private String buildWelcomeMessage(String userName) {
         return """
             🐾 ¡Bienvenido a PetCare! 🐶🐱🐰
@@ -108,6 +151,82 @@ public class EmailService {
                 userEmail,
                 userName != null ? userName : "No especificado",
                 java.time.LocalDateTime.now().toString()
+        );
+    }
+
+    private String buildConfirmationMessage(String ownerName, String professionalName, String petName,
+                                            String sessionDate, String startTime, String endTime) {
+        return """
+            Hola %s,
+            
+            Tu reserva con %s ha sido confirmada 🎉
+            🐾 Mascota: %s
+            📅 Fecha: %s
+            🕒 Horario: %s a %s
+            
+            Gracias por confiar en nosotros. Si necesitás modificar algo, podés hacerlo desde tu perfil.
+            
+            ¡Nos vemos pronto!
+            El equipo de PetCare
+            """.formatted(
+                ownerName != null ? ownerName : "Usuario",
+                professionalName != null ? professionalName : "el profesional",
+                petName != null ? petName : "tu mascota",
+                sessionDate != null ? sessionDate : "por confirmar",
+                startTime != null ? startTime : "por confirmar",
+                endTime != null ? endTime : "por confirmar"
+        );
+    }
+
+    private String buildCancellationMessage(String ownerName, String professionalName, String petName,
+                                            String sessionDate, String startTime, String endTime, String reason) {
+        String reasonText = (reason != null && !reason.trim().isEmpty()) ?
+                "\nMotivo: " + reason : "";
+
+        return """
+            Hola %s,
+            
+            Lamentamos informarte que la reserva con %s ha sido cancelada.
+            🐾 Mascota: %s
+            📅 Fecha original: %s
+            🕒 Horario: %s a %s
+            
+            Podés volver a reservar desde tu perfil o explorar otros profesionales disponibles.
+            
+            Gracias por tu comprensión,
+            El equipo de PetCare
+            """.formatted(
+                ownerName != null ? ownerName : "Usuario",
+                professionalName != null ? professionalName : "el profesional",
+                petName != null ? petName : "tu mascota",
+                sessionDate != null ? sessionDate : "por confirmar",
+                startTime != null ? startTime : "por confirmar",
+                endTime != null ? endTime : "por confirmar",
+                reasonText
+        );
+    }
+
+    private String buildRescheduleMessage(String ownerName, String professionalName, String petName,
+                                          String newDate, String newStartTime, String newEndTime) {
+        return """
+            Hola %s,
+            
+            %s ha propuesto una reprogramación para tu reserva.
+            🐾 Mascota: %s
+            📅 Nueva fecha: %s
+            🕒 Nuevo horario: %s a %s
+            
+            Podés aceptar o rechazar esta propuesta desde tu perfil. La reserva original quedará en pausa hasta que respondas.
+            
+            Gracias por tu colaboración,
+            El equipo de PetCare
+            """.formatted(
+                ownerName != null ? ownerName : "Usuario",
+                professionalName != null ? professionalName : "El profesional",
+                petName != null ? petName : "tu mascota",
+                newDate != null ? newDate : "por confirmar",
+                newStartTime != null ? newStartTime : "por confirmar",
+                newEndTime != null ? newEndTime : "por confirmar"
         );
     }
 }
