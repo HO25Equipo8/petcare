@@ -43,10 +43,10 @@ PetCare is a digital solution designed to help pet owners manage their pets' hea
 ## 🛠 Tech Stack
 
 ### Frontend
-- **Framework**: [React/Vue.js/Angular - specify your choice]
-- **Styling**: [CSS Framework - Tailwind CSS/Bootstrap/Material-UI]
-- **State Management**: [Redux/Vuex/Context API]
-- **Build Tool**: [Vite/Webpack]
+- **Framework**: [React](https://react.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/)
+- **State Management**: [Context API](https://react.dev/learn/passing-data-deeply-with-context)
+- **Build Tool**: [Vite](https://vite.dev/)
 
 ### Backend
 - **Runtime**: Node.js
@@ -115,8 +115,7 @@ Before running this project, make sure you have the following installed:
 
    **Frontend `.env`:**
    ```env
-   REACT_APP_API_URL=http://localhost:5000/api
-   REACT_APP_GOOGLE_MAPS_API_KEY=your_google_maps_key
+   VITE_API_BASE_URL=your_api_base_url_here
    ```
 
 4. **Database Setup**
@@ -133,10 +132,10 @@ Before running this project, make sure you have the following installed:
    ```bash
    # Start backend server
    cd backend
-   npm run dev
-   
+   npm start
+
    # In a new terminal, start frontend
-   cd frontend
+   cd ../frontend
    npm start
    ```
 
