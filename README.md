@@ -279,12 +279,12 @@ spring.jpa.show-sql=true
 
 Developed by **Team 8** at **Hackathon One**.
 
-| Role                                | Name            | GitHub | LinkedIn |
-|-------------------------------------|-----------------|--------|----------|
-| Frontend Developer                  | Julio Blanco    | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
-| Backend Developer                   | Leo Moisés      | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
-| Backend Developer                   | Martin Di Peco  | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
-| Backend Developer & Project Manager | Julia Rodriguez | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
+| Role                                | Name            | GitHub                                         |                                                                         |
+|-------------------------------------|-----------------|------------------------------------------------|---------------------------------------------------------------------------------|
+| Frontend Developer                  | Julio Sosa      | [@juliopzsosa](https://github.com/juliopzsosa) | [Profile](https://linkedin.com/in/profile)                                      |
+| Backend Developer                   | Leo Amaya       | [@LEONISPE](https://github.com/LEONISPE)       | [Profile](https://linkedin.com/in/profile)                                      |
+| Backend Developer                   | Martin Di Peco  | [@username](https://github.com/username)       | [Profile](https://linkedin.com/in/profile)                                      |
+| Backend Developer & Project Manager | Julia Rodriguez | [@JuliaDaniR](https://github.com/JuliaDaniR)       | [Julia Daniela Rodriguez](https://www.linkedin.com/in/julia-daniela-rodriguez/) |
 
 ## 🎉 Acknowledgments
 
