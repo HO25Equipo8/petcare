@@ -1,39 +1,25 @@
 package com.petcare.back.validation;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.petcare.back.domain.dto.request.ScheduleConfigCreateDTO;
-import com.petcare.back.domain.dto.request.ScheduleTurnCreateDTO;
-import com.petcare.back.domain.dto.response.ScheduleConfigResponseDTO;
 import com.petcare.back.domain.entity.ScheduleConfig;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
-import com.petcare.back.domain.enumerated.WeekDayEnum;
-import com.petcare.back.domain.mapper.request.ScheduleConfigCreateMapper;
-import com.petcare.back.domain.mapper.response.ScheduleConfigResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.ScheduleConfigRepository;
 import com.petcare.back.repository.ScheduleRepository;
 import com.petcare.back.service.ScheduleConfigService;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,6 +44,8 @@ public class ValidateScheduleConfigServiceTest {
         mockUser.setId(1L);
         mockUser.setRole(Role.SITTER);
         mockUser.setName("Sitter Test");
+        mockUser.setVerified(true);
+        mockUser.setProfileComplete(true);
 
         Authentication auth = mock(Authentication.class);
         when(auth.getPrincipal()).thenReturn(mockUser);
