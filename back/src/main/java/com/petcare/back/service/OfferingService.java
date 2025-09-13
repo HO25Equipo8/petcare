@@ -10,6 +10,7 @@ import com.petcare.back.domain.mapper.request.OfferingCreateMapper;
 import com.petcare.back.domain.mapper.response.OfferingResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.OfferingRepository;
+import com.petcare.back.repository.UserRepository;
 import com.petcare.back.validation.ValidationOffering;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class OfferingService {
     private final OfferingCreateMapper mapper;
     private final OfferingResponseMapper responseMapper;
     private final List<ValidationOffering> validations;
+    private final UserRepository userRepository;
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     @Transactional
@@ -70,4 +72,86 @@ public class OfferingService {
             throw new MyException("No se pudo registrar el servicio. Revisá los datos o contactá al equipo.");
         }
     }
+
+    public List<OfferingResponseDTO> getBySitter(User sitter) {
+        return repository.findBySitterId(sitter.getId()).stream()
+                .map(responseMapper::toDto)
+                .toList();
+    }
+
+    public OfferingResponseDTO getById(Long id) throws MyException {
+        Offering offering = repository.findById(id)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
+        return responseMapper.toDto(offering);
+    }
+
+    @Transactional
+    public OfferingResponseDTO update(Long id, User sitter, OfferingCreateDTO dto) throws MyException {
+
+        Offering offering = repository.findById(id)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
+
+        if (!offering.getSitter().getId().equals(sitter.getId())) {
+            throw new MyException("No tenés permiso para modificar este servicio");
+        }
+
+        if (dto.name() != null) {
+            offering.setName(dto.name());
+        }
+        if (dto.description() != null) {
+            offering.setDescription(dto.description());
+        }
+        if (dto.allowedRole() != null) {
+            offering.setAllowedRole(dto.allowedRole());
+        }
+        if (dto.basePrice() != null) {
+            offering.setBasePrice(dto.basePrice());
+        }
+        if (dto.applicablePetTypes() != null && !dto.applicablePetTypes().isEmpty()) {
+            offering.setApplicablePetTypes(dto.applicablePetTypes());
+        }
+
+        repository.save(offering);
+
+        return responseMapper.toDto(offering);
+    }
+
+    @Transactional
+    public void softDelete(Long id, User sitter) throws MyException {
+        Offering offering = repository.findById(id)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
+
+        if (!offering.getSitter().getId().equals(sitter.getId())) {
+            throw new MyException("No tenés permiso para eliminar este servicio");
+        }
+
+        offering.setActive(false);
+        repository.save(offering);
+    }
+
+    public void activeOffering(Long id, User sitter) throws MyException {
+        Offering offering = repository.findById(id)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
+
+        if (!offering.getSitter().getId().equals(sitter.getId())) {
+            throw new MyException("No tenés permiso para activar este servicio");
+        }
+
+        offering.setActive(true);
+        repository.save(offering);
+    }
+
+    public List<OfferingResponseDTO> getPublicOfferingsBySitter(Long sitterId) throws MyException {
+        User sitter = userRepository.findById(sitterId)
+                .orElseThrow(() -> new MyException("Profesional no encontrado"));
+
+        if (!sitter.isVerified()) {
+            throw new MyException("Este profesional aún no está verificado");
+        }
+
+        return repository.findBySitterIdAndActiveTrue(sitterId).stream()
+                .map(responseMapper::toDto)
+                .toList();
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.ComboOfferingCreateDTO;
+import com.petcare.back.domain.dto.request.ComboOfferingUpdateDTO;
 import com.petcare.back.domain.dto.response.ComboOfferingResponseDTO;
 import com.petcare.back.domain.entity.ComboOffering;
 import com.petcare.back.domain.entity.Offering;
@@ -12,6 +13,7 @@ import com.petcare.back.domain.mapper.response.ComboResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.ComboOfferingRepository;
 import com.petcare.back.repository.OfferingRepository;
+import com.petcare.back.repository.UserRepository;
 import com.petcare.back.validation.WarningComboEvaluator;
 import com.petcare.back.validation.ValidationCombo;
 import jakarta.transaction.Transactional;
@@ -34,6 +36,7 @@ public class ComboOfferingService {
     private final OfferingCreateMapper offeringCreateMapper;
     private final WarningComboEvaluator warningComboEvaluator;
     private final List<ValidationCombo> validations;
+    private final UserRepository userRepository;
 
     @Transactional
     public ComboOfferingResponseDTO create(ComboOfferingCreateDTO dto) throws MyException {
@@ -87,9 +90,75 @@ public class ComboOfferingService {
         );
     }
 
+    @Transactional
+    public ComboOfferingResponseDTO update(Long id, User sitter, ComboOfferingUpdateDTO dto) throws MyException {
+        ComboOffering combo = comboOfferingRepository.findById(id)
+                .orElseThrow(() -> new MyException("Combo no encontrado"));
+
+        if (!combo.getSitter().getId().equals(sitter.getId())) {
+            throw new MyException("No tenés permiso para modificar este combo");
+        }
+
+        if (dto.name() != null) combo.setName(dto.name());
+        if (dto.description() != null) combo.setDescription(dto.description());
+        if (dto.discount() != null) combo.setDiscount(dto.discount());
+
+        // Actualizar servicios si se envían nuevos IDs
+        if (dto.offeringIds() != null && !dto.offeringIds().isEmpty()) {
+            List<Offering> offerings = offeringRepository.findAllById(dto.offeringIds());
+
+            boolean todosSonDelUsuario = offerings.stream()
+                    .allMatch(o -> o.getSitter() != null && o.getSitter().getId().equals(sitter.getId()));
+
+            if (!todosSonDelUsuario) {
+                throw new MyException("Solo podés actualizar combos con servicios que vos ofrecés.");
+            }
+
+            combo.setOfferings(offerings);
+            combo.getFinalPrice();
+        }
+        return comboResponseMapper.toResponse(combo);
+    }
+
+    public ComboOfferingResponseDTO getById(Long id) throws MyException {
+        ComboOffering combo = comboOfferingRepository.findById(id)
+                .orElseThrow(() -> new MyException("Combo no encontrado"));
+        return comboResponseMapper.toResponse(combo);
+    }
+
+    public List<ComboOfferingResponseDTO> getBySitter(User sitter) {
+        return comboOfferingRepository.findBySitterId(sitter.getId()).stream()
+                .map(comboResponseMapper::toResponse)
+                .toList();
+    }
+
     public List<ComboOfferingResponseDTO> findAll() {
         return comboOfferingRepository.findAll().stream()
                 .map(comboResponseMapper::toResponse)
                 .toList();
+    }
+
+    public List<ComboOfferingResponseDTO> getPublicCombosBySitter(Long sitterId) throws MyException {
+        User sitter = userRepository.findById(sitterId)
+                .orElseThrow(() -> new MyException("Profesional no encontrado"));
+
+        if (!sitter.isVerified()) {
+            throw new MyException("Este profesional aún no está verificado");
+        }
+
+        return comboOfferingRepository.findBySitterId(sitterId).stream()
+                .map(comboResponseMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public void delete(Long id, User sitter) throws MyException {
+        ComboOffering combo = comboOfferingRepository.findById(id)
+                .orElseThrow(() -> new MyException("Combo no encontrado"));
+
+        if (!combo.getSitter().getId().equals(sitter.getId())) {
+            throw new MyException("No tenés permiso para eliminar este combo");
+        }
+        comboOfferingRepository.delete(combo);
     }
 }

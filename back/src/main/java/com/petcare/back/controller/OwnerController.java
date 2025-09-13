@@ -35,6 +35,7 @@ public class OwnerController {
     private final PlanService planService;
     private final BookingService bookingService;
     private final UserService userService;
+    private final OfferingService offeringService;
 
     @Operation(
             summary = "Registrar mascota",
@@ -128,6 +129,46 @@ public class OwnerController {
     @GetMapping("/list/combo")
     public ResponseEntity<List<ComboOfferingResponseDTO>> findAll() {
         return ResponseEntity.ok(comboOfferingService.findAll());
+    }
+
+    @Operation(
+            summary = "Listar combos públicos de un profesional",
+            description = "Devuelve todos los combos activos ofrecidos por el profesional indicado, visibles para dueños."
+    )
+
+    @GetMapping("/public/{sitterId}/combos")
+    public ResponseEntity<?> verCombos(@PathVariable Long sitterId) {
+        try {
+            List<ComboOfferingResponseDTO> combos = comboOfferingService.getPublicCombosBySitter(sitterId);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "data", combos
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    @Operation(
+            summary = "Listar servicios individuales de un profesional",
+            description = "Devuelve todos los servicios activos ofrecidos por el profesional indicado, visibles para dueños."
+    )
+    @GetMapping("/public/{sitterId}/offerings")
+    public ResponseEntity<?> verOfferings(@PathVariable Long sitterId) {
+        try {
+            List<OfferingResponseDTO> offerings = offeringService.getPublicOfferingsBySitter(sitterId);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "data", offerings
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
     }
 
     @Operation(
