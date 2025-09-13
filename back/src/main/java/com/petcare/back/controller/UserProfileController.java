@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 import java.util.List;
 
-
+@CrossOrigin(origins = "http://localhost:5173/", allowedHeaders = "*", allowCredentials = "true")
 @SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/me")
