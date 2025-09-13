@@ -1,6 +1,6 @@
 # 🐾 PetCare — All-in-One Platform for Pet Services
 
-![Project Banner](./assets/banner-petcare.png) <!-- Replace with real image -->
+![Project Banner](https://drive.google.com/file/d/12Dtq7LIG3MWY6QgTcgaDY6dzhWtHb6J8/view?usp=drive_link)
 
 **PetCare** is a web application that connects pet owners with trusted animal care professionals (walkers, veterinarians, sitters, and more).
 It’s built to deliver a collaborative, visual, and emotionally engaging experience — with robust workflows, cross-layer validations, and a double-consent model for sensitive actions.
@@ -275,224 +275,20 @@ spring.jpa.show-sql=true
 
 ---
 
-## 👥 Authors
-
-Developed by **Team HO25Equipo8** at **Hackathon One**.
-
----
-
-Would you like me to also **restructure it in a GitHub-optimized style** (with badges, quick-start at the top, and a shorter marketing-style description), or do you want to keep this **developer-focused documentation style**?
-
-
-
-# PetCare 🐾
-
-A comprehensive pet care management application developed for the **No Country ONE 2025 Hackathon**.
-
-![PetCare Banner](https://drive.google.com/file/d/12Dtq7LIG3MWY6QgTcgaDY6dzhWtHb6J8/view)
-
-
-PetCare is a web application designed to connect pet owners with animal care professionals (walkers, veterinarians, sitters, etc.). It offers a collaborative, visual, and emotional experience, with robust workflows, cross-layer validation, and double opt-in logic.
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-- [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [Team](#team)
-- [License](#license)
-
-## 🎯 Overview
-
-PetCare is a digital solution designed to help pet owners manage their pets' health, appointments, and daily care routines. Built during the No Country ONE 2025 Hackathon, this application aims to streamline pet care management and improve the relationship between pet owners, their pets, and veterinary professionals.
-
-## ✨ Features
-
-### Core Features
-- **Pet Profile Management**: Create detailed profiles for each pet with photos, breed information, and medical history
-- **Health Tracking**: Monitor vaccination schedules, medication reminders, and health records
-- **Appointment Scheduling**: Book and manage veterinary appointments
-- **Care Reminders**: Set up notifications for feeding, medication, and exercise routines
-- **Emergency Contacts**: Quick access to emergency veterinary services
-- **Growth Tracking**: Monitor pet growth and weight over time
-
-### Advanced Features
-- **Multi-pet Management**: Handle multiple pets in one account
-- **Veterinarian Portal**: Dedicated interface for veterinary professionals
-- **Medical Records**: Secure storage and sharing of medical documents
-- **Community Features**: Connect with other pet owners in your area
-- **GPS Pet Tracking**: Location services for pet safety (if applicable)
-
-## 🛠 Tech Stack
-
-### Frontend
-- **Framework**: [React](https://react.dev/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/)
-- **State Management**: [Context API](https://react.dev/learn/passing-data-deeply-with-context)
-- **Build Tool**: [Vite](https://vite.dev/)
-
-### Backend
-- **Runtime**: Java 21
-- **Framework**: [SpringBoot]
-- **Database**: [MySQL]
-- **Authentication**: JWT + bcrypt
-
-### DevOps & Tools
-- **Version Control**: Git & GitHub
-- **Deployment**: [Vercel/Render/Aiven]
-
-## 🚀 Getting Started
-
-The application is available at:
-- **Frontend**: https://petcare-zeta-kohl.vercel.app/
-- **Backend API**: https://petcare-7yjq.onrender.com/
-
-## 💡 Usage
-
-### For Pet Owners
-
-1. **Registration & Login**
-    - Create an account with email verification
-    - Complete your profile setup
-
-2. **Add Your Pet**
-    - Click "Add New Pet"
-    - Fill in pet details (name, breed, age, medical history)
-    - Upload a profile photo
-
-3. **Schedule Appointments**
-    - Navigate to "Appointments"
-    - Select your preferred veterinarian
-    - Choose available time slots
-
-4. **Set Reminders**
-    - Go to "Care Schedule"
-    - Add feeding, medication, and exercise reminders
-    - Customize notification preferences
-
-### For Veterinarians
-
-1. **Professional Account Setup**
-    - Register as a veterinary professional
-    - Verify credentials
-    - Set up clinic information
-
-2. **Manage Appointments**
-    - View and manage appointment requests
-    - Access pet medical histories
-    - Update treatment records
-
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-```http
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/logout
-GET /api/auth/profile
-```
-
-### Pet Management Endpoints
-
-```http
-GET /api/pets              # Get all pets for authenticated user
-POST /api/pets             # Create new pet profile
-GET /api/pets/:id          # Get specific pet details
-PUT /api/pets/:id          # Update pet information
-DELETE /api/pets/:id       # Delete pet profile
-```
-
-### Appointment Endpoints
-
-```http
-GET /api/appointments      # Get user appointments
-POST /api/appointments     # Create new appointment
-PUT /api/appointments/:id  # Update appointment
-DELETE /api/appointments/:id # Cancel appointment
-```
-
-For complete API documentation, visit `/api/docs` when running the server locally.
-
-## 📁 Project Structure
-
-```
-petcare/
-├── backend/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── utils/
-│   ├── config/
-│   └── server.js
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── App.js
-│   └── package.json
-├── mobile/ (if applicable)
-├── docs/
-├── tests/
-├── .gitignore
-├── README.md
-└── package.json
-```
-
-## 🤝 Contributing
-
-We welcome contributions from the community! Please follow these steps:
-
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Make your changes**
-4. **Commit your changes**
-   ```bash
-   git commit -m 'Add amazing feature'
-   ```
-5. **Push to the branch**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-6. **Open a Pull Request**
-
-### Code Style Guidelines
-- Use ESLint and Prettier for code formatting
-- Write meaningful commit messages
-- Include tests for new features
-- Update documentation as needed
-
 ## 👥 Team
 
-**Equipo 8 - No Country ONE 2025**
+Developed by **Team 8** at **Hackathon One**.
 
-| Role | Name | GitHub | LinkedIn |
-|------|------|--------|----------|
-| Frontend Developer | [Name] | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
-| Backend Developer | [Name] | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
-| UI/UX Designer | [Name] | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
-| Project Manager | [Name] | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
+| Role                                | Name            | GitHub | LinkedIn |
+|-------------------------------------|-----------------|--------|----------|
+| Frontend Developer                  | Julio Blanco    | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
+| Backend Developer                   | Leo Moisés      | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
+| Backend Developer                   | Martin Di Peco  | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
+| Backend Developer & Project Manager | Julia Rodriguez | [@username](https://github.com/username) | [Profile](https://linkedin.com/in/profile) |
 
 ## 🎉 Acknowledgments
 
 - Thanks to **No Country** for organizing this amazing hackathon
-- Special thanks to mentors and reviewers
-- Icons and images from [Unsplash](https://unsplash.com) and [Feather Icons](https://feathericons.com)
 
 ## 📄 License
 
@@ -502,12 +298,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you have any questions or need help getting started:
 
-- **Email**: [team-email@example.com]
-- **Discord**: [Your Discord Server]
+- **Email**: [petcare.cuidadoseguro@gmail.com]
 - **Issues**: [Create an issue](https://github.com/HO25Equipo8/petcare/issues)
 
 ---
 
 **Made with ❤️ during No Country ONE 2025 Hackathon**
-
-![Footer](https://via.placeholder.com/800x100/2196F3/FFFFFF?text=Thank+you+for+checking+out+PetCare!)
