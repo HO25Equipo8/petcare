@@ -6,10 +6,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record OfferingResponseDTO(Long id,
-                                  String name,
-                                  String description,
-                                  BigDecimal basePrice,
-                                  List<PetTypeEnum> applicablePetTypes,
-                                  LocalDateTime createdAt) {
+public record OfferingResponseDTO(
+        Long id,
+        String name,
+        String description,
+        BigDecimal basePrice,
+        List<PetTypeEnum> applicablePetTypes
+) {
 }

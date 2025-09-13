@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -116,6 +117,109 @@ public class SitterController {
             ));
         }
     }
+    @Operation(
+            summary = "Listar servicios propios",
+            description = "Devuelve todos los servicios individuales registrados por el profesional autenticado."
+    )
+    @GetMapping("/my/offering")
+    public ResponseEntity<?> getMyOfferings() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User sitter = (User) authentication.getPrincipal();
+
+        List<OfferingResponseDTO> offerings = offeringService.getBySitter(sitter);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "data", offerings
+        ));
+    }
+
+    @Operation(
+            summary = "Obtener servicio por ID",
+            description = "Devuelve los datos de un servicio individual registrado, si existe."
+    )
+    @GetMapping("/offering/{id}")
+    public ResponseEntity<?> getByIdOffering(@PathVariable Long id) {
+        try {
+            OfferingResponseDTO dto = offeringService.getById(id);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "data", dto
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    @Operation(
+            summary = "Actualizar servicio",
+            description = "Permite modificar los datos de un servicio individual registrado por el profesional."
+    )
+    @PutMapping("/update/offering/{id}")
+    public ResponseEntity<?> updateOffering(@PathVariable Long id,
+                                    @Valid @RequestBody OfferingCreateDTO dto) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User sitter = (User) authentication.getPrincipal();
+
+            OfferingResponseDTO updated = offeringService.update(id, sitter, dto);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Servicio actualizado con éxito",
+                    "data", updated
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    @Operation(
+            summary = "Eliminar servicio",
+            description = "Permite desactivar un servicio individual registrado por el profesional."
+    )
+    @DeleteMapping("/delete/offering/{id}")
+    public ResponseEntity<?> deleteOffering(@PathVariable Long id) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User sitter = (User) authentication.getPrincipal();
+
+            offeringService.softDelete(id, sitter);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Servicio eliminado con éxito"
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    @Operation(
+            summary = "Activar servicio",
+            description = "Permite activar un servicio individual registrado por el profesional."
+    )
+    @DeleteMapping("/active/offering/{id}")
+    public ResponseEntity<?> activeOffering(@PathVariable Long id) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User sitter = (User) authentication.getPrincipal();
+
+            offeringService.activeOffering(id, sitter);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Servicio activado con éxito"
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
 
     @Operation(
             summary = "Registrar combo de servicios",
@@ -146,6 +250,79 @@ public class SitterController {
         }
     }
 
+    @Operation(
+            summary = "Obtener combo por ID",
+            description = "Devuelve los datos completos de un combo registrado, incluyendo servicios asociados y advertencias."
+    )
+    @GetMapping("/combo/{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        try {
+            ComboOfferingResponseDTO dto = comboOfferingService.getById(id);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "data", dto
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Actualizar combo",
+            description = "Permite modificar los datos de un combo registrado por el profesional, incluyendo nombre, descripción y descuento."
+    )
+    @PutMapping("/update/combo/{id}")
+    public ResponseEntity<?> updateCombo(@PathVariable Long id,
+                                    @AuthenticationPrincipal User sitter,
+                                    @RequestBody ComboOfferingUpdateDTO dto) {
+        try {
+            ComboOfferingResponseDTO updated = comboOfferingService.update(id, sitter, dto);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Combo actualizado con éxito",
+                    "data", updated
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    @Operation(
+            summary = "Eliminar combo",
+            description = "Permite eliminar un combo registrado por el profesional."
+    )
+    @DeleteMapping("/delete/combo/{id}")
+    public ResponseEntity<?> deleteCombo(@PathVariable Long id, @AuthenticationPrincipal User sitter) {
+        try {
+            comboOfferingService.delete(id, sitter);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Combo eliminado con éxito"
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    @Operation(
+            summary = "Listar combos propios",
+            description = "Devuelve todos los combos registrados por el profesional autenticado."
+    )
+    @GetMapping("/my/combos")
+    public ResponseEntity<?> getMyCombos(@AuthenticationPrincipal User sitter) {
+        List<ComboOfferingResponseDTO> combos = comboOfferingService.getBySitter(sitter);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "data", combos
+        ));
+    }
     @Operation(
             summary = "Registrar regla de descuento",
             description = "Crea una nueva regla de descuento aplicable a planes o servicios, según condiciones definidas."
