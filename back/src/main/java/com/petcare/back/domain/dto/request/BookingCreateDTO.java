@@ -11,18 +11,10 @@ public record BookingCreateDTO(
         @Min(value = 1, message = "ID de mascota inválido")
         Long petId,
 
-        // Puede ser null, pero si se envia, debe ser >= 1
-        @Min(value = 1, message = "ID de servicio inválido")
-        Long offeringId,
-
-        // Puede ser null, pero si se envia, debe ser >= 1
         @Min(value = 1, message = "ID de combo inválido")
         Long comboOfferingId,
 
-        @NotEmpty(message = "Debés seleccionar al menos un horario")
-        List<Long> scheduleIds,
-
-        @NotEmpty(message = "Debés seleccionar al menos un profesional")
-        List<Long> professionals
+        @NotEmpty(message = "Debés enviar al menos un ítem de servicio")
+        List<BookingServiceItemCreateDTO> items
 ) {
 }

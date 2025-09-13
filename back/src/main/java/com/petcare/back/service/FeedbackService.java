@@ -3,6 +3,7 @@ package com.petcare.back.service;
 import com.petcare.back.domain.dto.request.FeedbackDTO;
 import com.petcare.back.domain.dto.response.FeedbackResponseDTO;
 import com.petcare.back.domain.entity.Booking;
+import com.petcare.back.domain.entity.BookingServiceItem;
 import com.petcare.back.domain.entity.Feedback;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
@@ -35,6 +36,7 @@ public class FeedbackService {
         List<Feedback> feedbacks = feedbackRepository.findByTargetOrderByCreatedAtDesc(target);
         return feedbackMapper.toDtoList(feedbacks);
     }
+
     public FeedbackResponseDTO giveFeedback(FeedbackDTO dto) throws MyException {
         User author = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User target = userRepository.findById(dto.targetUserId())
@@ -75,8 +77,16 @@ public class FeedbackService {
             throw new MyException("Solo podés dejar feedback si la reserva fue completada.");
         }
 
-        boolean authorParticipa = booking.getOwner().equals(author) || booking.getProfessionals().contains(author);
-        boolean targetParticipa = booking.getOwner().equals(target) || booking.getProfessionals().contains(target);
+        // 🔄 Validar participación usando ítems
+        boolean authorParticipa = booking.getOwner().equals(author) ||
+                booking.getServiceItems().stream()
+                        .map(BookingServiceItem::getProfessional)
+                        .anyMatch(prof -> prof.equals(author));
+
+        boolean targetParticipa = booking.getOwner().equals(target) ||
+                booking.getServiceItems().stream()
+                        .map(BookingServiceItem::getProfessional)
+                        .anyMatch(prof -> prof.equals(target));
 
         if (!authorParticipa || !targetParticipa) {
             throw new MyException("Ambos usuarios deben haber participado en la misma reserva.");

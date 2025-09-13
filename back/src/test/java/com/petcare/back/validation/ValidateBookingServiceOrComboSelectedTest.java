@@ -1,6 +1,7 @@
 package com.petcare.back.validation;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
+import com.petcare.back.domain.dto.request.BookingServiceItemCreateDTO;
 import com.petcare.back.exception.MyException;
 import org.junit.jupiter.api.Test;
 
@@ -15,19 +16,24 @@ class ValidateBookingServiceOrComboSelectedTest {
 
     @Test
     void shouldPassWhenServiceIsSelected() throws MyException {
-        BookingCreateDTO dto = new BookingCreateDTO(1L, 1L, null, List.of(1L), List.of());
+        BookingServiceItemCreateDTO item = new BookingServiceItemCreateDTO(1L, 100L, 10L); // offeringId, scheduleId, professionalId
+        BookingCreateDTO dto = new BookingCreateDTO(1L, null, List.of(item));
+
         assertDoesNotThrow(() -> validator.validate(dto));
     }
 
     @Test
     void shouldPassWhenComboIsSelected() throws MyException {
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, 2L, List.of(1L), List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(1L, 2L, List.of()); // comboOfferingId presente, sin ítems
+
         assertDoesNotThrow(() -> validator.validate(dto));
     }
 
     @Test
     void shouldThrowWhenNeitherIsSelected() {
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, List.of(1L), List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(1L, null, List.of()); // sin combo, sin ítems
+
         assertThrows(MyException.class, () -> validator.validate(dto));
     }
 }
+

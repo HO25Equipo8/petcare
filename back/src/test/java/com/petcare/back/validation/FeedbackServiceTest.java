@@ -3,6 +3,7 @@ package com.petcare.back.validation;
 import com.petcare.back.domain.dto.request.FeedbackDTO;
 import com.petcare.back.domain.dto.response.FeedbackResponseDTO;
 import com.petcare.back.domain.entity.Booking;
+import com.petcare.back.domain.entity.BookingServiceItem;
 import com.petcare.back.domain.entity.Feedback;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
@@ -55,7 +56,6 @@ class FeedbackServiceTest {
         SecurityContextHolder.clearContext();
     }
 
-    //Valida que un usuario no pueda dejarse feedback a sí mismo
     @Test
     void shouldThrowExceptionIfAuthorIsTarget() {
         User user = new User();
@@ -69,25 +69,27 @@ class FeedbackServiceTest {
         Booking booking = new Booking();
         booking.setId(10L);
         booking.setStatus(BookingStatusEnum.COMPLETADO);
-        booking.setOwner(user); // necesario para evitar NPE
+        booking.setOwner(user);
 
         when(bookingRepository.findById(10L)).thenReturn(Optional.of(booking));
 
-        MyException ex = assertThrows(MyException.class, () -> {
-            feedbackService.giveFeedback(dto);
-        });
-
+        MyException ex = assertThrows(MyException.class, () -> feedbackService.giveFeedback(dto));
         assertEquals("No puedes dejar feedback sobre ti mismo.", ex.getMessage());
     }
 
-    //Test: feedback duplicado
     @Test
     void shouldThrowExceptionIfFeedbackAlreadyExists() {
         User author = new User(); author.setId(1L);
         User target = new User(); target.setId(2L);
-        Booking booking = new Booking(); booking.setId(10L); booking.setStatus(BookingStatusEnum.COMPLETADO);
+
+        Booking booking = new Booking();
+        booking.setId(10L);
+        booking.setStatus(BookingStatusEnum.COMPLETADO);
         booking.setOwner(author);
-        booking.setProfessionals(List.of(target));
+
+        BookingServiceItem item = new BookingServiceItem();
+        item.setProfessional(target);
+        booking.setServiceItems(List.of(item));
 
         FeedbackDTO dto = new FeedbackDTO(2L, 10L, 5, "Todo bien", FeedbackContext.BOOKING);
 
@@ -97,20 +99,23 @@ class FeedbackServiceTest {
 
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(author, null));
 
-        MyException ex = assertThrows(MyException.class, () -> {
-            feedbackService.giveFeedback(dto);
-        });
-
+        MyException ex = assertThrows(MyException.class, () -> feedbackService.giveFeedback(dto));
         assertEquals("Ya dejaste feedback para esta reserva.", ex.getMessage());
     }
 
-    //Test: reserva no completada
     @Test
     void shouldThrowExceptionIfBookingNotCompleted() {
         User author = new User(); author.setId(1L);
         User target = new User(); target.setId(2L);
-        Booking booking = new Booking(); booking.setId(10L); booking.setStatus(BookingStatusEnum.PENDIENTE);
+
+        Booking booking = new Booking();
+        booking.setId(10L);
+        booking.setStatus(BookingStatusEnum.PENDIENTE);
         booking.setOwner(author);
+
+        BookingServiceItem item = new BookingServiceItem();
+        item.setProfessional(target);
+        booking.setServiceItems(List.of(item));
 
         FeedbackDTO dto = new FeedbackDTO(2L, 10L, 5, "Todo bien", FeedbackContext.BOOKING);
 
@@ -120,20 +125,23 @@ class FeedbackServiceTest {
 
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(author, null));
 
-        MyException ex = assertThrows(MyException.class, () -> {
-            feedbackService.giveFeedback(dto);
-        });
-
+        MyException ex = assertThrows(MyException.class, () -> feedbackService.giveFeedback(dto));
         assertEquals("Solo podés dejar feedback si la reserva fue completada.", ex.getMessage());
     }
 
-    //Test: rating fuera de rango
     @Test
     void shouldThrowExceptionIfRatingOutOfRange() {
         User author = new User(); author.setId(1L);
         User target = new User(); target.setId(2L);
-        Booking booking = new Booking(); booking.setId(10L); booking.setStatus(BookingStatusEnum.COMPLETADO);
+
+        Booking booking = new Booking();
+        booking.setId(10L);
+        booking.setStatus(BookingStatusEnum.COMPLETADO);
         booking.setOwner(author);
+
+        BookingServiceItem item = new BookingServiceItem();
+        item.setProfessional(target);
+        booking.setServiceItems(List.of(item));
 
         FeedbackDTO dto = new FeedbackDTO(2L, 10L, 6, "Excelente", FeedbackContext.BOOKING);
 
@@ -143,21 +151,23 @@ class FeedbackServiceTest {
 
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(author, null));
 
-        MyException ex = assertThrows(MyException.class, () -> {
-            feedbackService.giveFeedback(dto);
-        });
-
+        MyException ex = assertThrows(MyException.class, () -> feedbackService.giveFeedback(dto));
         assertEquals("La calificación debe estar entre 1 y 5 estrellas.", ex.getMessage());
     }
 
-    //Test: feedback exitoso
     @Test
     void shouldSaveFeedbackSuccessfully() throws MyException {
         User author = new User(); author.setId(1L);
         User target = new User(); target.setId(2L);
-        Booking booking = new Booking(); booking.setId(10L); booking.setStatus(BookingStatusEnum.COMPLETADO);
+
+        Booking booking = new Booking();
+        booking.setId(10L);
+        booking.setStatus(BookingStatusEnum.COMPLETADO);
         booking.setOwner(author);
-        booking.setProfessionals(List.of(target));
+
+        BookingServiceItem item = new BookingServiceItem();
+        item.setProfessional(target);
+        booking.setServiceItems(List.of(item));
 
         FeedbackDTO dto = new FeedbackDTO(2L, 10L, 5, "Excelente trato", FeedbackContext.BOOKING);
 

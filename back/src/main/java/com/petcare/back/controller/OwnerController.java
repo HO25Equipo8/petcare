@@ -243,18 +243,18 @@ public class OwnerController {
     }
 
     @Operation(
-            summary = "Responder propuesta de reprogramación",
-            description = "Permite al dueño aceptar o rechazar la reprogramación propuesta por el profesional"
+            summary = "Responder propuesta de reprogramación de un servicio",
+            description = "Permite al dueño aceptar o rechazar la reprogramación propuesta por el profesional para un ítem específico"
     )
-    @PutMapping("/booking/{id}/respond-reprogram")
-    public ResponseEntity<?> respondToReprogramBooking(
-            @PathVariable Long id,
+    @PutMapping("/booking/item/{itemId}/respond-reprogram")
+    public ResponseEntity<?> respondToReprogramItem(
+            @PathVariable Long itemId,
             @RequestParam boolean accept
     ) {
         User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {
-            BookingResponseDTO response = bookingService.respondToReschedule(id, accept, owner);
-            return ResponseEntity.ok(response);
+            bookingService.respondToItemReschedule(itemId, accept, owner);
+            return ResponseEntity.ok(Map.of("status", "actualizado"));
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

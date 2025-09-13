@@ -2,6 +2,7 @@ package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
 import com.petcare.back.domain.dto.request.BookingDataByEmailDTO;
+import com.petcare.back.domain.dto.request.BookingServiceItemCreateDTO;
 import com.petcare.back.domain.dto.request.BookingSimulationRequestDTO;
 import com.petcare.back.domain.dto.response.BookingListDTO;
 import com.petcare.back.domain.dto.response.BookingResponseDTO;
@@ -29,10 +30,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,12 +45,9 @@ public class BookingService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository professionalRepository;
     private final BookingResponseMapper mapper;
-    private final BookingCreateMapper bookingCreateMapper;
     private final List<ValidationBooking> validations;
     private final EmailService emailService;
-
-
-    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
+    private final BookingServiceItemRepository bookingServiceItemRepository;
 
     @Transactional
     public BookingResponseDTO createBooking(BookingCreateDTO dto) throws MyException {
@@ -65,61 +60,65 @@ public class BookingService {
             throw new MyException("Solo los dueños pueden seleccionar su plan");
         }
 
-        // Recorre las validaciones antes de hacer toda la carga de datos
+        // 2. Validaciones externas
         for (ValidationBooking v : validations) {
             v.validate(dto);
         }
 
-        // 2. Cargar owner y mascota
+        // 3. Cargar owner y mascota
         User owner = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
         Pet pet = petRepository.findById(dto.petId())
                 .orElseThrow(() -> new RuntimeException("Pet not found"));
 
-        // 3. Crear booking desde mapper
-        Booking booking = bookingCreateMapper.toEntity(dto);
+        // 4. Crear booking base
+        Booking booking = new Booking();
         booking.setOwner(owner);
         booking.setPet(pet);
-
-        // 4. Asignar offering, combo y plan con validación explícita
-        if (dto.offeringId() != null) {
-            booking.setOffering(offeringRepository.findById(dto.offeringId())
-                    .orElseThrow(() -> new MyException("El servicio seleccionado no existe")));
-        }
-
-        if (dto.comboOfferingId() != null) {
-            booking.setComboOffering(comboRepository.findById(dto.comboOfferingId())
-                    .orElseThrow(() -> new MyException("El combo seleccionado no existe")));
-        }
-
-        // 5. Asignar horarios y marcar como PENDIENTES
-        List<Schedule> schedules = scheduleRepository.findAllById(dto.scheduleIds());
-
-        List<Long> noDisponibles = schedules.stream()
-                .filter(s -> s.getStatus() != ScheduleStatus.DISPONIBLE)
-                .map(Schedule::getScheduleId)
-                .toList();
-
-        if (!noDisponibles.isEmpty()) {
-            throw new MyException("Los siguientes horarios no están disponibles: " + noDisponibles);
-        }
-
-        schedules.forEach(s -> s.setStatus(ScheduleStatus.PENDIENTE));
-        scheduleRepository.saveAll(schedules);
-
-        booking.setSchedules(schedules);
         booking.setReservationDate(Instant.now());
         booking.setStatus(BookingStatusEnum.PENDIENTE);
 
-        // 6. Asignar profesionales (conversión de ids a entidades)
-        List<User> professionals = dto.professionals().stream()
-                .map(id -> professionalRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Professional not found: " + id)))
-                .toList();
+        // 5. Asignar combo si corresponde
+        if (dto.comboOfferingId() != null) {
+            ComboOffering combo = comboRepository.findById(dto.comboOfferingId())
+                    .orElseThrow(() -> new MyException("El combo seleccionado no existe"));
+            booking.setComboOffering(combo);
+        }
 
-        booking.setProfessionals(professionals);
+        // 6. Crear ítems del combo
+        List<BookingServiceItem> serviceItems = new ArrayList<>();
 
-        // 7. Calcular precio final con descuento del plan
+        for (BookingServiceItemCreateDTO itemDTO : dto.items()) {
+            Offering offering = offeringRepository.findById(itemDTO.offeringId())
+                    .orElseThrow(() -> new MyException("Servicio no encontrado"));
+
+            Schedule schedule = scheduleRepository.findById(itemDTO.scheduleId())
+                    .orElseThrow(() -> new MyException("Horario no encontrado"));
+
+            if (schedule.getStatus() != ScheduleStatus.DISPONIBLE) {
+                throw new MyException("Horario no disponible: " + schedule.getScheduleId());
+            }
+
+            schedule.setStatus(ScheduleStatus.PENDIENTE);
+            scheduleRepository.save(schedule);
+
+            User professional = professionalRepository.findById(itemDTO.professionalId())
+                    .orElseThrow(() -> new MyException("Profesional no encontrado"));
+
+            BookingServiceItem item = new BookingServiceItem();
+            item.setBooking(booking);
+            item.setOffering(offering);
+            item.setSchedule(schedule);
+            item.setProfessional(professional);
+            item.setStatus(BookingStatusEnum.PENDIENTE);
+            item.setPrice(offering.getBasePrice());
+
+            serviceItems.add(item);
+        }
+
+        booking.setServiceItems(serviceItems);
+
+        // 7. Calcular precio final
         booking.setFinalPrice(calculateBookingPrice(booking));
 
         // 8. Guardar booking
@@ -132,35 +131,44 @@ public class BookingService {
         BigDecimal totalPrice = BigDecimal.ZERO;
         BigDecimal comboTotal = BigDecimal.ZERO;
         BigDecimal discountAmount = BigDecimal.ZERO;
-        BigDecimal promotionAmount = BigDecimal.ZERO;
 
-        // Servicio individual
-        if (booking.getOffering() != null && booking.getOffering().getBasePrice() != null) {
-            totalPrice = totalPrice.add(booking.getOffering().getBasePrice());
-        }
+        // 1. Sumar precios base desde los ítems
+        totalPrice = booking.getServiceItems().stream()
+                .map(BookingServiceItem::getPrice)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Combo
-        if (booking.getComboOffering() != null && booking.getComboOffering().getOfferings() != null) {
+        // 2. Aplicar descuento del combo si corresponde
+        if (booking.getComboOffering() != null && booking.getComboOffering().getDiscount() != null) {
             comboTotal = booking.getComboOffering().getOfferings().stream()
                     .map(Offering::getBasePrice)
                     .filter(Objects::nonNull)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal comboDiscountRate = BigDecimal.valueOf(booking.getComboOffering().getDiscount()).divide(BigDecimal.valueOf(100));
+            BigDecimal comboDiscountRate = BigDecimal.valueOf(booking.getComboOffering().getDiscount())
+                    .divide(BigDecimal.valueOf(100));
             discountAmount = comboTotal.multiply(comboDiscountRate);
-            totalPrice = totalPrice.add(comboTotal.subtract(discountAmount));
+            totalPrice = totalPrice.subtract(discountAmount);
         }
 
-        // Descuento por categoría del cliente según reglas del SITTER
-        if (booking.getOwner() != null && booking.getProfessionals() != null && !booking.getProfessionals().isEmpty()) {
-            User sitter = booking.getProfessionals().get(0);
-            CustomerCategory category = calculateCustomerCategory(booking.getOwner(), sitter);
+        // 3. Aplicar descuento por categoría del cliente
+        if (booking.getOwner() != null) {
+            // Tomamos el primer profesional de los ítems (si hay)
+            Optional<User> sitterOpt = booking.getServiceItems().stream()
+                    .map(BookingServiceItem::getProfessional)
+                    .filter(Objects::nonNull)
+                    .findFirst();
 
-            Optional<PlanDiscountRule> ruleOpt = planDiscountRuleRepository.findByCategoryAndSitter(category, sitter);
-            if (ruleOpt.isPresent()) {
-                BigDecimal rate = ruleOpt.get().getDiscount().divide(BigDecimal.valueOf(100));
-                BigDecimal categoryDiscount = totalPrice.multiply(rate);
-                totalPrice = totalPrice.subtract(categoryDiscount);
+            if (sitterOpt.isPresent()) {
+                User sitter = sitterOpt.get();
+                CustomerCategory category = calculateCustomerCategory(booking.getOwner(), sitter);
+
+                Optional<PlanDiscountRule> ruleOpt = planDiscountRuleRepository.findByCategoryAndSitter(category, sitter);
+                if (ruleOpt.isPresent()) {
+                    BigDecimal rate = ruleOpt.get().getDiscount().divide(BigDecimal.valueOf(100));
+                    BigDecimal categoryDiscount = totalPrice.multiply(rate);
+                    totalPrice = totalPrice.subtract(categoryDiscount);
+                }
             }
         }
 
@@ -189,7 +197,10 @@ public class BookingService {
                 .orElseThrow(() -> new MyException("Reserva no encontrada"));
 
         boolean isOwner = booking.getOwner().equals(actor);
-        boolean isProfessional = booking.getProfessionals().contains(actor);
+
+        boolean isProfessional = booking.getServiceItems().stream()
+                .map(BookingServiceItem::getProfessional)
+                .anyMatch(prof -> prof.equals(actor));
 
         if (!isOwner && !isProfessional) {
             throw new MyException("No tienes permisos para modificar esta reserva");
@@ -201,7 +212,7 @@ public class BookingService {
 
         booking.setStatus(newStatus);
 
-        // 🔄 Sincronizar estado de horarios
+        // 🔄 Sincronizar estado de horarios e ítems
         ScheduleStatus scheduleStatus = switch (newStatus) {
             case CANCELADO -> ScheduleStatus.CANCELADO;
             case CONFIRMADO -> ScheduleStatus.RESERVADO;
@@ -210,10 +221,48 @@ public class BookingService {
             case REPROGRAMAR -> ScheduleStatus.DISPONIBLE;
         };
 
-        booking.getSchedules().forEach(s -> s.setStatus(scheduleStatus));
-        scheduleRepository.saveAll(booking.getSchedules());
+        for (BookingServiceItem item : booking.getServiceItems()) {
+            item.setStatus(newStatus); // reflejar estado del booking en el ítem
+            item.getSchedule().setStatus(scheduleStatus);
+            scheduleRepository.save(item.getSchedule());
+        }
 
         bookingRepository.save(booking);
+        return mapper.toDTO(booking);
+    }
+
+    @Transactional
+    public BookingResponseDTO updateServiceItemStatus(Long itemId, BookingStatusEnum newStatus, User actor) throws MyException {
+        BookingServiceItem item = bookingServiceItemRepository.findById(itemId)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
+
+        Booking booking = item.getBooking();
+
+        boolean isOwner = booking.getOwner().equals(actor);
+        boolean isProfessional = item.getProfessional().equals(actor);
+
+        if (!isOwner && !isProfessional) {
+            throw new MyException("No tienes permisos para modificar este servicio");
+        }
+
+        if (item.getStatus() == BookingStatusEnum.CANCELADO || item.getStatus() == BookingStatusEnum.COMPLETADO) {
+            throw new MyException("No se puede modificar un servicio cancelado o completado");
+        }
+
+        item.setStatus(newStatus);
+
+        ScheduleStatus scheduleStatus = switch (newStatus) {
+            case CANCELADO -> ScheduleStatus.CANCELADO;
+            case CONFIRMADO -> ScheduleStatus.RESERVADO;
+            case PENDIENTE, PENDIENTE_REPROGRAMAR -> ScheduleStatus.PENDIENTE;
+            case COMPLETADO -> ScheduleStatus.EXPIRADO;
+            case REPROGRAMAR -> ScheduleStatus.DISPONIBLE;
+        };
+
+        item.getSchedule().setStatus(scheduleStatus);
+        scheduleRepository.save(item.getSchedule());
+        bookingServiceItemRepository.save(item);
+
         return mapper.toDTO(booking);
     }
 
@@ -221,83 +270,140 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new MyException("Reserva no encontrada"));
 
-            BookingDataByEmailDTO emailData = buildBookingEmailData(booking, sitter);
-            emailService.sendBookingConfirmationEmail(emailData);
+        List<BookingServiceItem> itemsDelSitter = booking.getServiceItems().stream()
+                .filter(item -> item.getProfessional().equals(sitter))
+                .toList();
 
-            return updateBookingStatus(bookingId, BookingStatusEnum.CONFIRMADO, sitter);
+        for (BookingServiceItem item : itemsDelSitter) {
+            confirmItem(item.getId(), sitter); // ya envía email por ítem
         }
 
-    public BookingResponseDTO cancelBooking(Long bookingId, User sitter, String reason) throws MyException {
+        return mapper.toDTO(booking);
+    }
+    @Transactional
+    public void confirmItem(Long itemId, User sitter) throws MyException {
+        BookingServiceItem item = bookingServiceItemRepository.findById(itemId)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
 
+        if (!item.getProfessional().equals(sitter)) {
+            throw new MyException("No tienes permisos para confirmar este servicio");
+        }
+
+        if (item.getStatus() == BookingStatusEnum.CANCELADO || item.getStatus() == BookingStatusEnum.COMPLETADO) {
+            throw new MyException("Este servicio ya no puede confirmarse");
+        }
+
+        item.setStatus(BookingStatusEnum.CONFIRMADO);
+        item.getSchedule().setStatus(ScheduleStatus.RESERVADO);
+
+        scheduleRepository.save(item.getSchedule());
+        bookingServiceItemRepository.save(item);
+
+        BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
+        emailService.sendBookingConfirmationEmail(emailData);
+    }
+
+
+    public BookingResponseDTO cancelBooking(Long bookingId, User sitter, String reason) throws MyException {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new MyException("Reserva no encontrada"));
 
-        BookingDataByEmailDTO emailData = buildBookingEmailData(booking, sitter);
-        emailService.sendBookingCancellationEmail(emailData, reason);
+        List<BookingServiceItem> itemsDelSitter = booking.getServiceItems().stream()
+                .filter(item -> item.getProfessional().equals(sitter))
+                .toList();
 
-        return updateBookingStatus(bookingId, BookingStatusEnum.CANCELADO, sitter);
+        for (BookingServiceItem item : itemsDelSitter) {
+            cancelItem(item.getId(), sitter, reason);
+        }
+
+        return mapper.toDTO(booking);
     }
+
+    @Transactional
+    public void cancelItem(Long itemId, User sitter, String reason) throws MyException {
+        BookingServiceItem item = bookingServiceItemRepository.findById(itemId)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
+
+        if (!item.getProfessional().equals(sitter)) {
+            throw new MyException("No tienes permisos para cancelar este servicio");
+        }
+
+        if (item.getStatus() == BookingStatusEnum.CANCELADO || item.getStatus() == BookingStatusEnum.COMPLETADO) {
+            throw new MyException("Este servicio ya no puede cancelarse");
+        }
+
+        item.setStatus(BookingStatusEnum.CANCELADO);
+        item.getSchedule().setStatus(ScheduleStatus.DISPONIBLE);
+
+        scheduleRepository.save(item.getSchedule());
+        bookingServiceItemRepository.save(item);
+
+        BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
+        emailService.sendBookingCancellationEmail(emailData, reason);
+    }
+
 
     //Metodo para que el sitter pueda reprogramar una reserva
     @Transactional
-    public BookingResponseDTO rescheduleBooking(Long bookingId, List<Long> newScheduleIds, User sitter) throws MyException {
-        //Validar y actualizar estado a REPROGRAMAR
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new MyException("Reserva no encontrada"));
+    public void rescheduleItem(Long itemId, Long newScheduleId, User sitter) throws MyException {
+        BookingServiceItem item = bookingServiceItemRepository.findById(itemId)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
 
-        if (!booking.getProfessionals().contains(sitter)) {
-            throw new MyException("No tienes permisos para reprogramar esta reserva");
+        if (!item.getProfessional().equals(sitter)) {
+            throw new MyException("No tienes permisos para reprogramar este servicio");
         }
 
-        if (booking.getStatus() != BookingStatusEnum.CONFIRMADO && booking.getStatus() != BookingStatusEnum.PENDIENTE) {
-            throw new MyException("Solo se pueden reprogramar reservas activas");
+        if (item.getStatus() != BookingStatusEnum.CONFIRMADO && item.getStatus() != BookingStatusEnum.PENDIENTE) {
+            throw new MyException("Solo se pueden reprogramar servicios activos");
         }
 
-        booking.setStatus(BookingStatusEnum.REPROGRAMAR);
-        bookingRepository.save(booking);
+        Schedule nuevoHorario = scheduleRepository.findById(newScheduleId)
+                .orElseThrow(() -> new MyException("Horario no encontrado"));
 
-        //Aplicar nuevos horarios y pasar a PENDIENTE_REPROGRAMAR
-        List<Schedule> nuevosHorarios = scheduleRepository.findAllById(newScheduleIds);
-        nuevosHorarios.forEach(s -> s.setStatus(ScheduleStatus.PENDIENTE));
-        scheduleRepository.saveAll(nuevosHorarios);
+        if (nuevoHorario.getStatus() != ScheduleStatus.DISPONIBLE) {
+            throw new MyException("El nuevo horario no está disponible");
+        }
 
-        booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.CANCELADO));
-        booking.setSchedules(nuevosHorarios);
+        // Cancelar el horario anterior
+        item.getSchedule().setStatus(ScheduleStatus.CANCELADO);
+        scheduleRepository.save(item.getSchedule());
 
-        booking.setStatus(BookingStatusEnum.PENDIENTE_REPROGRAMAR);
-        bookingRepository.save(booking);
+        // Asignar nuevo horario
+        nuevoHorario.setStatus(ScheduleStatus.PENDIENTE);
+        scheduleRepository.save(nuevoHorario);
 
-        BookingDataByEmailDTO emailData = buildBookingEmailData(booking, sitter);
-        System.out.println(emailData);
+        item.setSchedule(nuevoHorario);
+        item.setStatus(BookingStatusEnum.PENDIENTE_REPROGRAMAR);
+        bookingServiceItemRepository.save(item);
+
+        BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
         emailService.sendBookingRescheduleEmail(emailData);
-
-        return mapper.toDTO(booking);
     }
 
     //Metodo para que el dueño acepte la reprogramacion de la reserva
     @Transactional
-    public BookingResponseDTO respondToReschedule(Long bookingId, boolean accept, User owner) throws MyException {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new MyException("Reserva no encontrada"));
+    public void respondToItemReschedule(Long itemId, boolean accept, User owner) throws MyException {
+        BookingServiceItem item = bookingServiceItemRepository.findById(itemId)
+                .orElseThrow(() -> new MyException("Servicio no encontrado"));
 
-        if (!booking.getOwner().equals(owner)) {
+        if (!item.getBooking().getOwner().equals(owner)) {
             throw new MyException("Solo el dueño puede responder esta reprogramación");
         }
 
-        if (booking.getStatus() != BookingStatusEnum.PENDIENTE_REPROGRAMAR) {
-            throw new MyException("La reserva no está esperando reprogramación");
+        if (item.getStatus() != BookingStatusEnum.PENDIENTE_REPROGRAMAR) {
+            throw new MyException("Este servicio no está esperando reprogramación");
         }
 
         if (accept) {
-            booking.setStatus(BookingStatusEnum.CONFIRMADO);
+            item.setStatus(BookingStatusEnum.CONFIRMADO);
+            item.getSchedule().setStatus(ScheduleStatus.RESERVADO);
         } else {
-            booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.DISPONIBLE));
-            scheduleRepository.saveAll(booking.getSchedules());
-            booking.setStatus(BookingStatusEnum.CANCELADO); // o volver a PENDIENTE si querés permitir otro intento
+            item.setStatus(BookingStatusEnum.CANCELADO);
+            item.getSchedule().setStatus(ScheduleStatus.DISPONIBLE);
         }
 
-        bookingRepository.save(booking);
-        return mapper.toDTO(booking);
+        scheduleRepository.save(item.getSchedule());
+        bookingServiceItemRepository.save(item);
     }
 
     public List<BookingListDTO> getBookingsForUser(User user) {
@@ -306,7 +412,7 @@ public class BookingService {
         if (user.getRole() == Role.OWNER) {
             bookings = bookingRepository.findByOwnerId(user.getId());
         } else if (user.getRole() == Role.SITTER || user.getRole() == Role.ADMIN) {
-            bookings = bookingRepository.findByProfessionalsContaining(user);
+            bookings = bookingRepository.findByProfessional(user); // ✅ nueva query
         } else {
             bookings = List.of(); // o lanzar excepción si querés limitar
         }
@@ -316,23 +422,33 @@ public class BookingService {
                 .toList();
     }
 
+
     private BookingListDTO toSummaryDTO(Booking booking) {
+        // Obtener el primer ítem (puede ser el más próximo, el primero creado, etc.)
+        BookingServiceItem firstItem = booking.getServiceItems().stream()
+                .min(Comparator.comparing(item -> item.getSchedule().getEstablishedTime()))
+                .orElse(null);
+
+        String serviceLabel = firstItem != null
+                ? firstItem.getOffering().getName().getLabel()
+                : "Sin servicios";
+
+        Instant nextSession = firstItem != null
+                ? firstItem.getSchedule().getEstablishedTime()
+                : null;
+
         return new BookingListDTO(
                 booking.getId(),
                 booking.getPet().getName(),
-                booking.getOffering() != null ? booking.getOffering().getName().getLabel() : "Combo",
+                serviceLabel,
                 booking.getReservationDate(),
                 booking.getStatus(),
-                booking.getSchedules().stream()
-                        .map(Schedule::getEstablishedTime)
-                        .min(Comparator.naturalOrder())
-                        .orElse(null)
+                nextSession
         );
     }
 
-    public BookingDataByEmailDTO buildBookingEmailData(Booking booking, User sitter) {
-        Schedule schedule = booking.getSchedules().stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("La reserva no tiene horarios asignados"));
+    public BookingDataByEmailDTO buildServiceItemEmailData(BookingServiceItem item) {
+        Schedule schedule = item.getSchedule();
 
         Instant establishedTime = schedule.getEstablishedTime();
         LocalDate sessionDate = establishedTime.atZone(ZoneId.systemDefault()).toLocalDate();
@@ -342,10 +458,10 @@ public class BookingService {
         LocalTime endTime = startTime.plusMinutes(durationMinutes);
 
         return new BookingDataByEmailDTO(
-                booking.getOwner().getEmail(),
-                booking.getOwner().getName(),
-                sitter.getName(),
-                booking.getPet().getName(),
+                item.getBooking().getOwner().getEmail(),
+                item.getBooking().getOwner().getName(),
+                item.getProfessional().getName(),
+                item.getBooking().getPet().getName(),
                 sessionDate.toString(),
                 startTime.toString(),
                 endTime.toString()

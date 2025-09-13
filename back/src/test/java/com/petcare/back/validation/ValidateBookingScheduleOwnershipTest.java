@@ -1,6 +1,7 @@
 package com.petcare.back.validation;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
+import com.petcare.back.domain.dto.request.BookingServiceItemCreateDTO;
 import com.petcare.back.domain.entity.Schedule;
 import com.petcare.back.domain.entity.ScheduleConfig;
 import com.petcare.back.domain.entity.User;
@@ -16,12 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
-class ValidateBookingScheduleOwnershipTest {
+class ValidateBookingServiceItemScheduleOwnershipTest {
 
     @InjectMocks
-    private ValidateBookingScheduleOwnership validator;
+    private ValidateBookingServiceItemScheduleOwnership validator;
 
     @Mock
     private ScheduleRepository scheduleRepository;
@@ -39,11 +39,8 @@ class ValidateBookingScheduleOwnershipTest {
         schedule.setScheduleId(100L);
         schedule.setScheduleConfig(config);
 
-        BookingCreateDTO dto = new BookingCreateDTO(
-                1L, null, null,
-                List.of(100L), // scheduleIds
-                List.of(1L)    // profesionales seleccionados
-        );
+        BookingServiceItemCreateDTO itemDTO = new BookingServiceItemCreateDTO(1L, 100L, 1L); // offeringId, scheduleId, professionalId
+        BookingCreateDTO dto = new BookingCreateDTO(1L, 0L, List.of(itemDTO)); // petId, comboId, items
 
         Mockito.when(scheduleRepository.findAllById(List.of(100L)))
                 .thenReturn(List.of(schedule));
@@ -65,11 +62,8 @@ class ValidateBookingScheduleOwnershipTest {
         schedule.setScheduleId(101L);
         schedule.setScheduleConfig(config);
 
-        BookingCreateDTO dto = new BookingCreateDTO(
-                1L, null, null,
-                List.of(101L),
-                List.of(1L)
-        );
+        BookingServiceItemCreateDTO itemDTO = new BookingServiceItemCreateDTO(1L, 101L, 1L);
+        BookingCreateDTO dto = new BookingCreateDTO(1L, 0L, List.of(itemDTO));
 
         Mockito.when(scheduleRepository.findAllById(List.of(101L)))
                 .thenReturn(List.of(schedule));

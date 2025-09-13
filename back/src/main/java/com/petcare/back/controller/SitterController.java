@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -242,20 +243,72 @@ public class SitterController {
     }
 
     @Operation(
-            summary = "Proponer reprogramación",
-            description = "Permite al profesional modificar los horarios de una reserva activa. El dueño deberá aceptar o rechazar la propuesta"
+            summary = "Proponer reprogramación de un servicio",
+            description = "Permite al profesional modificar el horario de un ítem activo. El dueño deberá aceptar o rechazar la propuesta"
     )
-    @PutMapping("/booking/{id}/reschedule")
-    public ResponseEntity<?> rescheduleBooking(
-            @PathVariable Long id,
-            @RequestBody List<Long> newScheduleIds
+    @PutMapping("/booking/item/{itemId}/reschedule")
+    public ResponseEntity<?> rescheduleItem(
+            @PathVariable Long itemId,
+            @RequestParam Long newScheduleId
     ) {
         User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {
-            BookingResponseDTO response = bookingService.rescheduleBooking(id, newScheduleIds, sitter);
-            return ResponseEntity.ok(response);
+            bookingService.rescheduleItem(itemId, newScheduleId, sitter);
+            return ResponseEntity.ok(Map.of("status", "Propuesta de reprogramación de horario enviada"));
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Operation(
+            summary = "Confirmar ítem de reserva",
+            description = "Permite confirmar un ítem específico dentro de una reserva, validando el rol del profesional y actualizando el estado."
+    )
+    @PutMapping("/booking/item/{itemId}/confirm")
+    public ResponseEntity<?> confirmItem(@PathVariable Long itemId, @AuthenticationPrincipal User sitter) {
+        try {
+            bookingService.confirmItem(itemId, sitter);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Ítem confirmado con éxito"
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Cancelar ítem de reserva",
+            description = "Permite cancelar un ítem específico dentro de una reserva, registrando el motivo y actualizando el estado."
+    )
+    @PutMapping("/booking/item/{itemId}/cancel")
+    public ResponseEntity<?> cancelItem(@PathVariable Long itemId,
+                                        @AuthenticationPrincipal User sitter,
+                                        @RequestParam String reason) {
+        try {
+            bookingService.cancelItem(itemId, sitter, reason);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Ítem cancelado con éxito"
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
         }
     }
 }

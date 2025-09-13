@@ -1,6 +1,7 @@
 package com.petcare.back.validation;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
+import com.petcare.back.domain.dto.request.BookingServiceItemCreateDTO;
 import com.petcare.back.domain.entity.Offering;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
@@ -9,7 +10,11 @@ import com.petcare.back.repository.OfferingRepository;
 import com.petcare.back.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class ValidateBookingOfferingRoleCoverage implements ValidationBooking {
@@ -25,21 +30,37 @@ public class ValidateBookingOfferingRoleCoverage implements ValidationBooking {
 
     @Override
     public void validate(BookingCreateDTO data) throws MyException {
-        if (data.offeringId() == null || data.professionals() == null) return;
+        if (data.items() == null || data.items().isEmpty()) return;
 
-        Offering offering = offeringRepository.findById(data.offeringId())
-                .orElseThrow(() -> new MyException("El servicio seleccionado no existe"));
+        Set<Long> professionalIds = data.items().stream()
+                .map(BookingServiceItemCreateDTO::professionalId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
-        ProfessionalRoleEnum requiredRole = offering.getAllowedRole();
+        Map<Long, User> professionals = userRepository.findAllById(professionalIds).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
 
-        List<User> professionals = userRepository.findAllById(data.professionals());
+        for (BookingServiceItemCreateDTO item : data.items()) {
+            Long offeringId = item.offeringId();
+            Long professionalId = item.professionalId();
 
-        boolean cubierto = professionals.stream()
-                .anyMatch(p -> p.getProfessionalRoles().contains(requiredRole));
+            if (offeringId == null || professionalId == null) continue;
 
-        if (!cubierto) {
-            throw new MyException("El servicio " + offering.getName().getLabel() +
-                    " requiere al menos un profesional con rol " + requiredRole.name());
+            Offering offering = offeringRepository.findById(offeringId)
+                    .orElseThrow(() -> new MyException("El servicio con ID " + offeringId + " no existe"));
+
+            User professional = professionals.get(professionalId);
+            if (professional == null) {
+                throw new MyException("El profesional con ID " + professionalId + " no existe");
+            }
+
+            ProfessionalRoleEnum requiredRole = offering.getAllowedRole();
+            if (!professional.getProfessionalRoles().contains(requiredRole)) {
+                throw new MyException("El servicio " + offering.getName().getLabel() +
+                        " requiere un profesional con rol " + requiredRole.name() +
+                        ", pero " + professional.getName() + " no lo tiene");
+            }
         }
     }
+
 }
