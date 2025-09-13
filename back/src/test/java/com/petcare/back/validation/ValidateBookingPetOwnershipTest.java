@@ -25,6 +25,7 @@ class ValidateBookingPetOwnershipTest {
 
     @Mock
     PetRepository petRepository;
+
     @InjectMocks
     ValidateBookingPetOwnership validator;
 
@@ -34,7 +35,8 @@ class ValidateBookingPetOwnershipTest {
         Pet pet = new Pet(); pet.setId(10L); pet.setOwner(owner);
 
         SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(owner, null));
-        BookingCreateDTO dto = new BookingCreateDTO(10L, null, null, List.of(1L), List.of());
+
+        BookingCreateDTO dto = new BookingCreateDTO(10L, null, List.of()); // petId, comboId, items
 
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
 
@@ -43,7 +45,8 @@ class ValidateBookingPetOwnershipTest {
 
     @Test
     void shouldThrowWhenPetDoesNotExist() {
-        BookingCreateDTO dto = new BookingCreateDTO(99L, null, null, List.of(1L), List.of());
+        BookingCreateDTO dto = new BookingCreateDTO(99L, null, List.of());
+
         when(petRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(MyException.class, () -> validator.validate(dto));
@@ -56,10 +59,12 @@ class ValidateBookingPetOwnershipTest {
         Pet pet = new Pet(); pet.setId(10L); pet.setOwner(other);
 
         SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(owner, null));
-        BookingCreateDTO dto = new BookingCreateDTO(10L, null, null, List.of(1L), List.of());
+
+        BookingCreateDTO dto = new BookingCreateDTO(10L, null, List.of());
 
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
 
         assertThrows(MyException.class, () -> validator.validate(dto));
     }
 }
+

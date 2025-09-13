@@ -18,11 +18,12 @@ public class TestDataFactory {
 
     public static User mockSitter(Long id) {
         User user = new User();
-        user.setId(id);
+        user.setId(id); // ← esto es clave
         user.setRole(Role.SITTER);
         user.setProfessionalRoles(List.of(ProfessionalRoleEnum.CUIDADOR));
         return user;
     }
+
 
     public static Offering mockOffering(Long id, OfferingEnum name, String description) {
         return new Offering(
@@ -149,4 +150,5 @@ public class TestDataFactory {
                 turns
         );
     }
+
 }

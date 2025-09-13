@@ -14,13 +14,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("""
     SELECT b FROM Booking b
+    JOIN b.serviceItems i
     WHERE b.status = 'COMPLETED'
       AND (
-        (b.owner.id = :authorId AND :target MEMBER OF b.professionals)
+        (b.owner.id = :authorId AND i.professional = :target)
         OR
-        (b.owner.id = :targetId AND :author MEMBER OF b.professionals)
+        (b.owner.id = :targetId AND i.professional = :author)
       )
-""")
+    """)
     List<Booking> findCompletedBookingsBetweenUsers(
             @Param("authorId") Long authorId,
             @Param("targetId") Long targetId,
@@ -29,15 +30,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     );
 
     @Query("""
-    SELECT COUNT(b) 
-    FROM Booking b 
-    JOIN b.professionals p 
-    WHERE b.owner.id = :ownerId 
-      AND p.id = :sitterId
-""")
+    SELECT COUNT(b)
+    FROM Booking b
+    JOIN b.serviceItems i
+    WHERE b.owner.id = :ownerId
+      AND i.professional.id = :sitterId
+    """)
     int countByOwnerAndSitter(@Param("ownerId") Long ownerId, @Param("sitterId") Long sitterId);
 
     List<Booking> findByOwnerId(Long id);
 
-    List<Booking> findByProfessionalsContaining(User user);
+    @Query("""
+    SELECT DISTINCT b
+    FROM Booking b
+    JOIN b.serviceItems i
+    WHERE i.professional = :user
+""")
+    List<Booking> findByProfessional(@Param("user") User user);
 }

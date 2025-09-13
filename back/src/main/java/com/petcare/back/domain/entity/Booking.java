@@ -35,21 +35,12 @@ public class Booking {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-    @ManyToMany
-    @JoinTable(
-            name = "booking_professionals",
-            joinColumns = @JoinColumn(name = "booking_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> professionals = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "offering_id")
-    private Offering offering;
-
     @ManyToOne
     @JoinColumn(name = "combo_offering_id")
     private ComboOffering comboOffering;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookingServiceItem> serviceItems = new ArrayList<>();
 
     @ManyToOne
     private Incidents incidents;

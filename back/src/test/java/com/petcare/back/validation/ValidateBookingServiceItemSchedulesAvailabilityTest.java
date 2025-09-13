@@ -1,6 +1,7 @@
 package com.petcare.back.validation;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
+import com.petcare.back.domain.dto.request.BookingServiceItemCreateDTO;
 import com.petcare.back.domain.entity.Schedule;
 import com.petcare.back.domain.enumerated.ScheduleStatus;
 import com.petcare.back.exception.MyException;
@@ -18,19 +19,23 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-class ValidateBookingSchedulesAvailabilityTest {
+class ValidateBookingServiceItemSchedulesAvailabilityTest {
 
     @Mock
     ScheduleRepository scheduleRepository;
+
     @InjectMocks
-    ValidateBookingSchedulesAvailability validator;
+    ValidateBookingServiceItemSchedulesAvailability validator;
 
     @Test
     void shouldPassWhenAllSchedulesAreAvailable() throws MyException {
         Schedule s1 = new Schedule(); s1.setScheduleId(1L); s1.setStatus(ScheduleStatus.DISPONIBLE);
         Schedule s2 = new Schedule(); s2.setScheduleId(2L); s2.setStatus(ScheduleStatus.DISPONIBLE);
 
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, List.of(1L, 2L), List.of());
+        BookingServiceItemCreateDTO item1 = new BookingServiceItemCreateDTO(1L, 1L, 10L);
+        BookingServiceItemCreateDTO item2 = new BookingServiceItemCreateDTO(2L, 2L, 11L);
+        BookingCreateDTO dto = new BookingCreateDTO(1L, 0L, List.of(item1, item2));
+
         when(scheduleRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(s1, s2));
 
         assertDoesNotThrow(() -> validator.validate(dto));
@@ -39,7 +44,9 @@ class ValidateBookingSchedulesAvailabilityTest {
     @Test
     void shouldThrowWhenSomeSchedulesAreUnavailable() {
         Schedule s1 = new Schedule(); s1.setScheduleId(1L); s1.setStatus(ScheduleStatus.RESERVADO);
-        BookingCreateDTO dto = new BookingCreateDTO(1L, null, null, List.of(1L), List.of());
+
+        BookingServiceItemCreateDTO item = new BookingServiceItemCreateDTO(1L, 1L, 10L);
+        BookingCreateDTO dto = new BookingCreateDTO(1L, 0L, List.of(item));
 
         when(scheduleRepository.findAllById(List.of(1L))).thenReturn(List.of(s1));
 

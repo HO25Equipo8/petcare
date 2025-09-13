@@ -9,8 +9,15 @@ public class ValidateBookingSchedulesNotEmpty implements ValidationBooking {
 
     @Override
     public void validate(BookingCreateDTO data) throws MyException {
-        if (data.scheduleIds() == null || data.scheduleIds().isEmpty()) {
-            throw new MyException("Debés seleccionar al menos un horario para la reserva");
+        if (data.items() == null || data.items().isEmpty()) {
+            throw new MyException("Debés agregar al menos un servicio a la reserva");
+        }
+
+        boolean algunoSinHorario = data.items().stream()
+                .anyMatch(item -> item.scheduleId() == null);
+
+        if (algunoSinHorario) {
+            throw new MyException("Todos los servicios deben tener un horario asignado");
         }
     }
 }

@@ -145,7 +145,7 @@ public class UserService {
                 tieneFotosVerificacion;
 
         user.setProfileComplete(completo);
-        user.setVerified(user.getRole() == Role.OWNER);
+        user.setVerified(user.getRole() != Role.SITTER);
 
         return userRepository.save(user);
     }

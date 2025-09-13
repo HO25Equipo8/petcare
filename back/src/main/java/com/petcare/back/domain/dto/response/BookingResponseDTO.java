@@ -8,14 +8,12 @@ import java.util.List;
 
 public record BookingResponseDTO(
         Long id,
-        String ownerName,                // nombre del dueño
-        String petName,                  // nombre de la mascota
-        String offeringName,             // nombre del servicio
-        String comboOfferingName,        // nombre del combo, si aplica
-        List<String> scheduleDescription,      // descripción o rango horario
+        String ownerName,
+        String petName,
+        String comboOfferingName,
         Instant reservationDate,
         BookingStatusEnum status,
         BigDecimal finalPrice,
-        List<String> professionalNames
+        List<ServiceItemResponseDTO> items
 ) {
 }

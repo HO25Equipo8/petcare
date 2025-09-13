@@ -1,6 +1,7 @@
 package com.petcare.back.validation;
 
 import com.petcare.back.domain.entity.Booking;
+import com.petcare.back.domain.entity.BookingServiceItem;
 import com.petcare.back.domain.entity.ServiceSession;
 import com.petcare.back.domain.entity.User;
 import jakarta.validation.ValidationException;
@@ -24,7 +25,10 @@ class ValidateSessionServicesUserOwnershipTest {
 
         Booking booking = new Booking();
         booking.setOwner(other);
-        booking.setProfessionals(List.of(other)); // user no está
+
+        BookingServiceItem item = new BookingServiceItem();
+        item.setProfessional(other);
+        booking.setServiceItems(List.of(item)); // user no está
 
         ServiceSession session = new ServiceSession();
         session.setBooking(booking);
@@ -37,9 +41,14 @@ class ValidateSessionServicesUserOwnershipTest {
     @Test
     void shouldPassIfUserIsOwner() {
         User user = new User(); // el dueño
+        user.setId(1L);
+
         Booking booking = new Booking();
         booking.setOwner(user);
-        booking.setProfessionals(List.of(new User())); // ✅ lista válida
+
+        BookingServiceItem item = new BookingServiceItem();
+        item.setProfessional(new User()); // cualquier profesional
+        booking.setServiceItems(List.of(item));
 
         ServiceSession session = new ServiceSession();
         session.setBooking(booking);
@@ -50,9 +59,14 @@ class ValidateSessionServicesUserOwnershipTest {
     @Test
     void shouldPassIfUserIsProfessional() {
         User user = new User(); // el profesional
+        user.setId(1L);
+
         Booking booking = new Booking();
         booking.setOwner(new User());
-        booking.setProfessionals(List.of(user)); // ✅ está en la lista
+
+        BookingServiceItem item = new BookingServiceItem();
+        item.setProfessional(user); // ✅ está en el ítem
+        booking.setServiceItems(List.of(item));
 
         ServiceSession session = new ServiceSession();
         session.setBooking(booking);
