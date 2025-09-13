@@ -231,10 +231,10 @@ public class SitterController {
             description = "Permite al profesional cancelar una reserva activa. Libera los horarios asignados"
     )
     @PutMapping("/booking/{id}/cancel")
-    public ResponseEntity<?> cancelBooking(@PathVariable Long id) {
+    public ResponseEntity<?> cancelBooking(@PathVariable Long id, @RequestBody String reason) {
         User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {
-            BookingResponseDTO response = bookingService.cancelBooking(id, sitter);
+            BookingResponseDTO response = bookingService.cancelBooking(id, sitter, reason);
             return ResponseEntity.ok(response);
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

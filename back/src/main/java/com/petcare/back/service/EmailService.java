@@ -1,5 +1,6 @@
 package com.petcare.back.service;
 
+import com.petcare.back.domain.dto.request.BookingDataByEmailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -83,6 +84,24 @@ public class EmailService {
             throw new RuntimeException("Error enviando email de confirmación: " + e.getMessage());
         }
     }
+    public void sendBookingConfirmationEmail(BookingDataByEmailDTO emailDTO) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(emailDTO.userEmail());
+            message.setSubject("Reserva Confirmada - PetCare");
+            message.setText(buildConfirmationMessage(
+                    emailDTO.ownerName(),
+                    emailDTO.professionalName(),
+                    emailDTO.petName(),
+                    emailDTO.sessionDate(),
+                    emailDTO.startTime(),
+                    emailDTO.endTime()));
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email de confirmación: " + e.getMessage());
+        }
+    }
 
     public void sendBookingCancellationEmail(String userEmail, String ownerName, String professionalName,
                                              String petName, String sessionDate, String startTime, String endTime, String reason) {
@@ -92,6 +111,25 @@ public class EmailService {
             message.setTo(userEmail);
             message.setSubject("Reserva Cancelada - PetCare");
             message.setText(buildCancellationMessage(ownerName, professionalName, petName, sessionDate, startTime, endTime, reason));
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email de cancelación: " + e.getMessage());
+        }
+    }
+    public void sendBookingCancellationEmail(BookingDataByEmailDTO emailDTO, String reason) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(emailDTO.userEmail());
+            message.setSubject("Reserva Cancelada - PetCare");
+            message.setText(buildCancellationMessage(
+                    emailDTO.ownerName(),
+                    emailDTO.professionalName(),
+                    emailDTO.petName(),
+                    emailDTO.sessionDate(),
+                    emailDTO.startTime(),
+                    emailDTO.endTime(),
+                    reason));
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("Error enviando email de cancelación: " + e.getMessage());
@@ -112,6 +150,24 @@ public class EmailService {
         }
     }
 
+    public void sendBookingRescheduleEmail(BookingDataByEmailDTO emailDTO) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(emailDTO.userEmail());
+            message.setSubject("Propuesta de Reprogramación - PetCare");
+            message.setText(buildRescheduleMessage(
+                    emailDTO.ownerName(),
+                    emailDTO.professionalName(),
+                    emailDTO.petName(),
+                    emailDTO.sessionDate(),
+                    emailDTO.startTime(),
+                    emailDTO.endTime()));
+            mailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Error enviando email de reprogramación: " + e.getMessage());
+        }
+    }
 
     private String buildWelcomeMessage(String userName) {
         return """

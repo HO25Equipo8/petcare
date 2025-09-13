@@ -1,6 +1,7 @@
 package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.BookingCreateDTO;
+import com.petcare.back.domain.dto.request.BookingDataByEmailDTO;
 import com.petcare.back.domain.dto.request.BookingSimulationRequestDTO;
 import com.petcare.back.domain.dto.response.BookingListDTO;
 import com.petcare.back.domain.dto.response.BookingResponseDTO;
@@ -25,6 +26,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +49,7 @@ public class BookingService {
     private final BookingResponseMapper mapper;
     private final BookingCreateMapper bookingCreateMapper;
     private final List<ValidationBooking> validations;
+    private final EmailService emailService;
 
 
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
@@ -175,8 +180,7 @@ public class BookingService {
                 return rule.getCategory();
             }
         }
-
-        return CustomerCategory.NORMAL; // o BASE si querés agregarlo como default
+        return CustomerCategory.NORMAL;
     }
 
     @Transactional
@@ -197,21 +201,40 @@ public class BookingService {
 
         booking.setStatus(newStatus);
 
-        // Si se cancela, liberar horarios
-        if (newStatus == BookingStatusEnum.CANCELADO) {
-            booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.DISPONIBLE));
-            scheduleRepository.saveAll(booking.getSchedules());
-        }
+        // 🔄 Sincronizar estado de horarios
+        ScheduleStatus scheduleStatus = switch (newStatus) {
+            case CANCELADO -> ScheduleStatus.CANCELADO;
+            case CONFIRMADO -> ScheduleStatus.RESERVADO;
+            case PENDIENTE, PENDIENTE_REPROGRAMAR -> ScheduleStatus.PENDIENTE;
+            case COMPLETADO -> ScheduleStatus.EXPIRADO;
+            case REPROGRAMAR -> ScheduleStatus.DISPONIBLE;
+        };
+
+        booking.getSchedules().forEach(s -> s.setStatus(scheduleStatus));
+        scheduleRepository.saveAll(booking.getSchedules());
 
         bookingRepository.save(booking);
         return mapper.toDTO(booking);
     }
 
     public BookingResponseDTO confirmBooking(Long bookingId, User sitter) throws MyException {
-        return updateBookingStatus(bookingId, BookingStatusEnum.CONFIRMADO, sitter);
-    }
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new MyException("Reserva no encontrada"));
 
-    public BookingResponseDTO cancelBooking(Long bookingId, User sitter) throws MyException {
+            BookingDataByEmailDTO emailData = buildBookingEmailData(booking, sitter);
+            emailService.sendBookingConfirmationEmail(emailData);
+
+            return updateBookingStatus(bookingId, BookingStatusEnum.CONFIRMADO, sitter);
+        }
+
+    public BookingResponseDTO cancelBooking(Long bookingId, User sitter, String reason) throws MyException {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new MyException("Reserva no encontrada"));
+
+        BookingDataByEmailDTO emailData = buildBookingEmailData(booking, sitter);
+        emailService.sendBookingCancellationEmail(emailData, reason);
+
         return updateBookingStatus(bookingId, BookingStatusEnum.CANCELADO, sitter);
     }
 
@@ -238,11 +261,15 @@ public class BookingService {
         nuevosHorarios.forEach(s -> s.setStatus(ScheduleStatus.PENDIENTE));
         scheduleRepository.saveAll(nuevosHorarios);
 
-        booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.DISPONIBLE));
+        booking.getSchedules().forEach(s -> s.setStatus(ScheduleStatus.CANCELADO));
         booking.setSchedules(nuevosHorarios);
 
         booking.setStatus(BookingStatusEnum.PENDIENTE_REPROGRAMAR);
         bookingRepository.save(booking);
+
+        BookingDataByEmailDTO emailData = buildBookingEmailData(booking, sitter);
+        System.out.println(emailData);
+        emailService.sendBookingRescheduleEmail(emailData);
 
         return mapper.toDTO(booking);
     }
@@ -300,6 +327,28 @@ public class BookingService {
                         .map(Schedule::getEstablishedTime)
                         .min(Comparator.naturalOrder())
                         .orElse(null)
+        );
+    }
+
+    public BookingDataByEmailDTO buildBookingEmailData(Booking booking, User sitter) {
+        Schedule schedule = booking.getSchedules().stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("La reserva no tiene horarios asignados"));
+
+        Instant establishedTime = schedule.getEstablishedTime();
+        LocalDate sessionDate = establishedTime.atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalTime startTime = establishedTime.atZone(ZoneId.systemDefault()).toLocalTime();
+
+        int durationMinutes = schedule.getScheduleConfig().getServiceDurationMinutes();
+        LocalTime endTime = startTime.plusMinutes(durationMinutes);
+
+        return new BookingDataByEmailDTO(
+                booking.getOwner().getEmail(),
+                booking.getOwner().getName(),
+                sitter.getName(),
+                booking.getPet().getName(),
+                sessionDate.toString(),
+                startTime.toString(),
+                endTime.toString()
         );
     }
 

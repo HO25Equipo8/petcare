@@ -71,7 +71,29 @@ public class UserProfileService {
         // Asignar al usuario y guardar
         user.setProfilePhoto(img);
         userRepository.save(user);
+
+        // ✅ Verificación de imágenes
+        boolean tieneFotoPerfil = user.getProfilePhoto() != null;
+
+        boolean tieneFotosVerificacion = true;
+        if (user.getRole() == Role.SITTER) {
+            int cantidadFotos = imageRepository.countByUserId(user.getId());
+            tieneFotosVerificacion = cantidadFotos > 0;
+        }
+
+        // ✅ Estado del perfil
+        boolean completo = user.getName() != null &&
+                user.getPhone() != null &&
+                user.getLocation() != null &&
+                tieneFotoPerfil &&
+                tieneFotosVerificacion;
+
+        user.setProfileComplete(completo);
+        if (completo){
+            user.setVerified(true);
+        }
     }
+
     public void updateProfilePhoto(MultipartFile file) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) auth.getPrincipal();
@@ -97,6 +119,27 @@ public class UserProfileService {
         if (user.getProfilePhoto() == null) {
             user.setProfilePhoto(image);
             userRepository.save(user);
+        }
+
+        // ✅ Verificación de imágenes
+        boolean tieneFotoPerfil = user.getProfilePhoto() != null;
+
+        boolean tieneFotosVerificacion = true;
+        if (user.getRole() == Role.SITTER) {
+            int cantidadFotos = imageRepository.countByUserId(user.getId());
+            tieneFotosVerificacion = cantidadFotos > 0;
+        }
+
+        // ✅ Estado del perfil
+        boolean completo = user.getName() != null &&
+                user.getPhone() != null &&
+                user.getLocation() != null &&
+                tieneFotoPerfil &&
+                tieneFotosVerificacion;
+
+        user.setProfileComplete(completo);
+        if (completo){
+            user.setVerified(true);
         }
     }
 
