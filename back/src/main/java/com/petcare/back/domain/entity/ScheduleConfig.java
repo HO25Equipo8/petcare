@@ -53,6 +53,9 @@ public class ScheduleConfig {
     @Column(nullable = false)
     private Boolean active;
 
+    @OneToMany(mappedBy = "scheduleConfig", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -60,6 +63,10 @@ public class ScheduleConfig {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public boolean isActive() {
+        return active;
+    }
 }
 
 
