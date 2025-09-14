@@ -279,12 +279,12 @@ spring.jpa.show-sql=true
 
 Developed by **Team 8** at **Hackathon One**.
 
-| Role                                | Name            | GitHub                                         |                                                                         |
-|-------------------------------------|-----------------|------------------------------------------------|---------------------------------------------------------------------------------|
-| Frontend Developer                  | Julio Sosa      | [@juliopzsosa](https://github.com/juliopzsosa) | [Profile](https://linkedin.com/in/profile)                                      |
-| Backend Developer                   | Leo Amaya       | [@LEONISPE](https://github.com/LEONISPE)       | [Profile](https://linkedin.com/in/profile)                                      |
-| Backend Developer                   | Martin Di Peco  | [@username](https://github.com/username)       | [Profile](https://linkedin.com/in/profile)                                      |
-| Backend Developer & Project Manager | Julia Rodriguez | [@JuliaDaniR](https://github.com/JuliaDaniR)       | [Julia Daniela Rodriguez](https://www.linkedin.com/in/julia-daniela-rodriguez/) |
+| Role                                | Name            | GitHub                                           |                                                                                 |
+|-------------------------------------|-----------------|--------------------------------------------------|---------------------------------------------------------------------------------|
+| Frontend Developer                  | Julio Sosa      | [@juliopzsosa](https://github.com/juliopzsosa)   | [Julio Paz Sosa](https://www.linkedin.com/in/juliopzsosa/)                      |
+| Backend Developer                   | Leo Amaya       | [@LEONISPE](https://github.com/LEONISPE)         | [Leo Moises Nisperuza Amaya](https://linkedin.com/in/profile)                   |
+| Backend Developer                   | Martin Di Peco  | [@martindipeco](https://github.com/martindipeco) | [Martín Di Peco](https://linkedin.com/in/martindipeco)                          |
+| Backend Developer & Project Manager | Julia Rodriguez | [@JuliaDaniR](https://github.com/JuliaDaniR)     | [Julia Daniela Rodriguez](https://www.linkedin.com/in/julia-daniela-rodriguez/) |
 
 ## 🎉 Acknowledgments
 
