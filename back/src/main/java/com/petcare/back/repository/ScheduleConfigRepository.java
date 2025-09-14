@@ -55,4 +55,6 @@ public interface ScheduleConfigRepository extends JpaRepository<ScheduleConfig, 
             @Param("newStart") LocalTime newStart,
             @Param("newEnd") LocalTime newEnd
     );
+
+    List<ScheduleConfig> findBySitterId(Long id);
 }

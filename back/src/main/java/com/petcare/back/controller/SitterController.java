@@ -3,12 +3,16 @@ package com.petcare.back.controller;
 import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.PlanDiscountRule;
+import com.petcare.back.domain.entity.ScheduleConfig;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.OfferingVariantDescriptionEnum;
+import com.petcare.back.domain.enumerated.ScheduleStatus;
+import com.petcare.back.domain.enumerated.WeekDayEnum;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +90,127 @@ public class SitterController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "error",
                     "message", "No se pudo obtener el estado de la configuración"
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Listar todas las configuraciones horarias propias",
+            description = "Devuelve todas las configuraciones horarias registradas por el profesional autenticado, incluyendo turnos y cantidad de horarios generados."
+    )
+    @GetMapping("/schedule/config/all")
+    public ResponseEntity<?> getAllScheduleConfigs() {
+        try {
+            List<ScheduleConfigResponseDTO> configs = scheduleConfigService.getAllConfigsBySitter();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "data", configs
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    @Operation(
+            summary = "Eliminar configuración horaria",
+            description = "Desactiva la configuración horaria actual del profesional, eliminando los horarios futuros no reservados."
+    )
+    @DeleteMapping("/schedule/config/{id}/desactivate")
+    public ResponseEntity<?> deleteScheduleConfig(@PathVariable Long id, @AuthenticationPrincipal User sitter) {
+        try {
+            scheduleConfigService.deactivateConfig(id, sitter);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Configuración horaria eliminada correctamente"
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    @Operation(
+            summary = "Activar configuración horaria",
+            description = "Activa una configuración horaria previamente desactivada y regenera los horarios futuros según sus turnos."
+    )
+    @PutMapping("/schedule/config/{id}/activate")
+    public ResponseEntity<?> activateScheduleConfig(@PathVariable Long id, @AuthenticationPrincipal User sitter) {
+        try {
+            ScheduleConfigResponseDTO config = scheduleConfigService.activateConfig(id, sitter);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Configuración activada y horarios generados con éxito",
+                    "data", config
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
+        }
+    }
+
+    @PutMapping("/schedule/{id}/reschedule")
+    public ResponseEntity<?> reschedule(@PathVariable Long id,
+                                        @RequestBody @Valid ScheduleRescheduleDTO dto,
+                                        @AuthenticationPrincipal User sitter) {
+        try {
+            ScheduleResponseDTO updated = scheduleConfigService.reschedule(id, dto, sitter);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Horario reprogramado con éxito",
+                    "data", updated
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    @GetMapping("/schedule/config/visual")
+    public ResponseEntity<?> getVisualConfigs() {
+        try {
+            List<Map<String, Object>> visualBlocks = scheduleConfigService.getVisualBlocks();
+            return ResponseEntity.ok(Map.of("status", "success", "data", visualBlocks));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("status", "error", "message", "Error interno del servidor"));
+        }
+    }
+
+    @PostMapping("/schedule/config/{id}/duplicate")
+    public ResponseEntity<?> duplicateConfig(@PathVariable Long id,
+                                             @AuthenticationPrincipal User sitter) {
+        try {
+            ScheduleConfigResponseDTO duplicated = scheduleConfigService.duplicateConfig(id, sitter);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Configuración duplicada con éxito",
+                    "data", duplicated
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
             ));
         }
     }
@@ -339,13 +465,20 @@ public class SitterController {
 
     @Operation(
             summary = "Listar reglas de descuento del profesional",
-            description = "Devuelve las reglas de descuento creadas por el profesional autenticado, con sus condiciones y valores."
+            description = "Devuelve las reglas de descuento creadas por el profesional autenticado, con sus condiciones y valores.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Listado exitoso de reglas de descuento"),
+                    @ApiResponse(responseCode = "400", description = "Error de validación o rol no autorizado")
+            }
     )
     @GetMapping("/list/discount/rule")
-    public ResponseEntity<?> getRulesForSitter() throws MyException {
+    public ResponseEntity<Map<String, Object>> getRulesForSitter() throws MyException {
+        List<PlanDiscountRuleResponseDTO> rules = planDiscountRuleService.getRulesForSitter();
+
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "data", planDiscountRuleService.getRulesForSitter()
+                "data", rules,
+                "count", rules.size()
         ));
     }
 

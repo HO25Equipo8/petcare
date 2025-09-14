@@ -5,6 +5,7 @@ import com.petcare.back.domain.dto.response.PlanDiscountRuleResponseDTO;
 import com.petcare.back.domain.entity.PlanDiscountRule;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.Role;
+import com.petcare.back.domain.mapper.response.PlanDiscountRuleMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PlanDiscountRuleRepository;
 import com.petcare.back.validation.ValidationPlanDiscountRule;
@@ -21,6 +22,7 @@ public class PlanDiscountRuleService {
 
     private final PlanDiscountRuleRepository repository;
     private final List<ValidationPlanDiscountRule> validationPlanDiscountRules;
+    private final PlanDiscountRuleMapper planDiscountRuleMapper;
 
     public PlanDiscountRuleResponseDTO createRule(PlanDiscountRuleDTO dto) throws MyException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -57,7 +59,7 @@ public class PlanDiscountRuleService {
         );
     }
 
-    public List<PlanDiscountRule> getRulesForSitter() throws MyException {
+    public List<PlanDiscountRuleResponseDTO> getRulesForSitter() throws MyException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
@@ -65,7 +67,10 @@ public class PlanDiscountRuleService {
             throw new MyException("Solo los profesionales pueden consultar sus reglas de descuento.");
         }
 
-        return repository.findBySitterId(user.getId());
+        return repository.findBySitterId(user.getId())
+                .stream()
+                .map(planDiscountRuleMapper::toDto)
+                .toList();
     }
 
     public void deleteRule(Long id) throws MyException {
