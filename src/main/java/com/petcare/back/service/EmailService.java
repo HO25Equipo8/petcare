@@ -71,19 +71,6 @@ public class EmailService {
         }
     }
 
-    public void sendBookingConfirmationEmail(String userEmail, String ownerName, String professionalName,
-                                             String petName, String sessionDate, String startTime, String endTime) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(userEmail);
-            message.setSubject("Reserva Confirmada - PetCare");
-            message.setText(buildConfirmationMessage(ownerName, professionalName, petName, sessionDate, startTime, endTime));
-            mailSender.send(message);
-        } catch (Exception e) {
-            throw new RuntimeException("Error enviando email de confirmación: " + e.getMessage());
-        }
-    }
     public void sendBookingConfirmationEmail(BookingDataByEmailDTO emailDTO) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -103,19 +90,6 @@ public class EmailService {
         }
     }
 
-    public void sendBookingCancellationEmail(String userEmail, String ownerName, String professionalName,
-                                             String petName, String sessionDate, String startTime, String endTime, String reason) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(userEmail);
-            message.setSubject("Reserva Cancelada - PetCare");
-            message.setText(buildCancellationMessage(ownerName, professionalName, petName, sessionDate, startTime, endTime, reason));
-            mailSender.send(message);
-        } catch (Exception e) {
-            throw new RuntimeException("Error enviando email de cancelación: " + e.getMessage());
-        }
-    }
     public void sendBookingCancellationEmail(BookingDataByEmailDTO emailDTO, String reason) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -133,20 +107,6 @@ public class EmailService {
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("Error enviando email de cancelación: " + e.getMessage());
-        }
-    }
-
-    public void sendBookingRescheduleEmail(String userEmail, String ownerName, String professionalName,
-                                           String petName, String newDate, String newStartTime, String newEndTime) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(userEmail);
-            message.setSubject("Propuesta de Reprogramación - PetCare");
-            message.setText(buildRescheduleMessage(ownerName, professionalName, petName, newDate, newStartTime, newEndTime));
-            mailSender.send(message);
-        } catch (Exception e) {
-            throw new RuntimeException("Error enviando email de reprogramación: " + e.getMessage());
         }
     }
 
