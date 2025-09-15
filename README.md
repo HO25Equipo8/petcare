@@ -289,7 +289,7 @@ Developed by **Team 8** at **Hackathon One**.
 
 ## 🎉 Acknowledgments
 
-- Thanks to **No Country** for organizing this amazing hackathon
+- Thanks to **No Country** and **Programa One** for organizing this amazing hackathon
 
 ## 📄 License
 
