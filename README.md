@@ -282,7 +282,7 @@ Developed by **Team 8** at **Hackathon One**.
 | Role                                | Name            | GitHub                                           |                                                                                 |
 |-------------------------------------|-----------------|--------------------------------------------------|---------------------------------------------------------------------------------|
 | Frontend Developer                  | Julio Sosa      | [@juliopzsosa](https://github.com/juliopzsosa)   | [Julio Paz Sosa](https://www.linkedin.com/in/juliopzsosa/)                      |
-| Backend Developer                   | Leo Amaya       | [@LEONISPE](https://github.com/LEONISPE)         | [Leo Moises Nisperuza Amaya](https://linkedin.com/in/profile)                   |
+| Backend Developer                   | Leo Amaya       | [@LEONISPE](https://github.com/LEONISPE)         | [Leo Moises Nisperuza Amaya](https://www.linkedin.com/in/leo-moises-nisperuza-amaya-19568434b/)                   |
 | Backend Developer                   | Martin Di Peco  | [@martindipeco](https://github.com/martindipeco) | [Martín Di Peco](https://linkedin.com/in/martindipeco)                          |
 | Backend Developer & Project Manager | Julia Rodriguez | [@JuliaDaniR](https://github.com/JuliaDaniR)     | [Julia Daniela Rodriguez](https://www.linkedin.com/in/julia-daniela-rodriguez/) |
 
