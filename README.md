@@ -1,6 +1,5 @@
-# 🐾 PetCare Platform
+# 🐾 PetCare Platform - Safe walk, pure love
 ## All-in-One for Pet Services
-## Safe walk, pure love
 
 ![Project Banner](https://drive.google.com/file/d/12Dtq7LIG3MWY6QgTcgaDY6dzhWtHb6J8/view?usp=drive_link)
 
