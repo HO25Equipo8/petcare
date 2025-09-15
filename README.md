@@ -1,6 +1,7 @@
-# 🐾 PetCare — All-in-One Platform for Pet Services
+# 🐾 PetCare Platform - Safe walk, pure love
+## All-in-One for Pet Services
 
-![Project Banner](https://drive.google.com/file/d/12Dtq7LIG3MWY6QgTcgaDY6dzhWtHb6J8/view?usp=drive_link)
+![Project Banner](https://drive.google.com/uc?export=view&id=11kW2FgUxDCXcID9i4w4IVnex5TZKZIqB)
 
 **PetCare** is a web application that connects pet owners with trusted animal care professionals (walkers, veterinarians, sitters, and more).
 It’s built to deliver a collaborative, visual, and emotionally engaging experience — with robust workflows, cross-layer validations, and a double-consent model for sensitive actions.
@@ -288,7 +289,7 @@ Developed by **Team 8** at **Hackathon One**.
 
 ## 🎉 Acknowledgments
 
-- Thanks to **No Country** for organizing this amazing hackathon
+- Thanks to **No Country** and **Programa One** for organizing this amazing hackathon
 
 ## 📄 License
 
