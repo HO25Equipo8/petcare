@@ -1,28 +1,28 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority"
-import { cn } from "../utils"
+import { cn } from "./cn"
 
 const ButtonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // Primary buttons (Verde) - para CTAs principales como "Reportar Incidente", "Guardar"
+        // Principales
         default: "bg-primary-cta text-white shadow hover:bg-primary-hover",
         primary: "bg-primary-cta text-white shadow hover:bg-primary-hover",
         
-        // Accent buttons (Amber) - para CTAs secundarios como "Solicitar Servicio", "Ver Más", "Dejar Reseña"
+        // Acento
         accent: "bg-accent-cta text-text-primary shadow hover:bg-accent-hover",
         secondary: "bg-accent-cta text-text-primary shadow hover:bg-accent-hover",
         
-        // Status buttons
+        // Status
         destructive: "bg-destructive-error text-white shadow-sm hover:bg-red-600",
         success: "bg-primary-cta text-white shadow-sm hover:bg-primary-hover",
         warning: "bg-warning-alert text-text-primary shadow-sm hover:bg-yellow-500",
         info: "bg-informational-info text-white shadow-sm hover:bg-blue-600",
         
-        // Utility buttons
+        // Utilitarios
         outline: "border border-dividers bg-surface-cards shadow-sm hover:bg-background-general hover:text-text-primary",
         ghost: "hover:bg-background-general hover:text-text-primary",
         link: "text-primary-cta underline-offset-4 hover:underline",

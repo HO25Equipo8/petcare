@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "../utils";
+import { cn } from "./cn";
 
 function Table({ className, ...props }) {
   return (

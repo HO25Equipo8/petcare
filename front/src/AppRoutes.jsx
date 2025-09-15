@@ -1,35 +1,35 @@
 
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { LandingPage } from './features/landing-page/LandingPage';
-import { OwnerDashboard } from './pages/OwnerDashboard';
-import { SitterDashboard } from './features/dashboard/sitter/Dashboard';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { PetProfiles } from './components/PetProfiles';
-import { CaregiverDirectory } from './components/CaregiverDirectory';
-import { LiveTracking } from './components/LiveTracking';
-import { BookingSystem } from './components/BookingSystem';
-import { IncidentManagement } from './components/IncidentManagement';
+import { HomePage } from './features/landing-page/Page';
+import { OwnerDashboard } from './features/dashboard/owner/NavItem';
+import { SitterDashboard } from './features/dashboard/sitter/NavItem';
+import { AdminDashboard } from './features/dashboard/admin/NavItem';
+import { PetProfiles } from './features/pet-profiles/NavItem';
+import { CaregiverDirectory } from './features/caregivers/NavItem';
+import { LiveTracking } from './features/tracking/NavItem';
+import { BookingSystem } from './features/booking/NavItem';
+import { IncidentManagement } from './features/incidents/NavItem';
 
 export function AppRoutes({ user, isLoggedIn, setShowAuthModal }) {
   const location = useLocation();
 
-  // Si no se inició sesión, mostrar landing page
+  // Si no loggeado, solo /home
   if (!isLoggedIn || !user) {
     return (
       <Routes>
-        <Route path="/home" element={<LandingPage onLogin={() => setShowAuthModal(true)} />} />
+        <Route path="/home" element={<HomePage onLogin={() => setShowAuthModal(true)} />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     );
   }
 
-  // Redirección a dashboard por rol
+  // Dashboard path por rol
   let dashboardPath = '/home';
   if (user.role === 'admin') dashboardPath = '/admin/dashboard';
   if (user.role === 'sitter') dashboardPath = '/sitter/dashboard';
   if (user.role === 'owner') dashboardPath = '/owner/dashboard';
 
-  // Si usuario está /home, redirigir a dashboard
+  // Si usuario en /home, redirigir a su dashboard
   if (location.pathname === '/home') {
     return <Navigate to={dashboardPath} replace />;
   }
@@ -38,7 +38,7 @@ export function AppRoutes({ user, isLoggedIn, setShowAuthModal }) {
   return (
     <Routes>
       {/* Home */}
-      <Route path="/home" element={<LandingPage onLogin={() => setShowAuthModal(true)} />} />
+      <Route path="/home" element={<HomePage onLogin={() => setShowAuthModal(true)} />} />
 
       {/* Admin */}
       {user.role === 'admin' && (

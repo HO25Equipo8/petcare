@@ -1,7 +1,6 @@
 import * as React from "react"
 import { cva } from "class-variance-authority"
-
-import { cn } from "../utils"
+import { cn } from "./cn"
 
 const alertVariants = cva(
   "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
@@ -10,7 +9,7 @@ const alertVariants = cva(
       variant: {
         default: "bg-surface-cards text-text-primary border-border-dividers",
         
-        // Status alerts según especificaciones
+        // Alertas por estado
         success: "border-primary-cta/50 bg-background-emphasis text-primary-cta [&>svg]:text-primary-cta",
         destructive: "border-destructive-error/50 bg-red-3 text-destructive-error [&>svg]:text-destructive-error",
         error: "border-destructive-error/50 bg-red-3 text-destructive-error [&>svg]:text-destructive-error",

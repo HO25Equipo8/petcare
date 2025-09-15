@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
-import { PetHeader } from './components/PetHeader';
+import { Header } from './shared/navigation/Header';
 import { AppRoutes } from './AppRoutes';
-import { AuthModal } from './features/auth/AuthModal';
+import { AuthModal } from './features/auth/Modal';
 import { BrowserRouter } from 'react-router-dom';
 import * as jwt_decode from 'jwt-decode';
 import { getProfile } from './features/dashboard/sitter/services/getProfile';
@@ -13,7 +12,7 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [loadingLogin, setLoadingLogin] = useState(false);
 
-  // Restaurar usuario desde localStorage si hay token
+  // Si JWT, decodificar y obtener perfil
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token && !isLoggedIn) {
@@ -65,7 +64,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-background-general">
-        <PetHeader 
+        <Header 
           isLoggedIn={isLoggedIn}
           user={user}
           onLogin={() => setShowAuthModal(true)}
