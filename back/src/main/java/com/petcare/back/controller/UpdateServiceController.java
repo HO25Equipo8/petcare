@@ -90,38 +90,4 @@ public class UpdateServiceController {
                 "incidentId", incidentId
         ));
     }
-
-    @Operation(
-            summary = "Cancelar sesión",
-            description = "Permite al cuidador (SITTER) cancelar una sesión en curso por motivos justificados. La sesión se marca como CANCELADA y se registra el motivo como actualización interna."
-    )
-    @PutMapping("/{id}/cancel")
-    public ResponseEntity<?> cancelSession(
-            @PathVariable Long id,
-            @RequestParam String reason
-    ) throws MyException {
-        ServiceSession session = updateSessionService.cancelSession(id, reason);
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "Sesión cancelada",
-                "data", ServiceSessionMapper.INSTANCE.toDto(session)
-        ));
-    }
-
-    @Operation(
-            summary = "Postergar sesión",
-            description = "Permite al cuidador (SITTER) postergar una sesión en curso por retrasos u otros motivos. La sesión se marca como POSTERGADA y se registra el motivo como actualización interna."
-    )
-    @PutMapping("/{id}/postpone")
-    public ResponseEntity<?> postponeSession(
-            @PathVariable Long id,
-            @RequestParam String reason
-    ) throws MyException {
-        ServiceSession session = updateSessionService.postponeSession(id, reason);
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "Sesión postergada",
-                "data", ServiceSessionMapper.INSTANCE.toDto(session)
-        ));
-    }
 }
