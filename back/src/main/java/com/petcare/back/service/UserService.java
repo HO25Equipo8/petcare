@@ -2,21 +2,27 @@ package com.petcare.back.service;
 
 import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.NearbySitterResponseDTO;
+import com.petcare.back.domain.dto.response.PetResponseDTO;
 import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
 import com.petcare.back.domain.entity.Location;
+import com.petcare.back.domain.entity.Pet;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.ProfessionalRoleEnum;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.mapper.response.NearbySitterResponseMapper;
+import com.petcare.back.domain.mapper.response.PetResponseMapper;
 import com.petcare.back.domain.mapper.response.UserUpdateResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.FeedbackRepository;
 import com.petcare.back.repository.ImageRepository;
+import com.petcare.back.repository.PetRepository;
 import com.petcare.back.repository.UserRepository;
 import com.petcare.back.validation.ValidationUserProfile;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +40,8 @@ public class UserService {
     private final NearbySitterResponseMapper responseMapper;
     private final UserUpdateResponseMapper userUpdateResponseMapper;
     private final FeedbackRepository feedbackRepository;
+    private final PetRepository petRepository;
+    private final PetResponseMapper petResponseMapper;
 
     @Transactional
     public User updateProfile(UserUpdateDTO dto) throws MyException {
@@ -161,7 +169,7 @@ public class UserService {
         return userRepository.findTopSittersByReputationNative(pageable);
     }
 
-    //Método para buscar profesionales según radio
+    //buscar profesionales según radio
     public List<NearbySitterResponseDTO> findNearbySitters(double radiusKm) throws MyException {
         User owner = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Location location = owner.getLocation();
@@ -223,5 +231,18 @@ public class UserService {
                 roles,
                 feedbackCount
         );
+    }
+
+    public Page<PetResponseDTO> findPetsOfAuthenticatedOwner(Pageable pageable) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        if (user.getRole() != Role.OWNER) {
+            throw new IllegalArgumentException("Solo los OWNER pueden consultar sus mascotas");
+        }
+
+        Page<Pet> petsPage = petRepository.findAllByOwnerId(user.getId(), pageable);
+
+        return petsPage.map(p -> petResponseMapper.toDto(p));
     }
 }
