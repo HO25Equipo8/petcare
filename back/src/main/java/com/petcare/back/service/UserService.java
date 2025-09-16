@@ -245,4 +245,38 @@ public class UserService {
 
         return petsPage.map(p -> petResponseMapper.toDto(p));
     }
+
+    public List<User> getAllSitters() {
+        return userRepository.findByRole(Role.SITTER);
+    }
+
+    public List<User> getActiveSitters() {
+        return userRepository.findByRoleAndActive(Role.SITTER, true);
+    }
+
+    public List<User> getAllOwners() {
+        return userRepository.findByRole(Role.OWNER);
+    }
+
+    public List<User> getActiveOwners() {
+        return userRepository.findByRoleAndActive(Role.OWNER, true);
+    }
+
+    @Transactional
+    public User activateUser(Long userId) throws MyException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new MyException("Usuario no encontrado"));
+
+        user.setActive(true);
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User deactivateUser(Long userId) throws MyException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new MyException("Usuario no encontrado"));
+
+        user.setActive(false);
+        return userRepository.save(user);
+    }
 }

@@ -306,4 +306,24 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
         }
     }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<?> activateUser(@PathVariable Long id) {
+        try {
+            User user = userService.activateUser(id);
+            return ResponseEntity.ok("Usuario " + user.getId() + " activado correctamente");
+        } catch (MyException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
+        try {
+            User user = userService.deactivateUser(id);
+            return ResponseEntity.ok("Usuario " + user.getId() + " desactivado correctamente");
+        } catch (MyException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

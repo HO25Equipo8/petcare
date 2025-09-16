@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByRole(Role role);
 
+    List<User> findByRoleAndActive(Role role, Boolean active);
+
     @Query(value = """
     SELECT u.* FROM users u
     LEFT JOIN feedbacks f ON f.target_id = u.id
