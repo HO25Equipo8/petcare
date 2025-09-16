@@ -12,6 +12,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -123,6 +127,17 @@ public class OwnerController {
     }
 
     @Operation(
+            summary = "Listar mis pets con paginación",
+            description = "Devuelve los pets del owner autenticado con soporte de paginación."
+    )
+    @GetMapping("/list/pets")
+    public ResponseEntity<Page<PetResponseDTO>> findAllPets(
+            @PageableDefault(size = 5, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(userService.findPetsOfAuthenticatedOwner(pageable));
+    }
+
+    @Operation(
             summary = "Listar combos de servicios",
             description = "Devuelve todos los combos registrados en el sistema, cada uno compuesto por múltiples servicios agrupados."
     )
@@ -135,7 +150,6 @@ public class OwnerController {
             summary = "Listar combos públicos de un profesional",
             description = "Devuelve todos los combos activos ofrecidos por el profesional indicado, visibles para dueños."
     )
-
     @GetMapping("/public/{sitterId}/combos")
     public ResponseEntity<?> verCombos(@PathVariable Long sitterId) {
         try {
@@ -151,6 +165,7 @@ public class OwnerController {
             ));
         }
     }
+
     @Operation(
             summary = "Listar servicios individuales de un profesional",
             description = "Devuelve todos los servicios activos ofrecidos por el profesional indicado, visibles para dueños."
