@@ -23,9 +23,8 @@ public class TrackingPoint {
 
     private Double latitude;
     private Double longitude;
-
     private LocalDateTime timestamp;
 
-    @Column(name = "booking_id")
-    private UUID bookingId; // referencia a la reserva
+    @Column(name = "session_id")
+    private Long sessionId;
 }

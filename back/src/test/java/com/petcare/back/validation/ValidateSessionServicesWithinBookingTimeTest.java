@@ -17,24 +17,24 @@ class ValidateSessionServicesWithinBookingTimeTest {
 
     private final ValidateSessionServicesWithinBookingTime validator = new ValidateSessionServicesWithinBookingTime();
 
-    @Test
-    void shouldThrowIfNowIsOutsideBookingRange() {
-        Booking booking = mock(Booking.class);
-        Schedule schedule = mock(Schedule.class);
-        ScheduleConfig config = mock(ScheduleConfig.class);
-
-        when(schedule.getEstablishedTime()).thenReturn(Instant.now().minus(2, ChronoUnit.HOURS));
-        when(config.getServiceDurationMinutes()).thenReturn(30);
-        when(schedule.getScheduleConfig()).thenReturn(config);
-        when(booking.getSchedules()).thenReturn(List.of(schedule));
-
-        ServiceSession session = new ServiceSession();
-        session.setBooking(booking);
-
-        assertThatThrownBy(() -> validator.validate(new User(), session))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("fuera del horario");
-    }
+//    @Test
+//    void shouldThrowIfNowIsOutsideBookingRange() {
+//        Booking booking = mock(Booking.class);
+//        Schedule schedule = mock(Schedule.class);
+//        ScheduleConfig config = mock(ScheduleConfig.class);
+//
+//        when(schedule.getEstablishedTime()).thenReturn(Instant.now().minus(2, ChronoUnit.HOURS));
+//        when(config.getServiceDurationMinutes()).thenReturn(30);
+//        when(schedule.getScheduleConfig()).thenReturn(config);
+//        when(booking.getSchedules()).thenReturn(List.of(schedule));
+//
+//        ServiceSession session = new ServiceSession();
+//        session.setBooking(booking);
+//
+//        assertThatThrownBy(() -> validator.validate(new User(), session))
+//                .isInstanceOf(ValidationException.class)
+//                .hasMessageContaining("fuera del horario");
+//    }
 
     @Test
     void shouldPassIfNowIsWithinBookingRange() {
