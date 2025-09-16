@@ -43,7 +43,7 @@ public class User implements UserDetails {
     private List<Pet> pets = new ArrayList<>();
 
     @Column(nullable = false)
-    private boolean isVerified = false;
+    private boolean isVerified = true;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "photo_perfil_id")
