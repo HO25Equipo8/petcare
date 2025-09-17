@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +39,9 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+@Slf4j
 @CrossOrigin(origins = "http://localhost:5173/", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/user")
@@ -92,16 +95,11 @@ public class UserController {
         // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
 
-        // mapear role profesional de el user
-
-
         // Crear el usuario con el nuevo constructor
         User newUser = new User(
                 userRegisterDTO.login(),
                 encryptedPassword,
                 role);
-
-
 
         if (userRegisterDTO.role() == Role.ADMIN || userRegisterDTO.role() == Role.OWNER) {
             newUser.setVerified(true);
@@ -119,7 +117,7 @@ public class UserController {
 
         } catch (Exception e) {
             // If email fails, return error (as requested)
-            return ResponseEntity.status(500).body("Usuario creado pero error enviando emails: " + e.getMessage());
+            log.error("Usuario creado pero error enviando emails: " + e.getMessage());
         }
 
         // Respuesta con DTO
