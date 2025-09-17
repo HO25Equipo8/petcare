@@ -36,7 +36,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String name = oauth2User.getAttribute("name");
         String googleId = oauth2User.getAttribute("sub");
 
-        String frontUrl = "https://petcare-zeta-kohl.vercel.app";
+        // Detectar entorno
+        String frontUrl;
+        if (System.getProperty("env") != null && System.getProperty("env").equals("dev")) {
+            frontUrl = "http://localhost:5173"; // Desarrollo local
+        } else {
+            frontUrl = "https://petcare-zeta-kohl.vercel.app"; // Producción
+        }
 
         if (email == null || googleId == null) {
             response.sendRedirect("https://petcare-zeta-kohl.vercel.app/login?error=oauth_error");

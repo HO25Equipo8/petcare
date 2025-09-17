@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/ws/**","/topic/**", "/app/**").permitAll() //Agregue esta linea para el websocket
                         .anyRequest().authenticated())
-                 .oauth2Login(oauth2 -> oauth2
+                .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

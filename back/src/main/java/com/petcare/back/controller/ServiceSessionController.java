@@ -5,7 +5,6 @@ import com.petcare.back.domain.dto.response.ServiceSessionResponseDTO;
 import com.petcare.back.domain.entity.ServiceSession;
 import com.petcare.back.domain.mapper.request.ServiceSessionMapper;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.repository.ServiceSessionRepository;
 import com.petcare.back.service.UpdateSessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -22,7 +21,6 @@ import java.util.Map;
 @SecurityRequirement(name = "bearer-key")
 public class ServiceSessionController {
 
-    private final UpdateSessionService sessionService;
     private final UpdateSessionService updateSessionService;
 
     @Operation(
@@ -30,24 +28,35 @@ public class ServiceSessionController {
             description = "Permite al cuidador (SITTER) iniciar una sesión asociada a una reserva activa. La sesión debe comenzar dentro del horario reservado."
     )
     @PostMapping("/{bookingId}/start")
-    public ResponseEntity<Map<String, Object>> startSession(@PathVariable Long bookingId) throws MyException {
-        ServiceSession session = sessionService.startSession(new StartSessionDTO(bookingId));
-        ServiceSessionResponseDTO dto = ServiceSessionMapper.INSTANCE.toDto(session);
+    public ResponseEntity<Map<String, Object>> startSession(@PathVariable Long bookingId) {
+        try {
+            ServiceSession session = updateSessionService.startSession(new StartSessionDTO(bookingId));
+            ServiceSessionResponseDTO dto = ServiceSessionMapper.INSTANCE.toDto(session);
 
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "Sesión iniciada con éxito",
-                "data", dto
-        ));
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Sesión iniciada con éxito",
+                    "data", dto
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor: " + e.getMessage()
+            ));
+        }
     }
-
     @Operation(
             summary = "Unirse a sesión en curso",
             description = "Permite al dueño (OWNER) acceder a la sesión en vivo si está en progreso y la reserva le pertenece."
     )
     @GetMapping("/{bookingId}/join")
     public ResponseEntity<ServiceSessionResponseDTO> joinSession(@PathVariable Long bookingId) {
-        ServiceSessionResponseDTO responseDTO = sessionService.joinSession(bookingId);
+        ServiceSessionResponseDTO responseDTO = updateSessionService.joinSession(bookingId);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -57,7 +66,7 @@ public class ServiceSessionController {
     )
     @PutMapping("/{sessionId}/finish")
     public ResponseEntity<?> finishSession(@PathVariable Long sessionId) throws MyException {
-        ServiceSession session = sessionService.finish(sessionId);
+        ServiceSession session = updateSessionService.finish(sessionId);
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
