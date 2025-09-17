@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,9 +39,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-@Slf4j
 @CrossOrigin(origins = "http://localhost:5173/", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/user")
@@ -102,8 +99,8 @@ public class UserController {
                 userRegisterDTO.login(),
                 encryptedPassword,
                 role);
-      
-        newUser.setVerified(true);
+
+        newUser.setChecked(true);
         newUser.setActive(true);
 
         userRepository.save(newUser);

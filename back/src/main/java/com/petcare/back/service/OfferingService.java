@@ -44,7 +44,7 @@ public class OfferingService {
             throw new MyException("Solo los profesionales pueden registrar servicios");
         }
 
-        if(!user.isVerified()){
+        if(!user.isChecked()){
             if (user.getProfileComplete()) {
                 throw new MyException("Debes estar verificado para poder crear servicios, tu perfil está en evaluación");
             }else{
@@ -145,7 +145,7 @@ public class OfferingService {
         User sitter = userRepository.findById(sitterId)
                 .orElseThrow(() -> new MyException("Profesional no encontrado"));
 
-        if (!sitter.isVerified()) {
+        if (!sitter.isChecked()) {
             throw new MyException("Este profesional aún no está verificado");
         }
 

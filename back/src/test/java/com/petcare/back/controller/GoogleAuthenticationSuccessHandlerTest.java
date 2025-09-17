@@ -130,7 +130,7 @@ public class GoogleAuthenticationSuccessHandlerTest {
         user.setProvider(provider);
         user.setProviderId(providerId);
         user.setRole(Role.USER);
-        user.setVerified(true);
+        user.setChecked(true);
         return user;
     }
 }

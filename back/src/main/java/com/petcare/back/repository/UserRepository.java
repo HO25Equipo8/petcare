@@ -34,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     SELECT u FROM User u
     WHERE u.role = 'SITTER'
       AND u.active = true
-      AND u.verified = true
+      AND u.checked = true
       AND u.location IS NOT NULL
       AND (6371 * acos(
             cos(radians(:lat)) *
@@ -44,7 +44,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             sin(radians(u.location.latitude))
       )) <= :radius
 """)
-    List<User> findVerifiedActiveSittersWithinRadius(@Param("lat") double lat,
+    List<User> findCheckedActiveSittersWithinRadius(@Param("lat") double lat,
                                                      @Param("lng") double lng,
                                                      @Param("radius") double radiusKm);
 }
