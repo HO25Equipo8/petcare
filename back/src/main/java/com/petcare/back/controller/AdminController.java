@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "http://127.0.0.1:5501/", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/admin")
 @SecurityRequirement(name = "bearer-key")

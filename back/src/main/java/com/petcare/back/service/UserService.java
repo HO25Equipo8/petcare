@@ -92,7 +92,7 @@ public class UserService {
                 tieneFotosVerificacion;
 
         user.setProfileComplete(completo);
-        user.setVerified(user.getRole() == Role.OWNER);
+        user.setChecked(user.getRole() == Role.OWNER);
 
         return userRepository.save(user);
     }
@@ -153,7 +153,7 @@ public class UserService {
                 tieneFotosVerificacion;
 
         user.setProfileComplete(completo);
-        user.setVerified(user.getRole() != Role.SITTER);
+        user.setChecked(user.getRole() != Role.SITTER);
 
         return userRepository.save(user);
     }
@@ -178,7 +178,7 @@ public class UserService {
             throw new MyException("Tu perfil no tiene una ubicación registrada.");
         }
 
-        List<User> sitters = userRepository.findVerifiedActiveSittersWithinRadius(
+        List<User> sitters = userRepository.findCheckedActiveSittersWithinRadius(
                 location.getLatitude(), location.getLongitude(), radiusKm
         );
 

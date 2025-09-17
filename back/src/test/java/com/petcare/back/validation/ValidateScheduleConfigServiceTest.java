@@ -44,7 +44,7 @@ public class ValidateScheduleConfigServiceTest {
         mockUser.setId(1L);
         mockUser.setRole(Role.SITTER);
         mockUser.setName("Sitter Test");
-        mockUser.setVerified(true);
+        mockUser.setChecked(true);
         mockUser.setProfileComplete(true);
 
         Authentication auth = mock(Authentication.class);

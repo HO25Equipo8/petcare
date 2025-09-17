@@ -90,7 +90,7 @@ public class UserProfileService {
 
         user.setProfileComplete(completo);
         if (completo){
-            user.setVerified(true);
+            user.setChecked(true);
         }
     }
 
@@ -139,11 +139,9 @@ public class UserProfileService {
 
         user.setProfileComplete(completo);
         if (completo){
-            user.setVerified(true);
+            user.setChecked(true);
         }
     }
-
-
 
     public void uploadPrifilePhotoPet(Long petId, MultipartFile file) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

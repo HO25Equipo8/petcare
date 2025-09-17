@@ -43,7 +43,7 @@ public class User implements UserDetails {
     private List<Pet> pets = new ArrayList<>();
 
     @Column(nullable = false)
-    private boolean isVerified = true;
+    private boolean checked = true;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "photo_perfil_id")
@@ -153,4 +153,7 @@ public class User implements UserDetails {
         return role.name();
     }
 
+    public Boolean isChecked(){
+        return checked;
+    }
 }
