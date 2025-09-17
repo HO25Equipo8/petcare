@@ -137,7 +137,7 @@ public class UpdateSessionService {
 
     @Transactional
     public ServiceSession finish(Long sessionId) throws MyException {
-
+        System.out.println("👉 Entrando en FINISH con sessionId=" + sessionId);
         ServiceSession session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session no encontrada"));
 
@@ -166,6 +166,7 @@ public class UpdateSessionService {
     }
     @Transactional
     public ServiceSession cancelSession(Long sessionId, String reason) throws MyException {
+        System.out.println("👉 Entrando en CANCEL con sessionId=" + sessionId);
         ServiceSession session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
 

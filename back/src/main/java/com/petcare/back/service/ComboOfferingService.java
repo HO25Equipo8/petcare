@@ -46,7 +46,7 @@ public class ComboOfferingService {
         if (user.getRole() != Role.SITTER) {
             throw new MyException("Solo los profesionales pueden registrar combos.");
         }
-        if(!user.isVerified()){
+        if(!user.isChecked()){
             if (user.getProfileComplete()) {
                 throw new MyException("Debes estar verificado para poder crear combos, tu perfil está en evaluación");
             }else{
@@ -142,7 +142,7 @@ public class ComboOfferingService {
         User sitter = userRepository.findById(sitterId)
                 .orElseThrow(() -> new MyException("Profesional no encontrado"));
 
-        if (!sitter.isVerified()) {
+        if (!sitter.isChecked()) {
             throw new MyException("Este profesional aún no está verificado");
         }
 

@@ -16,9 +16,10 @@ import com.petcare.back.service.EmailService;
 import com.petcare.back.service.ScheduleConfigService;
 import com.petcare.back.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +60,7 @@ public class UserController {
     private BookingService bookingService;
     @Autowired
     private ScheduleConfigService scheduleConfigService;
+    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
     @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
@@ -92,34 +94,24 @@ public class UserController {
         // Encriptar la contraseña
         String encryptedPassword = passwordEncoder.encode(userRegisterDTO.pass1());
 
-        // mapear role profesional de el user
-
-
         // Crear el usuario con el nuevo constructor
         User newUser = new User(
                 userRegisterDTO.login(),
                 encryptedPassword,
                 role);
 
-
-
-        if (userRegisterDTO.role() == Role.ADMIN || userRegisterDTO.role() == Role.OWNER) {
-            newUser.setVerified(true);
-        }
+        newUser.setChecked(true);
+        newUser.setActive(true);
 
         userRepository.save(newUser);
 
-        // Send email notifications
+//        // Send email notifications
         try {
-            // Send welcome email to user
             emailService.sendWelcomeEmail(newUser.getEmail(), getUserName(newUser));
-
-            // Send notification to admin
             emailService.sendAdminNotification(newUser.getEmail(), getUserName(newUser));
-
         } catch (Exception e) {
             // If email fails, return error (as requested)
-            return ResponseEntity.status(500).body("Usuario creado pero error enviando emails: " + e.getMessage());
+            log.error("Usuario creado pero error enviando emails: " + e.getMessage());
         }
 
         // Respuesta con DTO
