@@ -267,4 +267,76 @@ public class UserProfileService {
        petRepository.save(pet);
 
     }
+
+    public void uploadVerifyIdentityPhoto(List<MultipartFile> imageFiles) throws IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) auth.getPrincipal();
+
+        User user = userRepository.findById(principal.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (user.getRole() != Role.SITTER) {
+            throw new IllegalArgumentException("Solo las SITTER pueden cargar fotos de verificacion de identidad");
+        }
+        if (!user.getPhotosVerifyIdentity().isEmpty()) {
+            throw new IllegalArgumentException("ya tienes fotos de verificación de identidad");
+        }
+
+        if (user.getPhotosVerifyIdentity().size() + imageFiles.size() > 3) {
+            throw new IllegalArgumentException("no puedes subir mas de 3 fotos de verificacion de identidad");
+        }
+        for (MultipartFile file : imageFiles) {
+            if (!file.isEmpty()) {
+                imageValidator.validate(file); // Validar formato/tamaño
+                byte[] optimizedImage = imageTreatment.process(file); // Comprimir
+
+                Image image = new Image();
+                image.setImageName(file.getOriginalFilename());
+                image.setImageType(file.getContentType());
+                image.setData(optimizedImage);
+
+                // ✅ En vez de save manual, se guarda por cascada
+                user.getPhotosVerifyIdentity().add(image);
+            }
+        }
+
+        user.setProfileComplete(true);
+        userRepository.save(user); // cascade guarda también las imágenes
+    }
+
+    public void updateVerifyIdentityPhoto(List<MultipartFile> imagesFiles) throws IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) auth.getPrincipal();
+
+        User user = userRepository.findById(principal.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (user.getRole() != Role.SITTER) {
+            throw new IllegalArgumentException("Solo las SITTER pueden actualizar fotos de verificación de identidad");
+        }
+
+        // Validar que se envíen 3 imágenes
+        if (imagesFiles == null || imagesFiles.size() != 3) {
+            throw new IllegalArgumentException("Debes enviar exactamente 3 imágenes para la verificación de identidad");
+        }
+
+        // Si ya tenía fotos, vaciamos la lista para reemplazarlas
+        user.getPhotosVerifyIdentity().clear();
+
+        // Iterar sobre cada archivo y crear nuevas entidades Image
+        for (MultipartFile file : imagesFiles) {
+            imageValidator.validate(file);
+            byte[] processedBytes = imageTreatment.process(file);
+
+            Image image = new Image();
+            image.setImageName(file.getOriginalFilename());
+            image.setImageType(file.getContentType());
+            image.setData(processedBytes);
+
+            user.getPhotosVerifyIdentity().add(image);
+        }
+
+        // Guardar usuario con sus nuevas imágenes
+        userRepository.save(user);
+    }
 }

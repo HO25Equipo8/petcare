@@ -1,8 +1,6 @@
 # 🐾 PetCare Platform - Safe walk, pure love
 ## All-in-One for Pet Services
 
-![Project Banner](https://drive.google.com/uc?export=view&id=11kW2FgUxDCXcID9i4w4IVnex5TZKZIqB)
-
 **PetCare** is a web application that connects pet owners with trusted animal care professionals (walkers, veterinarians, sitters, and more).
 It’s built to deliver a collaborative, visual, and emotionally engaging experience — with robust workflows, cross-layer validations, and a double-consent model for sensitive actions.
 
@@ -58,8 +56,6 @@ Main features include:
 ---
 
 ## 🌍 Project Architecture
-
-![Architecture Diagram](./assets/arquitectura.png) <!-- Replace with real image -->
 
 * **Frontend (React):** dynamic UI for managing pets, bookings, and sessions.
 * **Backend (Spring Boot):** REST API, business logic, authentication, WebSocket services.

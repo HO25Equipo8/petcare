@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +40,9 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+@Slf4j
 @CrossOrigin(origins = "http://localhost:5173/", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/user")
@@ -99,7 +102,7 @@ public class UserController {
                 userRegisterDTO.login(),
                 encryptedPassword,
                 role);
-
+      
         newUser.setVerified(true);
         newUser.setActive(true);
 
@@ -110,7 +113,8 @@ public class UserController {
             emailService.sendWelcomeEmail(newUser.getEmail(), getUserName(newUser));
             emailService.sendAdminNotification(newUser.getEmail(), getUserName(newUser));
         } catch (Exception e) {
-            log.error("Error enviando emails: ", e);
+            // If email fails, return error (as requested)
+            log.error("Usuario creado pero error enviando emails: " + e.getMessage());
         }
 
         // Respuesta con DTO
@@ -295,6 +299,26 @@ public class UserController {
 
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<?> activateUser(@PathVariable Long id) {
+        try {
+            User user = userService.activateUser(id);
+            return ResponseEntity.ok("Usuario " + user.getId() + " activado correctamente");
+        } catch (MyException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
+        try {
+            User user = userService.deactivateUser(id);
+            return ResponseEntity.ok("Usuario " + user.getId() + " desactivado correctamente");
+        } catch (MyException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }

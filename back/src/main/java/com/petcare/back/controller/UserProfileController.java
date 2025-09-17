@@ -14,11 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Arrays;
 
-
-
-
-import java.util.List;
-
 @CrossOrigin(origins = "http://localhost:5173/", allowedHeaders = "*", allowCredentials = "true")
 @SecurityRequirement(name = "bearer-key")
 @RestController
@@ -82,6 +77,32 @@ public class UserProfileController {
     ) throws IOException {
         userProfileService.uploadPetGallery(petId, Arrays.asList(images));
         return ResponseEntity.ok("Images uploaded successfully");
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Subir fotos de  identificacion de  la sitter",
+            description = "Cargar fotos  de identificacion de la sitter")
+    public ResponseEntity<String> uploadImagesPhotoIdentity(@Parameter(description = "max 3",
+            required = true, content = @Content(
+            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE
+            ,schema = @Schema(type = "string", format = "binary")))
+                                                           @RequestPart("images") MultipartFile[] images) throws IOException {
+        userProfileService.uploadVerifyIdentityPhoto(Arrays.asList(images));
+        return ResponseEntity.ok("Images uploaded successfully");
+
+    }
+
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "actualizar  fotos de  identificacion de  la sitter",
+            description = "actualizar fotos  de identificacion de la sitter")
+    public ResponseEntity<String> updateImagesFotoIdentity(@Parameter(description = "max 3",
+            required = true, content = @Content(
+            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE
+            ,schema = @Schema(type = "string", format = "binary")))
+                                                           @RequestPart("images") MultipartFile[] images) throws IOException {
+        userProfileService.updateVerifyIdentityPhoto(Arrays.asList(images));
+        return ResponseEntity.ok("Images updated successfully");
+
     }
 }
 
