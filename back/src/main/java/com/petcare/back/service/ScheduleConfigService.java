@@ -18,6 +18,7 @@ import com.petcare.back.domain.mapper.response.ScheduleWithSitterMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.ScheduleConfigRepository;
 import com.petcare.back.repository.ScheduleRepository;
+import com.petcare.back.repository.UserRepository;
 import com.petcare.back.validation.ValidationScheduleConfig;
 
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,7 @@ public class ScheduleConfigService {
     private final List<ValidationScheduleConfig> validations;
     private final ScheduleResponseMapper scheduleMapper;;
     private final ScheduleWithSitterMapper scheduleWithSitterMapper;
+    private final UserRepository userRepository;
 
     public ScheduleConfigResponseDTO createScheduleConfig(ScheduleConfigCreateDTO dto) throws MyException {
 
@@ -559,6 +561,17 @@ public class ScheduleConfigService {
 
         return scheduleRepository.findAvailableBySitter(sitter.getId())
                 .stream()
+                .map(s -> new ScheduleDropdownDTO(s.getScheduleId(), s.getEstablishedTime()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScheduleDropdownDTO> getAvailableSchedulesBySitterId(Long sitterId) throws MyException {
+        if (!userRepository.existsByIdAndRole(sitterId, Role.SITTER)) {
+            throw new MyException("El profesional no existe o no tiene rol válido");
+        }
+
+        return scheduleRepository.findAvailableBySitter(sitterId).stream()
                 .map(s -> new ScheduleDropdownDTO(s.getScheduleId(), s.getEstablishedTime()))
                 .collect(Collectors.toList());
     }

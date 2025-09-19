@@ -46,4 +46,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findCheckedActiveSittersWithinRadius(@Param("lat") double lat,
                                                      @Param("lng") double lng,
                                                      @Param("radius") double radiusKm);
+
+    boolean existsByIdAndRole(Long sitterId, Role role);
 }

@@ -9,6 +9,7 @@ import com.petcare.back.service.UpdateSessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,14 +66,26 @@ public class ServiceSessionController {
             description = "Permite al cuidador (SITTER) finalizar una sesión en curso. La sesión debe estar activa para poder cerrarse correctamente."
     )
     @PutMapping("/{sessionId}/finish")
-    public ResponseEntity<?> finishSession(@PathVariable Long sessionId) throws MyException {
-        ServiceSession session = updateSessionService.finish(sessionId);
+    public ResponseEntity<?> finishSession(@PathVariable Long sessionId) {
+        try {
+            ServiceSession session = updateSessionService.finish(sessionId);
 
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "Sesión finalizada con éxito",
-                "data", ServiceSessionMapper.INSTANCE.toDto(session)
-        ));
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Sesión finalizada con éxito",
+                    "data", ServiceSessionMapper.INSTANCE.toDto(session)
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "message", "Error inesperado al finalizar la sesión"
+            ));
+        }
     }
 
     @Operation(
