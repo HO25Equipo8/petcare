@@ -42,8 +42,11 @@ public class User implements UserDetails {
     @JsonManagedReference   // prevents recursion
     private List<Pet> pets = new ArrayList<>();
 
-    @Column(name = "verified", nullable = false)
+    @Column(name = "is_verified", nullable = false)
     private boolean checked = true;
+
+    @Column(name = "verified")
+    private boolean oldVerified = true;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "photo_perfil_id")

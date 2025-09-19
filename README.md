@@ -1,4 +1,4 @@
-# 🐾 PetCare Platform - Safe walk, pure love
+# 🐾 PetCare Platform - Complete care, endless love
 ## All-in-One for Pet Services
 
 **PetCare** is a web application that connects pet owners with trusted animal care professionals (walkers, veterinarians, sitters, and more).
