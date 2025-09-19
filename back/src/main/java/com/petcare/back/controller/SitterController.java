@@ -2,9 +2,11 @@ package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.*;
+import com.petcare.back.domain.entity.ServiceSession;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.OfferingVariantDescriptionEnum;
+import com.petcare.back.domain.mapper.request.ServiceSessionMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +41,7 @@ public class SitterController {
     private final ComboOfferingService comboOfferingService;
     private final PlanDiscountRuleService planDiscountRuleService;
     private final BookingService bookingService;
+    private final UpdateSessionService updateSessionService;
 
     @Operation(
             summary = "Registrar configuración de horarios",
