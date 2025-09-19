@@ -307,7 +307,12 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
         }
     }
-
+    @Operation(
+            summary = "Activar usuario",
+            description = "Activa el usuario con el ID especificado. " +
+                    "Solo se puede activar si el usuario existe. " +
+                    "Devuelve un mensaje de confirmación o error si no se encuentra."
+    )
     @PatchMapping("/{id}/activate")
     public ResponseEntity<?> activateUser(@PathVariable Long id) {
         try {
@@ -318,6 +323,12 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "Desactivar usuario",
+            description = "Desactiva el usuario con el ID especificado. " +
+                    "Solo se puede desactivar si el usuario existe. " +
+                    "Devuelve un mensaje de confirmación o error si no se encuentra."
+    )
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
         try {
