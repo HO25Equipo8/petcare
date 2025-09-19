@@ -1,10 +1,8 @@
 package com.petcare.back.domain.dto.request;
 
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDate;
 import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

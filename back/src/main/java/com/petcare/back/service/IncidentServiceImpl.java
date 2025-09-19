@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
-
 @AllArgsConstructor
 @Service
 public class IncidentServiceImpl  implements IncidentsService{

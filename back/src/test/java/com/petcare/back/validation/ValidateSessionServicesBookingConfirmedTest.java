@@ -6,7 +6,6 @@ import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

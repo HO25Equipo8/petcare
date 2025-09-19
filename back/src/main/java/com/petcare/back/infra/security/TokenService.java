@@ -5,11 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-
 import com.petcare.back.domain.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -38,7 +36,7 @@ public class TokenService {
 
     private Instant generateExpiryDate() {
         ZoneId zone = ZoneId.systemDefault();  // Obtener la zona horaria del sistema
-        return LocalDateTime.now(zone).plusMinutes(60)
+        return LocalDateTime.now(zone).plusMinutes(360)
                 .toInstant(ZoneOffset.ofTotalSeconds(zone.getRules().getOffset(LocalDateTime.now()).getTotalSeconds()));
     }
 

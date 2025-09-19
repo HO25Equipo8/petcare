@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.petcare.back.domain.enumerated.WeekDayEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalTime;
 
 public record ScheduleTurnCreateDTO(

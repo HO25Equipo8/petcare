@@ -5,7 +5,6 @@ import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.ServiceSessionStatus;
 import com.petcare.back.exception.MyException;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

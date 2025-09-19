@@ -7,7 +7,6 @@ import com.petcare.back.domain.dto.response.UpdateServiceResponseDTO;
 import com.petcare.back.domain.entity.ServiceSession;
 import com.petcare.back.domain.entity.UpdateService;
 import com.petcare.back.domain.enumerated.IncidentsTypes;
-import com.petcare.back.domain.mapper.request.ServiceSessionMapper;
 import com.petcare.back.domain.mapper.response.UpdateServiceResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.UpdateSessionService;

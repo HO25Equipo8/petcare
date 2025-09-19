@@ -1,7 +1,6 @@
 package com.petcare.back.validation;
 
 import com.petcare.back.domain.dto.request.PlanDiscountRuleDTO;
-import com.petcare.back.domain.entity.PlanDiscountRule;
 import com.petcare.back.exception.MyException;
 import org.springframework.stereotype.Component;
 

@@ -1,13 +1,10 @@
 package com.petcare.back.validation;
 
 import com.petcare.back.domain.dto.request.PlanDiscountRuleDTO;
-import com.petcare.back.domain.entity.PlanDiscountRule;
 import com.petcare.back.domain.enumerated.CustomerCategory;
 import com.petcare.back.exception.MyException;
 import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

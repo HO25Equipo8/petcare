@@ -4,6 +4,7 @@ import com.petcare.back.domain.dto.request.UserAuthenticationDTO;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.infra.security.DataJwToken;
 import com.petcare.back.infra.security.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,13 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private TokenService tokenService;
-
+    @Operation(
+            summary = "Autenticar usuario",
+            description = "Recibe las credenciales de un usuario (email y contraseña), valida su autenticación y devuelve un token JWT si es exitoso. " +
+                    "Este token debe ser utilizado en las siguientes solicitudes para acceder a recursos protegidos."
+    )
     @PostMapping
     public ResponseEntity authenticateUser(@RequestBody @Valid UserAuthenticationDTO userAuthenticationDTO)
     {

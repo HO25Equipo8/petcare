@@ -1,6 +1,5 @@
 package com.petcare.back.domain.entity;
 
-import com.petcare.back.domain.enumerated.WeekDayEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,9 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "schedule_config")
