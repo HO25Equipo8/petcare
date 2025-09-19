@@ -45,9 +45,6 @@ public class User implements UserDetails {
     @Column(name = "is_verified", nullable = false)
     private boolean checked = true;
 
-    @Column(name = "verified")
-    private boolean oldVerified = true;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "photo_perfil_id")
     private Image profilePhoto;
