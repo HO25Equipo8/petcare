@@ -112,7 +112,7 @@ public class GeocodingService {
         Double lng = ((Number) location.get("lng")).doubleValue();
 
         // Podrías ampliar tu DTO para incluir lat/lng
-        return new LocationDTO(street, number, city, province, country, lat, lng);
+        return new LocationDTO(street, number, city, province, country, lat, lng, placeId);
     }
     public AutocompleteSuggestion getPlaceIdFromLocationDTO(LocationDTO dto) {
         // Construimos la dirección en texto

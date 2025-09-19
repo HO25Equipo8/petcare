@@ -16,11 +16,10 @@ import com.petcare.back.domain.mapper.response.ScheduleResponseMapper;
 import com.petcare.back.domain.mapper.response.ScheduleTurnResponseMapper;
 import com.petcare.back.domain.mapper.response.ScheduleWithSitterMapper;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.repository.BookingRepository;
 import com.petcare.back.repository.ScheduleConfigRepository;
 import com.petcare.back.repository.ScheduleRepository;
 import com.petcare.back.validation.ValidationScheduleConfig;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +29,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -548,5 +549,17 @@ public class ScheduleConfigService {
         configRepository.saveAll(expiredConfigs);
 
         log.info("Se desactivaron {} configuraciones vencidas", expiredConfigs.size());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScheduleDropdownDTO> getAvailableSchedulesForSitter(User sitter) {
+        if (sitter.getRole() != Role.SITTER) {
+            throw new IllegalArgumentException("Usuario no tiene permisos de Sitter");
+        }
+
+        return scheduleRepository.findAvailableBySitter(sitter.getId())
+                .stream()
+                .map(s -> new ScheduleDropdownDTO(s.getScheduleId(), s.getEstablishedTime()))
+                .collect(Collectors.toList());
     }
 }

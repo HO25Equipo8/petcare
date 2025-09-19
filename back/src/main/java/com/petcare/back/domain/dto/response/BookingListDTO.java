@@ -1,8 +1,10 @@
 package com.petcare.back.domain.dto.response;
 
+import com.petcare.back.domain.dto.request.BookingServiceItemCreateDTO;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
 
 import java.time.Instant;
+import java.util.List;
 
 public record BookingListDTO(
         Long bookingId,
@@ -10,6 +12,8 @@ public record BookingListDTO(
         String serviceTitle,
         Instant reservationDate,
         BookingStatusEnum status,
-        Instant firstScheduleStart
+        Instant firstScheduleStart,
+        Long comboId,
+        List<ServiceItemResponseDTO> items
 ) {
 }

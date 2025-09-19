@@ -42,7 +42,7 @@ public class User implements UserDetails {
     @JsonManagedReference   // prevents recursion
     private List<Pet> pets = new ArrayList<>();
 
-    @Column(name = "is_verified", nullable = false)
+    @Column(nullable = false)
     private boolean checked = true;
 
     @OneToOne(cascade = CascadeType.ALL)

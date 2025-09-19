@@ -7,6 +7,7 @@ import com.petcare.back.domain.dto.request.BookingSimulationRequestDTO;
 import com.petcare.back.domain.dto.response.BookingListDTO;
 import com.petcare.back.domain.dto.response.BookingResponseDTO;
 import com.petcare.back.domain.dto.response.BookingSimulationResponseDTO;
+import com.petcare.back.domain.dto.response.ServiceItemResponseDTO;
 import com.petcare.back.domain.entity.*;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
 import com.petcare.back.domain.enumerated.CustomerCategory;
@@ -14,6 +15,7 @@ import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.enumerated.ScheduleStatus;
 import com.petcare.back.domain.mapper.request.BookingCreateMapper;
 import com.petcare.back.domain.mapper.response.BookingResponseMapper;
+import com.petcare.back.domain.mapper.response.ServiceItemMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.*;
 import com.petcare.back.validation.ValidationBooking;
@@ -31,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +51,7 @@ public class BookingService {
     private final List<ValidationBooking> validations;
     private final EmailService emailService;
     private final BookingServiceItemRepository bookingServiceItemRepository;
+    private final ServiceItemMapper serviceItemMapper;
 
     @Transactional
     public BookingResponseDTO createBooking(BookingCreateDTO dto) throws MyException {
@@ -299,8 +303,14 @@ public class BookingService {
         scheduleRepository.save(item.getSchedule());
         bookingServiceItemRepository.save(item);
 
-        BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
-        emailService.sendBookingConfirmationEmail(emailData);
+//        try {
+//            BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
+//            emailService.sendBookingConfirmationEmail(emailData);
+//        } catch (Exception e) {
+//            // logueamos el error, pero no rompemos la transacción
+//            System.err.println("[confirmItem] ERROR enviando email: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -335,11 +345,21 @@ public class BookingService {
         item.setStatus(BookingStatusEnum.CANCELADO);
         item.getSchedule().setStatus(ScheduleStatus.DISPONIBLE);
 
+        System.out.println("Cancelando itemId=" + itemId + ", sitter=" + sitter.getId() +
+                ", item.professional=" + item.getProfessional().getId());
+
         scheduleRepository.save(item.getSchedule());
         bookingServiceItemRepository.save(item);
+        bookingServiceItemRepository.flush();
 
-        BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
-        emailService.sendBookingCancellationEmail(emailData, reason);
+//        try {
+//            BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
+//            emailService.sendBookingCancellationEmail(emailData, reason);
+//        } catch (Exception e) {
+//            // logueamos el error, pero no rompemos la transacción
+//            System.err.println("[confirmItem] ERROR enviando email: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -376,8 +396,14 @@ public class BookingService {
         item.setStatus(BookingStatusEnum.PENDIENTE_REPROGRAMAR);
         bookingServiceItemRepository.save(item);
 
-        BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
-        emailService.sendBookingRescheduleEmail(emailData);
+//        try {
+//            BookingDataByEmailDTO emailData = buildServiceItemEmailData(item);
+//            emailService.sendBookingRescheduleEmail(emailData);
+//        } catch (Exception e) {
+//            // logueamos el error, pero no rompemos la transacción
+//            System.err.println("[confirmItem] ERROR enviando email: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     //Metodo para que el dueño acepte la reprogramacion de la reserva
@@ -437,13 +463,23 @@ public class BookingService {
                 ? firstItem.getSchedule().getEstablishedTime()
                 : null;
 
+        Long comboId = booking.getComboOffering() != null
+                ? booking.getComboOffering().getId()
+                : null;
+
+        List<ServiceItemResponseDTO> items = booking.getServiceItems().stream()
+                .map(serviceItemMapper::toDTO)
+                .collect(Collectors.toList());
+
         return new BookingListDTO(
                 booking.getId(),
                 booking.getPet().getName(),
                 serviceLabel,
                 booking.getReservationDate(),
                 booking.getStatus(),
-                nextSession
+                nextSession,
+                comboId,
+                items
         );
     }
 
