@@ -133,4 +133,12 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 """)
     Page<Schedule> findBySitterId(@Param("sitterId") Long sitterId, Pageable pageable);
 
+    @Query("""
+        SELECT s 
+        FROM Schedule s
+        WHERE s.scheduleConfig.sitter.id = :sitterId
+          AND s.status = ScheduleStatus.DISPONIBLE
+        ORDER BY s.establishedTime ASC
+    """)
+    List<Schedule> findAvailableBySitter(@Param("sitterId") Long sitterId);
 }

@@ -3,6 +3,7 @@ package com.petcare.back.controller;
 import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.PlanDiscountRule;
+import com.petcare.back.domain.entity.Schedule;
 import com.petcare.back.domain.entity.ScheduleConfig;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.OfferingEnum;
@@ -541,11 +542,14 @@ public class SitterController {
             summary = "Cancelar reserva",
             description = "Permite al profesional cancelar una reserva activa. Libera los horarios asignados"
     )
-    @PutMapping("/booking/{id}/cancel")
-    public ResponseEntity<?> cancelBooking(@PathVariable Long id, @RequestBody String reason) {
+    @PutMapping("/sitter/booking/item/{itemId}/cancel")
+    public ResponseEntity<?> cancelItem(
+            @PathVariable Long itemId,
+            @RequestParam(required = false, defaultValue = "Sin motivo especificado") String reason
+    ) {
         User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {
-            BookingResponseDTO response = bookingService.cancelBooking(id, sitter, reason);
+            BookingResponseDTO response = bookingService.cancelBooking(itemId, sitter, reason);
             return ResponseEntity.ok(response);
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -567,6 +571,17 @@ public class SitterController {
             return ResponseEntity.ok(Map.of("status", "Propuesta de reprogramación de horario enviada"));
         } catch (MyException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/sitter/schedules/available")
+    public ResponseEntity<?> getAvailableSchedules() {
+        User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            List<ScheduleDropdownDTO> schedules = scheduleConfigService.getAvailableSchedulesForSitter(sitter);
+            return ResponseEntity.ok(Map.of("data", schedules));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
         }
     }
 

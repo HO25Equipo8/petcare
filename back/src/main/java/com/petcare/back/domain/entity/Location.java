@@ -39,5 +39,8 @@ public class Location {
 
     @Column(name = "longitude", nullable = false)
     private Double longitude;
+
+    @Column(name = "place_id")
+    private String placeId;
 }
 
