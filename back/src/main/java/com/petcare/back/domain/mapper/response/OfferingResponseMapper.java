@@ -5,7 +5,6 @@ import com.petcare.back.domain.entity.Offering;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-
 @Mapper(componentModel = "spring")
 public interface OfferingResponseMapper {
         @Mapping(target = "name", expression = "java(offering.getName().getLabel())")

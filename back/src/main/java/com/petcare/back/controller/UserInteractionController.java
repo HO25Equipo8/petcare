@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/public")
@@ -31,7 +32,6 @@ public class UserInteractionController {
     private final UserService userService;
     private final UserFeedbackMapper userFeedbackMapper;
 
-    //Dar Feedback
     @Operation(
             summary = "Enviar feedback",
             description = "Permite al usuario autenticado enviar una valoración y comentario sobre otro usuario con el que haya interactuado. El sistema valida que el feedback sea legítimo y lo asocia al perfil del destinatario."
@@ -42,7 +42,6 @@ public class UserInteractionController {
         return ResponseEntity.ok(Map.of("status", "success", "data", feedback));
     }
 
-    //Ver el perfil público
     @Operation(
             summary = "Consultar perfil público",
             description = "Devuelve el perfil público de un usuario según su ID, incluyendo nombre, rol, servicios ofrecidos y reputación basada en feedback recibido."
@@ -54,7 +53,6 @@ public class UserInteractionController {
         return ResponseEntity.ok(dto);
     }
 
-    //Ver su listado de feedback recibidos
     @Operation(
             summary = "Ver feedback recibido",
             description = "Devuelve el listado de valoraciones y comentarios que ha recibido el usuario indicado por ID. Útil para evaluar reputación y experiencia previa."
@@ -87,7 +85,7 @@ public class UserInteractionController {
     }
 
     @Operation(
-            summary = "Listar SITTERs destacados",
+            summary = "Listar profesionales destacados",
             description = "Devuelve los perfiles públicos de los SITTERs mejor valorados, ordenados por reputación. El tamaño del listado puede ajustarse con el parámetro 'size'."
     )
     @GetMapping("/sitters/top")

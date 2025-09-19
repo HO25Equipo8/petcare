@@ -4,8 +4,6 @@ import com.petcare.back.domain.dto.request.PetCreateDTO;
 import com.petcare.back.domain.entity.Pet;
 import org.mapstruct.Mapper;
 
-
-
 @Mapper(componentModel = "spring")
 public interface PetCreateMapper {
 

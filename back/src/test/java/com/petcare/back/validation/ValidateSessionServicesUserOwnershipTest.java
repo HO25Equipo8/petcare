@@ -6,9 +6,7 @@ import com.petcare.back.domain.entity.ServiceSession;
 import com.petcare.back.domain.entity.User;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

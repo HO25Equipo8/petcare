@@ -23,6 +23,7 @@ public class LocationController {
 
     private final UserRepository userRepository;
     private final GeocodingService geocodingService;
+
     @Operation(
             summary = "Obtener usuarios con ubicación",
             description = "Devuelve una lista de usuarios que tienen ubicación registrada, incluyendo su email, latitud y longitud. Útil para visualización en mapas o búsquedas geolocalizadas."

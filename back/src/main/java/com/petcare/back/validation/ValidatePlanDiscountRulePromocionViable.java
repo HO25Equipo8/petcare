@@ -1,8 +1,6 @@
 package com.petcare.back.validation;
 
-import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.request.PlanDiscountRuleDTO;
-import com.petcare.back.domain.entity.PlanDiscountRule;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.PlanDiscountRuleRepository;
 import lombok.RequiredArgsConstructor;

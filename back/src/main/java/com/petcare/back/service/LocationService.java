@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LocationService {
-
     private final LocationRepository locationRepository;
     private final GeocodingService geocodingService;
     private final LocationCreateMapper locationMapper;
-
 
     public LocationService(LocationRepository locationRepository, GeocodingService geocodingService, LocationCreateMapper locationMapper) {
         this.locationRepository = locationRepository;

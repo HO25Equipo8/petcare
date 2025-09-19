@@ -1,4 +1,5 @@
 package com.petcare.back.infra.error;
+
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Component;

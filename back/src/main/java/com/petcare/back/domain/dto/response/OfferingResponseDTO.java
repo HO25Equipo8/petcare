@@ -1,9 +1,7 @@
 package com.petcare.back.domain.dto.response;
 
 import com.petcare.back.domain.enumerated.PetTypeEnum;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public record OfferingResponseDTO(

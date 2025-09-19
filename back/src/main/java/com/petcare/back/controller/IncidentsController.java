@@ -1,21 +1,13 @@
 package com.petcare.back.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.petcare.back.domain.dto.request.IncidentsDTO;
-
-
 import com.petcare.back.domain.entity.Image;
-
 import com.petcare.back.exception.MyException;
-
 import com.petcare.back.domain.enumerated.IncidentsTypes;
-
 import com.petcare.back.service.IncidentsService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -94,6 +86,11 @@ public class IncidentsController {
     }
 
     //Obtener tipos de incidentes
+    @Operation(
+            summary = "Obtener tipos de incidentes",
+            description = "Devuelve una lista de todos los tipos de incidentes disponibles en la plataforma. " +
+                    "Los valores se obtienen del enum `IncidentsTypes` y se utilizan para clasificar reportes o eventos relacionados con servicios."
+    )
     @GetMapping("/incident/types")
     public ResponseEntity<List<String>> getIncidentTypes() {
         List<String> types = Arrays.stream(IncidentsTypes.values())

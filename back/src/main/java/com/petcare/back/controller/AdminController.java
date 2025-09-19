@@ -4,7 +4,6 @@ import com.petcare.back.domain.dto.request.PlanCreateDTO;
 import com.petcare.back.domain.dto.request.UserPublicProfileDTO;
 import com.petcare.back.domain.dto.response.PlanResponseDTO;
 import com.petcare.back.domain.dto.response.UserUpdateResponseDTO;
-import com.petcare.back.domain.entity.User;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.PlanService;
 import com.petcare.back.service.ScheduleConfigService;
@@ -22,8 +21,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
 
 @CrossOrigin(origins = "http://127.0.0.1:5501/", allowedHeaders = "*", allowCredentials = "true")
 @RestController
@@ -49,6 +46,12 @@ public class AdminController {
         return ResponseEntity.ok("Se expiraron " + count + " horarios y se eliminaron " + count1 + " sin reservas.");
     }
 
+    @Operation(
+            summary = "Registrar nuevo plan de suscripción",
+            description = "Permite a un administrador crear un nuevo plan de suscripción en la plataforma. " +
+                    "El plan se valida antes de ser persistido y se devuelve con su información completa. " +
+                    "Solo usuarios con rol ADMIN pueden acceder a este endpoint."
+    )
     @PostMapping("/register/plan")
     public ResponseEntity<?> create(@RequestBody @Valid PlanCreateDTO dto, UriComponentsBuilder uriBuilder) {
         try {
@@ -124,5 +127,4 @@ public class AdminController {
             ));
         }
     }
-
 }

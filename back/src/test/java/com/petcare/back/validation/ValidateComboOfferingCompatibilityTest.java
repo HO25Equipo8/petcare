@@ -5,9 +5,7 @@ import com.petcare.back.domain.entity.Offering;
 import com.petcare.back.domain.enumerated.ComboEnum;
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
