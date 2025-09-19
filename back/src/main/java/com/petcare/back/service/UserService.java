@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -45,7 +46,15 @@ public class UserService {
 
     @Transactional
     public User updateProfile(UserUpdateDTO dto) throws MyException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+
+        // 📌 Busco la entidad real en la BD
+        User user = (User) userRepository.findByEmail(email);
+        if (user == null) {
+            throw new MyException("Usuario no encontrado");
+        }
 
         // ✅ Datos básicos
         user.setName(dto.name());
@@ -63,7 +72,7 @@ public class UserService {
             if (user.getLocation() != null) {
                 updatedLocation = locationService.update(locationDTO, user.getLocation());
             } else {
-                updatedLocation = locationService.save(locationDTO);
+                updatedLocation = locationService.save(locationDTO, locationDTO.placeId());
             }
             user.setLocation(updatedLocation);
         }
@@ -92,14 +101,22 @@ public class UserService {
                 tieneFotosVerificacion;
 
         user.setProfileComplete(completo);
-        user.setChecked(user.getRole() == Role.OWNER);
+        user.setChecked(true);
 
         return userRepository.save(user);
     }
 
     @Transactional
     public User updateProfileBackend(UserUpdateBackendDTO dto) throws MyException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getUsername();
+
+        // 📌 Busco la entidad real en la BD
+        User user = (User) userRepository.findByEmail(email);
+        if (user == null) {
+            throw new MyException("Usuario no encontrado");
+        }
 
         // ✅ Datos básicos
         user.setName(dto.name());
@@ -124,7 +141,7 @@ public class UserService {
             if (user.getLocation() != null) {
                 updatedLocation = locationService.update(dto.location(), user.getLocation());
             } else {
-                updatedLocation = locationService.save(dto.location());
+                updatedLocation = locationService.save(dto.location(), autocompleteSuggestion.placeId());
             }
             user.setLocation(updatedLocation);
         }
@@ -153,7 +170,7 @@ public class UserService {
                 tieneFotosVerificacion;
 
         user.setProfileComplete(completo);
-        user.setChecked(user.getRole() != Role.SITTER);
+        user.setChecked(true);
 
         return userRepository.save(user);
     }

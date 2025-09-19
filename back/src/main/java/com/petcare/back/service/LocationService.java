@@ -21,12 +21,12 @@ public class LocationService {
         this.locationMapper = locationMapper;
     }
 
-    public Location save(LocationDTO dto) {
+    public Location save(LocationDTO dto, String placeId) {
         Location location = locationMapper.toEntity(dto);
-        return save(location);
+        return save(location, placeId);
     }
 
-    public Location save(Location location) {
+    public Location save(Location location, String placeId) {
         String number = location.getNumber();
         String street = location.getStreet();
 
@@ -46,6 +46,7 @@ public class LocationService {
         location.setLatitude(coords[0]);
         location.setLongitude(coords[1]);
         location.setNumber(number); // reafirma el número por si fue modificado
+        location.setPlaceId(placeId);
 
         return locationRepository.save(location);
     }
@@ -79,6 +80,7 @@ public class LocationService {
         existing.setCity(dto.city());
         existing.setProvince(dto.province());
         existing.setCountry(dto.country());
+        existing.setPlaceId(dto.placeId());
 
         // Recalculamos coordenadas
         String fullAddress = buildAddress(dto.street() + " " + dto.number(), existing);
