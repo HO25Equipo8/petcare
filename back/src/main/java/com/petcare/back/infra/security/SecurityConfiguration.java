@@ -43,7 +43,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.GET, "/hello").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/", "/public/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/user/register").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/upload").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // Allow OAuth2 endpoints

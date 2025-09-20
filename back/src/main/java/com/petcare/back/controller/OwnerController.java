@@ -40,6 +40,7 @@ public class OwnerController {
     private final BookingService bookingService;
     private final UserService userService;
     private final OfferingService offeringService;
+    private final ScheduleConfigService scheduleConfigService;
 
     @Operation(
             summary = "Registrar mascota",
@@ -186,6 +187,26 @@ public class OwnerController {
         }
     }
 
+    @Operation(
+            summary = "Listar horarios disponibles de un profesional",
+            description = "Devuelve todos los horarios en estado DISPONIBLE asociados al profesional indicado. " +
+                    "Este endpoint es público y puede ser utilizado por dueños para seleccionar turnos."
+    )
+    @GetMapping("/public/{sitterId}/schedules")
+    public ResponseEntity<?> verHorariosDisponibles(@PathVariable Long sitterId) {
+        try {
+            List<ScheduleDropdownDTO> horarios = scheduleConfigService.getAvailableSchedulesBySitterId(sitterId);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "data", horarios
+            ));
+        } catch (MyException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
     @Operation(
             summary = "Suscribirse a un plan",
             description = "Permite al usuario con rol OWNER elegir un plan de suscripción disponible en la plataforma. El plan determina el acceso a funcionalidades como actualizaciones en vivo y tracking."

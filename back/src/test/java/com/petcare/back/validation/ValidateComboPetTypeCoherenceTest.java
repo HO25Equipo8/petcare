@@ -7,10 +7,7 @@ import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.PetTypeEnum;
 import com.petcare.back.exception.MyException;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

@@ -9,18 +9,13 @@ import com.petcare.back.domain.dto.response.BookingResponseDTO;
 import com.petcare.back.domain.dto.response.BookingSimulationResponseDTO;
 import com.petcare.back.domain.dto.response.ServiceItemResponseDTO;
 import com.petcare.back.domain.entity.*;
-import com.petcare.back.domain.enumerated.BookingStatusEnum;
-import com.petcare.back.domain.enumerated.CustomerCategory;
-import com.petcare.back.domain.enumerated.Role;
-import com.petcare.back.domain.enumerated.ScheduleStatus;
-import com.petcare.back.domain.mapper.request.BookingCreateMapper;
+import com.petcare.back.domain.enumerated.*;
 import com.petcare.back.domain.mapper.response.BookingResponseMapper;
 import com.petcare.back.domain.mapper.response.ServiceItemMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.*;
 import com.petcare.back.validation.ValidationBooking;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.petcare.back.validation.ValidationSessionServices;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +44,7 @@ public class BookingService {
     private final EmailService emailService;
     private final BookingServiceItemRepository bookingServiceItemRepository;
     private final ServiceItemMapper serviceItemMapper;
+    private final ServiceSessionRepository sessionRepository;
 
     @Transactional
     public BookingResponseDTO createBooking(BookingCreateDTO dto) throws MyException {
@@ -562,5 +555,12 @@ public class BookingService {
                 recommendation
         );
     }
+
+    public User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return user;
+    }
+
 }
 

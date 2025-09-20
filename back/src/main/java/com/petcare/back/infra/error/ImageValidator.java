@@ -8,7 +8,6 @@ import java.util.List;
 @Component
 public class ImageValidator {
 
-
     private static final List<String> ALLOWED_TYPES = List.of(
             "image/png",
             "image/jpeg",
@@ -31,7 +30,5 @@ public class ImageValidator {
             throw new IllegalArgumentException("La imagen excede el tamaño máximo de 5MB.");
         }
     }
-
-
 }
 

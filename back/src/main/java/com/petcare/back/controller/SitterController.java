@@ -2,14 +2,11 @@ package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.*;
 import com.petcare.back.domain.dto.response.*;
-import com.petcare.back.domain.entity.PlanDiscountRule;
-import com.petcare.back.domain.entity.Schedule;
-import com.petcare.back.domain.entity.ScheduleConfig;
+import com.petcare.back.domain.entity.ServiceSession;
 import com.petcare.back.domain.entity.User;
 import com.petcare.back.domain.enumerated.OfferingEnum;
 import com.petcare.back.domain.enumerated.OfferingVariantDescriptionEnum;
-import com.petcare.back.domain.enumerated.ScheduleStatus;
-import com.petcare.back.domain.enumerated.WeekDayEnum;
+import com.petcare.back.domain.mapper.request.ServiceSessionMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.service.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +41,7 @@ public class SitterController {
     private final ComboOfferingService comboOfferingService;
     private final PlanDiscountRuleService planDiscountRuleService;
     private final BookingService bookingService;
+    private final UpdateSessionService updateSessionService;
 
     @Operation(
             summary = "Registrar configuración de horarios",
@@ -166,7 +163,12 @@ public class SitterController {
             ));
         }
     }
-
+    @Operation(
+            summary = "Reprogramar horario",
+            description = "Permite al profesional reprogramar un horario disponible. " +
+                    "Solo se puede modificar si el horario está en estado DISPONIBLE y pertenece al profesional autenticado. " +
+                    "El nuevo horario se establece con el valor recibido en el cuerpo de la solicitud."
+    )
     @PutMapping("/schedule/{id}/reschedule")
     public ResponseEntity<?> reschedule(@PathVariable Long id,
                                         @RequestBody @Valid ScheduleRescheduleDTO dto,
@@ -185,7 +187,12 @@ public class SitterController {
             ));
         }
     }
-
+    @Operation(
+            summary = "Obtener bloques visuales de configuración de horarios",
+            description = "Devuelve un resumen visual de las configuraciones de horarios del profesional autenticado. " +
+                    "Incluye nombre, rango de fechas, días activos, cantidad de horarios y estado de cada configuración. " +
+                    "Solo los usuarios con rol SITTER pueden acceder a esta información."
+    )
     @GetMapping("/schedule/config/visual")
     public ResponseEntity<?> getVisualConfigs() {
         try {
@@ -198,6 +205,12 @@ public class SitterController {
         }
     }
 
+    @Operation(
+            summary = "Duplicar configuración de horarios",
+            description = "Permite al profesional duplicar una configuración de horarios existente. " +
+                    "La nueva configuración copia los turnos, duración del servicio e intervalo entre servicios, " +
+                    "y se crea con la fecha actual como inicio. Solo el profesional propietario puede duplicarla."
+    )
     @PostMapping("/schedule/config/{id}/duplicate")
     public ResponseEntity<?> duplicateConfig(@PathVariable Long id,
                                              @AuthenticationPrincipal User sitter) {
@@ -573,7 +586,12 @@ public class SitterController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-
+    @Operation(
+            summary = "Obtener horarios disponibles del profesional",
+            description = "Devuelve una lista de horarios disponibles asociados al profesional autenticado. " +
+                    "Cada horario incluye su ID y la fecha/hora establecida. " +
+                    "Solo los usuarios con rol SITTER pueden acceder a esta información."
+    )
     @GetMapping("/sitter/schedules/available")
     public ResponseEntity<?> getAvailableSchedules() {
         User sitter = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

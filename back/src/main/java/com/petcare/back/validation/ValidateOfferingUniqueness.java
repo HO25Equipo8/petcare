@@ -3,7 +3,6 @@ package com.petcare.back.validation;
 import com.petcare.back.domain.dto.request.OfferingCreateDTO;
 import com.petcare.back.domain.entity.Offering;
 import com.petcare.back.domain.enumerated.OfferingVariantDescriptionEnum;
-import com.petcare.back.domain.enumerated.PetTypeEnum;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.OfferingRepository;
 import org.springframework.stereotype.Component;

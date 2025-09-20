@@ -62,6 +62,15 @@ public class UserController {
     private ScheduleConfigService scheduleConfigService;
     private static final Logger log = LoggerFactory.getLogger(BookingService.class);
 
+    @Operation(
+            summary = "Registrar nuevo usuario",
+            description = "Permite registrar un nuevo usuario en la plataforma. " +
+                    "Valida que el email no esté vacío ni duplicado, que las contraseñas coincidan y no estén vacías. " +
+                    "El rol se asigna automáticamente como USER si no se especifica. " +
+                    "La contraseña se encripta antes de guardar el usuario. " +
+                    "Se envían notificaciones por correo al usuario y al administrador. " +
+                    "Devuelve el ID del nuevo usuario y la URI del recurso creado."
+    )
     @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO
             , UriComponentsBuilder uriComponentsBuilder){
@@ -298,7 +307,12 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
         }
     }
-
+    @Operation(
+            summary = "Activar usuario",
+            description = "Activa el usuario con el ID especificado. " +
+                    "Solo se puede activar si el usuario existe. " +
+                    "Devuelve un mensaje de confirmación o error si no se encuentra."
+    )
     @PatchMapping("/{id}/activate")
     public ResponseEntity<?> activateUser(@PathVariable Long id) {
         try {
@@ -309,6 +323,12 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "Desactivar usuario",
+            description = "Desactiva el usuario con el ID especificado. " +
+                    "Solo se puede desactivar si el usuario existe. " +
+                    "Devuelve un mensaje de confirmación o error si no se encuentra."
+    )
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
         try {

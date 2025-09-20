@@ -3,8 +3,6 @@ package com.petcare.back.repository;
 import com.petcare.back.domain.entity.Schedule;
 import com.petcare.back.domain.entity.ScheduleConfig;
 import com.petcare.back.domain.enumerated.ScheduleStatus;
-import com.petcare.back.domain.enumerated.WeekDayEnum;
-import io.micrometer.common.KeyValues;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository

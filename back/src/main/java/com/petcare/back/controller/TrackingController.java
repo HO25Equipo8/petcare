@@ -2,9 +2,7 @@ package com.petcare.back.controller;
 
 import com.petcare.back.domain.dto.request.TrackingPointNotificationDTO;
 import com.petcare.back.domain.dto.request.TrackingPointRequestDTO;
-import com.petcare.back.domain.entity.TrackingPoint;
 import com.petcare.back.exception.MyException;
-import com.petcare.back.service.TrackingService;
 import com.petcare.back.service.UpdateSessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/tracking")

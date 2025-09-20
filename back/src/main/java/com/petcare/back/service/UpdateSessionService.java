@@ -8,15 +8,11 @@ import com.petcare.back.domain.dto.request.UpdateServiceRequestDTO;
 import com.petcare.back.domain.dto.response.*;
 import com.petcare.back.domain.entity.*;
 import com.petcare.back.domain.enumerated.BookingStatusEnum;
-import com.petcare.back.domain.enumerated.IncidentsTypes;
 import com.petcare.back.domain.enumerated.Role;
 import com.petcare.back.domain.enumerated.ServiceSessionStatus;
-import com.petcare.back.domain.mapper.request.ServiceSessionMapper;
-import com.petcare.back.domain.mapper.request.UpdateServiceCreateMapper;
 import com.petcare.back.domain.mapper.response.UpdateServiceResponseMapper;
 import com.petcare.back.exception.MyException;
 import com.petcare.back.repository.*;
-import com.petcare.back.validation.ValidationBooking;
 import com.petcare.back.validation.ValidationSessionServices;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -86,10 +80,6 @@ public class UpdateSessionService {
             throw new MyException("Solo el profesional puede actualizar la sesión");
         }
 
-        for (ValidationSessionServices v : validations) {
-            v.validate(user, session);
-        }
-
         // Crear el update
         UpdateService update = new UpdateService();
         update.setTitle(dto.title());
@@ -107,6 +97,31 @@ public class UpdateSessionService {
         return updateRepository.save(update);
     }
 
+    @Transactional
+    public ServiceSession finish(Long sessionId) throws MyException {
+        System.out.println("👉 Entrando en FINISH con sessionId=" + sessionId);
+        ServiceSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Session no encontrada"));
+
+        User user = getAuthenticatedUser();
+
+        if (user.getRole() != Role.SITTER) {
+            throw new MyException("Solo el profesional puede finalizar la sesión");
+        }
+
+        if (session.getStatus() == ServiceSessionStatus.FINALIZADO) {
+            throw new MyException("La sesión ya fue finalizada, no se pueden enviar actualizaciones");
+        }
+
+        session.setStatus(ServiceSessionStatus.FINALIZADO);
+        session.setEndTime(LocalDateTime.now());
+
+        Booking booking = bookingRepository.getReferenceById(session.getBooking().getId());
+        booking.setStatus(BookingStatusEnum.COMPLETADO);
+        bookingRepository.save(booking);
+
+        return sessionRepository.save(session);
+    }
 
 
     @Transactional
@@ -135,35 +150,6 @@ public class UpdateSessionService {
         return sessionRepository.save(session);
     }
 
-    @Transactional
-    public ServiceSession finish(Long sessionId) throws MyException {
-        System.out.println("👉 Entrando en FINISH con sessionId=" + sessionId);
-        ServiceSession session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new RuntimeException("Session no encontrada"));
-
-        User user = getAuthenticatedUser();
-
-        if (user.getRole() != Role.SITTER) {
-            throw new MyException("Solo el profesional puede finalizar la sesión");
-        }
-
-        if (session.getStatus() == ServiceSessionStatus.FINALIZADO) {
-            throw new MyException("La sesión ya fue finalizada, no se pueden enviar actualizaciones");
-        }
-
-        session.setStatus(ServiceSessionStatus.FINALIZADO);
-        session.setEndTime(LocalDateTime.now());
-
-        for (ValidationSessionServices v : validations) {
-            v.validate(user, session);
-        }
-
-        Booking booking = bookingRepository.getReferenceById(session.getBooking().getId());
-        booking.setStatus(BookingStatusEnum.COMPLETADO);
-        bookingRepository.save(booking);
-
-        return sessionRepository.save(session);
-    }
     @Transactional
     public ServiceSession cancelSession(Long sessionId, String reason) throws MyException {
         System.out.println("👉 Entrando en CANCEL con sessionId=" + sessionId);

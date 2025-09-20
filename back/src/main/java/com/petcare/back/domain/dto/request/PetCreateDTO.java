@@ -1,7 +1,6 @@
 package com.petcare.back.domain.dto.request;
 
 import com.petcare.back.domain.enumerated.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
